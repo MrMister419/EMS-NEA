@@ -16,6 +16,7 @@ class Server
     public static async Task Main(string[] args)
     {
         Event _event = await ListenForEvents();
+        Console.WriteLine();
         Console.WriteLine(SerializeEvent(receivedEvent));
     }
     
@@ -36,6 +37,7 @@ class Server
                 using (StreamReader reader = new StreamReader(request.InputStream))
                 {
                     string json = await reader.ReadToEndAsync();
+                    Console.WriteLine(json);
                     receivedEvent = DeserializeEvent(json);
                 }
             }
@@ -66,7 +68,28 @@ class Server
 class Event
 {
     private int eventID;
+    private string type;
+    private string description;
+    private Location location;
     private string startTimestamp;
     private string resolvedTimestamp;
-    
+    private string status;
+
+    // Factory method to create Event by deserializing JSON
+    public static Event Deserialize(string json)
+    {
+        return JsonSerializer.Deserialize<Event>(json);
+    }
+
+    public string Serialize()
+    {
+        return JsonSerializer.Serialize(this);
+    }
+}
+
+class Location
+{
+    private string address;
+    private string latitude;
+    private string longitude;
 }

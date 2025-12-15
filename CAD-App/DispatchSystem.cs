@@ -10,50 +10,60 @@ namespace EMS_NEA;
 
 class DispatchSystem
 {
-    private static List<Event> sentEvents;
     private static readonly Random Random = new Random();
     private static readonly HttpClient client = new HttpClient();
+
+    private static List<Dictionary<string, object>> eventsList;
+    private static Dictionary<string, object> currentEvent;
+    private static List<Dictionary<string, object>> sentEvents;
     
     public static async Task Main(string[] args)
     {
-        sentEvents = DeserializeEvents();
-        Event randomEvent = GetRandomEvent(sentEvents);
-        Console.WriteLine(randomEvent);
-        Console.WriteLine(randomEvent.Serialize());
-        //randomEvent.StartEvent(sentEvents.Count);
-        //await SendEvent(randomEvent);
-        
-    }
-    
-    // Listen for client requests for events
-    private static void ListenToClient()
-    {
+        eventsList = DeserializeEvents();
+        currentEvent = GetRandomEvent(eventsList);
+        sentEvents = new List<Dictionary<string, object>>();
+        Console.WriteLine(currentEvent); 
+        StartCurrentEvent();
+
+        await SendCurrentEvent();
         
     }
 
-    private static List<Event> DeserializeEvents()
+    private static List<Dictionary<string, object>> DeserializeEvents()
     {
         using (StreamReader reader = new StreamReader("SampleEvents.json"))
         {
             string json = reader.ReadToEnd();
             Console.WriteLine(json);
 
-            List<Event> events = JsonSerializer.Deserialize<List<Event>>(json);
+            List<Dictionary<string, object>> events = JsonSerializer.Deserialize<List<Dictionary<string, object>>>(json);
             Console.WriteLine(events);
 
             return events;
         }
     }
+    
+    private static string Serialize(Dictionary<string, object> eventToSerialize)
+    {
+        return JsonSerializer.Serialize(eventToSerialize);
+    }
 
-    private static Event GetRandomEvent(List<Event> events)
+    private static Dictionary<string, object> GetRandomEvent(List<Dictionary<string, object>> events)
     {
         int index = Random.Next(0, events.Count - 1);
         return events[index];
     }
-
-    private static async Task SendEvent(Event eventToSend)
+    
+    private static void StartCurrentEvent()
     {
-        string json = eventToSend.Serialize();
+        var obj = sentEvents.Count;
+        currentEvent["eventID"] = sentEvents.Count;
+        currentEvent["startTimestamp"] = DateTime.Now.ToLongTimeString();
+    }
+
+    private static async Task SendCurrentEvent()
+    {
+        string json = Serialize(currentEvent);
         Console.WriteLine(json);
         
         try
@@ -73,31 +83,18 @@ class DispatchSystem
             Console.WriteLine(e);
         }
         
-        sentEvents.Add(eventToSend);
-    }
-}
-
-class Event
-{
-    public int eventID { get; set; }
-    private string startTimestamp { get; set; }
-    private string resolvedTimestamp { get; set; }
-
-    public void StartEvent(int eventID)
-    {
-        this.eventID = eventID;
-        startTimestamp = DateTime.Now.ToLongTimeString();
-        Console.WriteLine("Event " + this.eventID + " started at " + startTimestamp);
+        sentEvents.Add(currentEvent);
+        eventsList.Remove(currentEvent);
     }
     
-    public void ResolveEvent()
+    private static void ResolveCurrentEvent()
     {
-        resolvedTimestamp = DateTime.Now.ToLongTimeString();
-        Console.WriteLine("Event " + eventID + " resolved at " + resolvedTimestamp);
+        currentEvent["resolvedTimestamp"] = DateTime.Now.ToLongTimeString();
     }
     
-    public string Serialize()
+    // Listen for client requests for events
+    private static void ListenToClient()
     {
-        return JsonSerializer.Serialize(this);
+        
     }
 }

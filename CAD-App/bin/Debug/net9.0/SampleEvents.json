@@ -1,0 +1,15 @@
+[
+    {
+      "eventID": -1,
+      "type": "cardiac arrest",
+      "description": "",
+      "location": {
+        "address": "",
+        "latitude": 51.509865,
+        "longitude": -0.118092
+      },
+      "startTimestamp": "",
+      "resolvedTimestamp": "",
+      "status": "active"
+    }
+]
