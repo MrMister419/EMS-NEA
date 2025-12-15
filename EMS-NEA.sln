@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CAD-App", "CAD-App\CAD-App.csproj", "{81EEEEB8-2C16-4FA7-963E-0FBD9CA5EA46}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server", "Server\Server.csproj", "{707E489A-8903-4527-8A59-0D28DEE94CA7}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{81EEEEB8-2C16-4FA7-963E-0FBD9CA5EA46}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{81EEEEB8-2C16-4FA7-963E-0FBD9CA5EA46}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{81EEEEB8-2C16-4FA7-963E-0FBD9CA5EA46}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{81EEEEB8-2C16-4FA7-963E-0FBD9CA5EA46}.Release|Any CPU.Build.0 = Release|Any CPU
+		{707E489A-8903-4527-8A59-0D28DEE94CA7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{707E489A-8903-4527-8A59-0D28DEE94CA7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{707E489A-8903-4527-8A59-0D28DEE94CA7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{707E489A-8903-4527-8A59-0D28DEE94CA7}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
