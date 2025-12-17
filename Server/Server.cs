@@ -10,7 +10,7 @@ using System.Data.OleDb;
 
 namespace EMS_NEA;
 
-class Server
+internal class Server
 {
     private static DatabaseManager database;
     private static readonly HttpListener listener = new HttpListener();
@@ -23,7 +23,7 @@ class Server
         Console.WriteLine(receivedEvent.Serialize());
         database.InsertEvent(receivedEvent);
     }
-    
+
 
     private static async Task<Event> ListenForEvents()
     {
@@ -34,7 +34,7 @@ class Server
             // Wait for a POST request
             HttpListenerContext context = await listener.GetContextAsync();
             HttpListenerRequest request = context.Request;
-            
+
             // Get Event from POST request
             if (request.HttpMethod == "POST")
             {
@@ -45,7 +45,7 @@ class Server
                     receivedEvent = Event.Deserialize(json);
                 }
             }
-            
+
             // Respond to POST request
             HttpListenerResponse response = context.Response;
             response.StatusCode = (int)HttpStatusCode.OK;
