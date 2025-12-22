@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Windows.Forms;
 
@@ -6,11 +7,15 @@ namespace Client;
 
 public partial class Startup : Form
 {
+    
+    private FormNavigation formNavigator;
+    
     public Startup()
     {
         InitializeComponent();
         loginTabButton.Checked = true;
         loginTabButton.Enabled = false;
+        formNavigator = new FormNavigation(this);
     }
 
     private void textBox4_TextChanged(object sender, System.EventArgs e)
@@ -23,8 +28,14 @@ public partial class Startup : Form
 
     }
 
+    private void LoginTabButtonCheckedChanged(object sender, System.EventArgs e)
+    {
+
+    }
+
     private void LoginTabButtonClick(object sender, System.EventArgs e)
     {
+        // TODO: optimise tab changing code
         loginTabButton.Enabled = false;
         signupTabButton.Enabled = true;
 
@@ -47,28 +58,13 @@ public partial class Startup : Form
         signupPanel.Enabled = true;
     }
 
-    private void LoginTabButtonCheckedChanged(object sender, System.EventArgs e)
-    {
-
-    }
-
     private void SignupSubmitButton_Click(object sender, System.EventArgs e)
     {
-        Client.SignUp(GetFormValues());
+        Client.SignUp(formNavigator.GetEnteredValues(signupPanel));
     }
     
-    private Dictionary<string, string> GetFormValues()
+    private void loginSubmitButton_Click(object sender, EventArgs e)
     {
-        Dictionary<string, string> formValues = new Dictionary<string, string>();
-        formValues.Add("First Name", textBox1.Text);
-        formValues.Add("Last Name", textBox2.Text);
-        formValues.Add("Phone Number", textBox3.Text);
-        formValues.Add("Email", textBox4.Text);
-        formValues.Add("Password", maskedTextBox1.Text);
         
-        // TODO: Use SecureString instead of string
-        maskedTextBox1.Text = null;
-
-        return formValues;
     }
 }
