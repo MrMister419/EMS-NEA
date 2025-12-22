@@ -63,6 +63,7 @@ internal class DispatchSystem
 
     private static async Task SendCurrentEvent()
     {
+        // TODO: move to networking class?
         string json = Serialize(currentEvent);
         Console.WriteLine(json);
 

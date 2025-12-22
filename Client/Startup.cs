@@ -60,7 +60,9 @@ public partial class Startup : Form
 
     private void SignupSubmitButton_Click(object sender, System.EventArgs e)
     {
-        Client.SignUp(formNavigator.GetEnteredValues(signupPanel));
+        Dictionary<string, string> formValues = 
+            formNavigator.GetEnteredValues(signupPanel);
+        Client.SignUp(formValues);
     }
     
     private void loginSubmitButton_Click(object sender, EventArgs e)

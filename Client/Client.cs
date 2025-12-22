@@ -1,10 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Runtime.CompilerServices;
 using System.Security;
 using System.Windows.Forms;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json;
+using System.Threading.Tasks;
 using Microsoft.VisualBasic.Logging;
 
 namespace Client;
@@ -14,6 +17,9 @@ static class Client
     /// <summary>
     ///  The main entry point for the client application.
     /// </summary>
+    
+    private static readonly HttpClient HttpClient = new HttpClient();
+    
     [STAThread]
     static void Main()
     {
@@ -21,20 +27,29 @@ static class Client
         Application.Run(new Startup());
     }
     
-    public static void SignUp(Dictionary<string, string> formValues)
+    public static async Task SignUp(Dictionary<string, string> formValues)
     {
-        foreach (var value in formValues)
-        {
-            Console.WriteLine(value.Key + " " + value.Value);
-        }
-        // Console.WriteLine(formValues["Password"]);
         formValues["Password"] = Hash(formValues["Password"]);
+        
+        string json = Serialize(formValues);
+        Console.WriteLine(json);
+        
+        try
+        {
+            StringContent content = new StringContent(json, Encoding.UTF8, "application/json");
+            HttpResponseMessage response = await HttpClient.PostAsync("http://localhost:50000", content); // TODO: Port?
 
-        // foreach (var value in formValues)
-        // {
-        //     Console.WriteLine(value.Key + " " + value.Value);
-        // }
-
+            response.EnsureSuccessStatusCode();
+            Console.WriteLine("POST request successful.");
+        }
+        catch (HttpRequestException e)
+        {
+            Console.WriteLine(e);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
     }
 
     public static void Login()
@@ -55,6 +70,11 @@ static class Client
 
         return hashedPassword;
     }
+    
+    private static string Serialize(Dictionary<string, string> eventToSerialize)
+    {
+        return JsonSerializer.Serialize(eventToSerialize);
+    }
 }
 
 public class FormNavigation
@@ -71,7 +91,6 @@ public class FormNavigation
     {
         Dictionary<string, string> formValues = new Dictionary<string, string>();
         List<Control> fieldPanels = GetControlByType<Panel>(formPanel);
-        Console.WriteLine(fieldPanels.Count);
 
         string fieldName = "";
         string fieldEntry = "";
@@ -101,15 +120,10 @@ public class FormNavigation
                     }
                 }
                 
-                Console.WriteLine(fieldName + " " + fieldEntry + " type: " + panel.GetType() + " Text: " +
-                                  panel.Text + " Name: " + panel.Name);
-                Console.WriteLine("----------------------------------------");
-                Console.WriteLine(typeof(TextBox));
             }
             formValues.Add(fieldName, fieldEntry);
         }
         
-        Console.WriteLine(formValues.Count);
         return formValues;
     }
 
@@ -122,26 +136,18 @@ public class FormNavigation
             parentControl = form;
         }
         
-        Console.WriteLine(typeof(type));
-        Console.WriteLine(parentControl.GetType());
-        
         foreach (Control control in parentControl.Controls)
         {
             List<Control> subControls = GetControlByType<type>(control, getBaseControlsOnly);
-            Console.WriteLine(control.Name);
             if (control is type)
             {
                 
                 if (subControls.Count > 0 && !getBaseControlsOnly)
                 {
-                    Console.WriteLine("flag1");
-
                     controls.AddRange(subControls);
                 }
                 else
                 {
-                    Console.WriteLine("flag2");
-
                     controls.Add(control);
                 }
             }
@@ -150,8 +156,21 @@ public class FormNavigation
                 controls.AddRange(subControls);
             }
         }
-        Console.WriteLine("found: " + controls.Count);
         
         return controls;
+    }
+}
+
+class User
+{
+    public string Username { get; set; }
+    public string Email { get; set; }
+    public string HashedPassword { get; set; }
+
+    public User(string username, string email, string hashedPassword)
+    {
+        Username = username;
+        Email = email;
+        HashedPassword = hashedPassword;
     }
 }

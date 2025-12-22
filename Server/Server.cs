@@ -13,36 +13,95 @@ namespace EMS_NEA;
 internal class Server
 {
     private static DatabaseManager database;
-    private static readonly HttpListener listener = new HttpListener();
     private static Event receivedEvent;
 
     public static async Task Main(string[] args)
     {
-        Event _event = await ListenForEvents();
         database = new DatabaseManager();
-        Console.WriteLine(receivedEvent.Serialize());
+        Listener listener = new Listener();
+        // Subscribe ProcessMessage as event handler
+        listener.MessageReceived += ProcessMessage;
+        listener.ListenForEvents();
+        
+    }
+    
+    private static void ProcessMessage(object sender, string receivedJson)
+    {
+        string requestType = "";
+        
+        // Get request type from JSON
+        using (JsonDocument doc = JsonDocument.Parse(receivedJson))
+        {
+            requestType = doc.RootElement.GetProperty("type").GetString();
+        }
+        
+        switch (requestType)
+        {
+            case "NewUser":
+                CreateNewUser(receivedJson);
+                break;
+            case "NewEvent":
+                CreateNewEvent(receivedJson);
+                break;
+            case "UpdateUser":
+                UpdateUser(receivedJson);
+                break;
+            case "UpdateEvent":
+                UpdateEvent(receivedJson);
+                break;
+            default:
+                Console.WriteLine("Unknown request type.");
+                break;
+        }
+    }
+
+    private static void CreateNewUser(string userJson)
+    {
+        
+    }
+
+    private static void CreateNewEvent(string eventJson)
+    {
+        receivedEvent = Event.DeserializeEvent(eventJson);
         database.InsertEvent(receivedEvent);
     }
 
-
-    private static async Task<Event> ListenForEvents()
+    private static void UpdateUser(string userUpdateJson)
     {
-        listener.Prefixes.Add("http://localhost:50000/");
-        listener.Start();
+        
+    }
+    
+    private static void UpdateEvent(string eventUpdateJson)
+    {
+        
+    }
+    
+}
+
+class Listener
+{
+    private readonly HttpListener listener = new HttpListener();
+    public event EventHandler<string> MessageReceived;
+    
+    public async Task ListenForEvents()
+    {
+        string receivedJson = "";
         while (true)
         {
+            listener.Prefixes.Add("http://localhost:50000/");
+            listener.Start();
             // Wait for a POST request
             HttpListenerContext context = await listener.GetContextAsync();
+            // Accept the request
             HttpListenerRequest request = context.Request;
 
-            // Get Event from POST request
+            // Extract data from POST request
             if (request.HttpMethod == "POST")
             {
                 using (StreamReader reader = new StreamReader(request.InputStream))
                 {
-                    string json = await reader.ReadToEndAsync();
-                    Console.WriteLine(json);
-                    receivedEvent = Event.Deserialize(json);
+                    receivedJson = await reader.ReadToEndAsync();
+                    Console.WriteLine(receivedJson);
                 }
             }
 
@@ -51,8 +110,13 @@ internal class Server
             response.StatusCode = (int)HttpStatusCode.OK;
             response.Close();
             Console.WriteLine("POST request answered.");
-            return receivedEvent;
+            MessageReceived.Invoke(this, receivedJson);
         }
+    }
+
+    protected virtual void OnTransmissionReceivedEvent(string receivedJson)
+    {
+        MessageReceived?.Invoke(this, receivedJson);
     }
 }
 
@@ -67,7 +131,7 @@ class Event
     public string status { get; set; }
 
     // Factory method to create Event by deserializing JSON
-    public static Event Deserialize(string json)
+    public static Event DeserializeEvent(string json)
     {
         return JsonSerializer.Deserialize<Event>(json);
     }
