@@ -21,12 +21,11 @@ internal class DatabaseManager
     public void InsertEvent(Event eventToInsert)
     {
         const string query =
-            "INSERT INTO Incident (IncidentID, incident_type, description, address, latitude, longitude, status, start_time, resolved_time) " +
-            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            "INSERT INTO Incident (incident_type, description, address, latitude, longitude, status, start_time, resolved_time) " +
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
         using (OleDbCommand command = new OleDbCommand(query, connection))
         {
-            command.Parameters.AddWithValue("@IncidentID", eventToInsert.eventID);
             command.Parameters.AddWithValue("@incident_type", eventToInsert.type);
             command.Parameters.AddWithValue("@description", eventToInsert.description);
             command.Parameters.AddWithValue("@address", eventToInsert.location.address);
@@ -39,6 +38,60 @@ internal class DatabaseManager
             Console.Write(command.ExecuteNonQuery());
             Console.WriteLine("Inserted event into database.");
             connection.Close();
+        }
+    }
+
+    public void InsertUser(User userToInsert)
+    {
+        const string query =
+            "INSERT INTO [User] (first_name, last_name, phone_number, email_address, password_hash, latitude, longitude, is_receiving) " +
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+
+        using (OleDbCommand command = new OleDbCommand(query, connection))
+        {
+            Console.WriteLine(userToInsert.password);
+            Console.WriteLine(userToInsert.email);
+            Console.WriteLine(userToInsert.phoneNumber);
+            Console.WriteLine(userToInsert.firstName);
+            Console.WriteLine(userToInsert.lastName);
+            
+            command.Parameters.AddWithValue("@first_name", userToInsert.firstName);
+            command.Parameters.AddWithValue("@last_name", userToInsert.lastName);
+            command.Parameters.AddWithValue("@phone_number", userToInsert.phoneNumber);
+            command.Parameters.AddWithValue("@email_address", userToInsert.email);
+            command.Parameters.AddWithValue("@password_hash", userToInsert.password);
+            command.Parameters.AddWithValue("@latitude", 0);
+            command.Parameters.AddWithValue("@longitude", 0);
+            command.Parameters.AddWithValue("@is_receiving", false);
+            
+            command.ExecuteNonQuery();
+            Console.WriteLine("Inserted user into database.");
+            connection.Close();
+        }
+    }
+
+    public string CheckLoginDetails(string email, string passwordHash)
+    {
+        const string query = 
+            "SELECT password_hash FROM [User] WHERE email_address = ?";
+        
+        using (OleDbCommand command = new OleDbCommand(query, connection))
+        {
+            command.Parameters.AddWithValue("@email_address", email);
+            
+            string? retrievedHash =  (string?) command.ExecuteScalar();
+            
+            if (retrievedHash == null)
+            {
+                return "Email not found.";
+            } else if (retrievedHash != passwordHash)
+            {
+                return "Incorrect password.";
+            }
+            else
+            {
+                return "Correct logins.";
+            }
         }
     }
 }

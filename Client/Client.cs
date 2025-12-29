@@ -17,12 +17,13 @@ static class Client
     /// <summary>
     ///  The main entry point for the client application.
     /// </summary>
-    
-    private static readonly HttpClient HttpClient = new HttpClient();
+
+    private static NetworkClient networkClient;
     
     [STAThread]
     static void Main()
     {
+        networkClient = new NetworkClient();
         ApplicationConfiguration.Initialize();
         Application.Run(new Startup());
     }
@@ -30,33 +31,32 @@ static class Client
     public static async Task SignUp(Dictionary<string, string> formValues)
     {
         formValues["Password"] = Hash(formValues["Password"]);
+        string wrappedJson = PackageJson(formValues, "NewUser");
         
-        string json = Serialize(formValues);
-        Console.WriteLine(json);
-        
-        try
-        {
-            StringContent content = new StringContent(json, Encoding.UTF8, "application/json");
-            HttpResponseMessage response = await HttpClient.PostAsync("http://localhost:50000", content); // TODO: Port?
-
-            response.EnsureSuccessStatusCode();
-            Console.WriteLine("POST request successful.");
-        }
-        catch (HttpRequestException e)
-        {
-            Console.WriteLine(e);
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-        }
+        networkClient.SendPOSTrequest(wrappedJson);
     }
 
-    public static void Login()
+    public static async Task<string> LogIn(Dictionary<string, string> formValues)
     {
+        formValues["Password"] = Hash(formValues["Password"]);
+        string wrappedJson = PackageJson(formValues, "CheckLogin");
         
+        string response = await networkClient.SendPOSTrequest(wrappedJson);
+        return response;
     }
 
+    private static string PackageJson(Dictionary<string, string> payload, string type)
+    {
+        string packagedJson;
+        Dictionary<string, object> wrappedValues = new Dictionary<string, object>();
+
+        wrappedValues.Add("type", type);
+        wrappedValues.Add("payload", payload);
+        packagedJson = JsonSerializer.Serialize(wrappedValues);
+        
+        return packagedJson;
+    }
+    
     private static string Hash(string? password)
     {
         string hashedPassword = "";
@@ -70,10 +70,35 @@ static class Client
 
         return hashedPassword;
     }
+}
+
+class NetworkClient
+{
+    private readonly HttpClient HttpClient = new HttpClient();
     
-    private static string Serialize(Dictionary<string, string> eventToSerialize)
+    public async Task<string> SendPOSTrequest(string json)
     {
-        return JsonSerializer.Serialize(eventToSerialize);
+        string responseMessage = "";
+        try
+        {
+            StringContent content = new StringContent(json, Encoding.UTF8, "application/json");
+            HttpResponseMessage response = await HttpClient.PostAsync("http://localhost:50000", content);
+
+            responseMessage = await response.Content.ReadAsStringAsync();
+            Console.WriteLine("message" + responseMessage);
+
+            Console.WriteLine("POST request successful.");
+        }
+        catch (HttpRequestException e)
+        {
+            Console.WriteLine("Connection error: " + e);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
+        
+        return responseMessage;
     }
 }
 
@@ -103,7 +128,7 @@ public class FormNavigation
                 {
                     case Label:
                         fieldName = childControl.Text;
-                        fieldName = fieldName.Replace("*", "").Trim();
+                        fieldName = fieldName.Replace("*", "").Replace(" ", "");
                         break;
                     case TextBox:
                     case MaskedTextBox:
@@ -165,12 +190,12 @@ class User
 {
     public string Username { get; set; }
     public string Email { get; set; }
-    public string HashedPassword { get; set; }
+    public string Password { get; set; }
 
     public User(string username, string email, string hashedPassword)
     {
         Username = username;
         Email = email;
-        HashedPassword = hashedPassword;
+        Password = hashedPassword;
     }
 }

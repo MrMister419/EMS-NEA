@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Client;
@@ -65,8 +66,12 @@ public partial class Startup : Form
         Client.SignUp(formValues);
     }
     
-    private void loginSubmitButton_Click(object sender, EventArgs e)
+    private async void loginSubmitButton_Click(object sender, EventArgs e)
     {
+        Dictionary<string, string> formValues = 
+            formNavigator.GetEnteredValues(loginPanel);
+        loginMessageLabel.Text = await Client.LogIn(formValues);
+        Console.WriteLine(loginMessageLabel.Text);
         
     }
 }

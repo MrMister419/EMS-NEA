@@ -52,11 +52,12 @@ partial class Startup
         signupPanel = new System.Windows.Forms.Panel();
         signupSubmitButton = new System.Windows.Forms.Button();
         loginPanel = new System.Windows.Forms.Panel();
+        loginMessageLabel = new System.Windows.Forms.Label();
         loginSubmitButton = new System.Windows.Forms.Button();
         groupBox2 = new System.Windows.Forms.GroupBox();
         panel2 = new System.Windows.Forms.Panel();
+        maskedTextBox2 = new System.Windows.Forms.MaskedTextBox();
         label9 = new System.Windows.Forms.Label();
-        textBox8 = new System.Windows.Forms.TextBox();
         panel1 = new System.Windows.Forms.Panel();
         label8 = new System.Windows.Forms.Label();
         textBox7 = new System.Windows.Forms.TextBox();
@@ -247,18 +248,28 @@ partial class Startup
         // loginPanel
         // 
         loginPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+        loginPanel.Controls.Add(loginMessageLabel);
         loginPanel.Controls.Add(loginSubmitButton);
         loginPanel.Controls.Add(groupBox2);
         loginPanel.Controls.Add(label12);
         loginPanel.Location = new System.Drawing.Point(67, 113);
         loginPanel.Name = "loginPanel";
-        loginPanel.Size = new System.Drawing.Size(659, 336);
+        loginPanel.Size = new System.Drawing.Size(659, 388);
         loginPanel.TabIndex = 5;
+        // 
+        // loginMessageLabel
+        // 
+        loginMessageLabel.AutoSize = true;
+        loginMessageLabel.Font = new System.Drawing.Font("Segoe UI", 12F);
+        loginMessageLabel.Location = new System.Drawing.Point(66, 242);
+        loginMessageLabel.Name = "loginMessageLabel";
+        loginMessageLabel.Size = new System.Drawing.Size(0, 28);
+        loginMessageLabel.TabIndex = 15;
         // 
         // loginSubmitButton
         // 
         loginSubmitButton.Font = new System.Drawing.Font("Segoe UI", 12F);
-        loginSubmitButton.Location = new System.Drawing.Point(246, 240);
+        loginSubmitButton.Location = new System.Drawing.Point(246, 288);
         loginSubmitButton.Name = "loginSubmitButton";
         loginSubmitButton.Size = new System.Drawing.Size(168, 71);
         loginSubmitButton.TabIndex = 14;
@@ -278,12 +289,20 @@ partial class Startup
         // 
         // panel2
         // 
+        panel2.Controls.Add(maskedTextBox2);
         panel2.Controls.Add(label9);
-        panel2.Controls.Add(textBox8);
         panel2.Location = new System.Drawing.Point(6, 76);
         panel2.Name = "panel2";
         panel2.Size = new System.Drawing.Size(346, 63);
         panel2.TabIndex = 10;
+        // 
+        // maskedTextBox2
+        // 
+        maskedTextBox2.Location = new System.Drawing.Point(5, 28);
+        maskedTextBox2.Name = "maskedTextBox2";
+        maskedTextBox2.Size = new System.Drawing.Size(286, 27);
+        maskedTextBox2.TabIndex = 10;
+        maskedTextBox2.UseSystemPasswordChar = true;
         // 
         // label9
         // 
@@ -292,13 +311,6 @@ partial class Startup
         label9.Size = new System.Drawing.Size(321, 17);
         label9.TabIndex = 9;
         label9.Text = "Password *";
-        // 
-        // textBox8
-        // 
-        textBox8.Location = new System.Drawing.Point(8, 28);
-        textBox8.Name = "textBox8";
-        textBox8.Size = new System.Drawing.Size(286, 27);
-        textBox8.TabIndex = 8;
         // 
         // panel1
         // 
@@ -373,10 +385,10 @@ partial class Startup
         AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
         AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
         ClientSize = new System.Drawing.Size(790, 535);
-        Controls.Add(signupPanel);
         Controls.Add(loginTabButton);
         Controls.Add(signupTabButton);
         Controls.Add(loginPanel);
+        Controls.Add(signupPanel);
         Name = "Startup";
         Text = "Signup";
         groupBox1.ResumeLayout(false);
@@ -392,6 +404,7 @@ partial class Startup
         panel3.PerformLayout();
         signupPanel.ResumeLayout(false);
         loginPanel.ResumeLayout(false);
+        loginPanel.PerformLayout();
         groupBox2.ResumeLayout(false);
         panel2.ResumeLayout(false);
         panel2.PerformLayout();
@@ -425,7 +438,6 @@ partial class Startup
     private System.Windows.Forms.Label label8;
     private System.Windows.Forms.TextBox textBox7;
     private System.Windows.Forms.Label label9;
-    private System.Windows.Forms.TextBox textBox8;
     private System.Windows.Forms.Label label12;
     private System.Windows.Forms.RadioButton signupTabButton;
     private System.Windows.Forms.RadioButton loginTabButton;
@@ -437,4 +449,6 @@ partial class Startup
     private System.Windows.Forms.Panel panel4;
     private System.Windows.Forms.Panel panel3;
     private System.Windows.Forms.Panel panel2;
+    private System.Windows.Forms.Label loginMessageLabel;
+    private System.Windows.Forms.MaskedTextBox maskedTextBox2;
 }

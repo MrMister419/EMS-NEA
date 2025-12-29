@@ -64,7 +64,12 @@ internal class DispatchSystem
     private static async Task SendCurrentEvent()
     {
         // TODO: move to networking class?
-        string json = Serialize(currentEvent);
+        Dictionary<string, object> wrappedValues = new Dictionary<string, object>();
+
+        wrappedValues.Add("type", "NewEvent");
+        wrappedValues.Add("payload", currentEvent);
+        
+        string json = Serialize(wrappedValues);
         Console.WriteLine(json);
 
         try
