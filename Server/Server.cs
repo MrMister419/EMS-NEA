@@ -11,8 +11,7 @@ using System.Data.OleDb;
 
 namespace EMS_NEA;
 
-// TODO: Internal?
-internal class Server
+class Server
 {
     private static DatabaseManager database;
 

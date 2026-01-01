@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace EMS_NEA;
 
-internal class DispatchSystem
+class DispatchSystem
 {
     private static readonly Random Random = new Random();
     private static readonly HttpClient Client = new HttpClient();

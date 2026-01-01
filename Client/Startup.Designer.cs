@@ -64,6 +64,7 @@ partial class Startup
         label12 = new System.Windows.Forms.Label();
         signupTabButton = new System.Windows.Forms.RadioButton();
         loginTabButton = new System.Windows.Forms.RadioButton();
+        panel8 = new System.Windows.Forms.Panel();
         groupBox1.SuspendLayout();
         panel7.SuspendLayout();
         panel6.SuspendLayout();
@@ -75,6 +76,7 @@ partial class Startup
         groupBox2.SuspendLayout();
         panel2.SuspendLayout();
         panel1.SuspendLayout();
+        panel8.SuspendLayout();
         SuspendLayout();
         // 
         // label1
@@ -351,11 +353,10 @@ partial class Startup
         signupTabButton.BackColor = System.Drawing.SystemColors.Control;
         signupTabButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
         signupTabButton.Font = new System.Drawing.Font("Segoe UI", 12F);
-        signupTabButton.Location = new System.Drawing.Point(405, 29);
+        signupTabButton.Location = new System.Drawing.Point(218, 10);
         signupTabButton.Name = "signupTabButton";
         signupTabButton.Size = new System.Drawing.Size(133, 63);
         signupTabButton.TabIndex = 7;
-        signupTabButton.TabStop = true;
         signupTabButton.Text = "Sign Up";
         signupTabButton.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
         signupTabButton.UseVisualStyleBackColor = false;
@@ -366,10 +367,11 @@ partial class Startup
         // 
         loginTabButton.Appearance = System.Windows.Forms.Appearance.Button;
         loginTabButton.BackColor = System.Drawing.SystemColors.Control;
+        loginTabButton.Checked = true;
         loginTabButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
         loginTabButton.Font = new System.Drawing.Font("Segoe UI", 12F);
         loginTabButton.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-        loginTabButton.Location = new System.Drawing.Point(233, 29);
+        loginTabButton.Location = new System.Drawing.Point(46, 10);
         loginTabButton.Name = "loginTabButton";
         loginTabButton.Size = new System.Drawing.Size(129, 63);
         loginTabButton.TabIndex = 8;
@@ -380,13 +382,21 @@ partial class Startup
         loginTabButton.CheckedChanged += LoginTabButtonCheckedChanged;
         loginTabButton.Click += LoginTabButtonClick;
         // 
+        // panel8
+        // 
+        panel8.Controls.Add(loginTabButton);
+        panel8.Controls.Add(signupTabButton);
+        panel8.Location = new System.Drawing.Point(187, 19);
+        panel8.Name = "panel8";
+        panel8.Size = new System.Drawing.Size(387, 88);
+        panel8.TabIndex = 9;
+        // 
         // Startup
         // 
         AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
         AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
         ClientSize = new System.Drawing.Size(790, 535);
-        Controls.Add(loginTabButton);
-        Controls.Add(signupTabButton);
+        Controls.Add(panel8);
         Controls.Add(loginPanel);
         Controls.Add(signupPanel);
         Name = "Startup";
@@ -410,6 +420,7 @@ partial class Startup
         panel2.PerformLayout();
         panel1.ResumeLayout(false);
         panel1.PerformLayout();
+        panel8.ResumeLayout(false);
         ResumeLayout(false);
     }
 
@@ -451,4 +462,5 @@ partial class Startup
     private System.Windows.Forms.Panel panel2;
     private System.Windows.Forms.Label loginMessageLabel;
     private System.Windows.Forms.MaskedTextBox maskedTextBox2;
+    private System.Windows.Forms.Panel panel8;
 }

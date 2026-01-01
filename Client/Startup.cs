@@ -9,14 +9,9 @@ namespace Client;
 public partial class Startup : Form
 {
     
-    private FormNavigation formNavigator;
-    
     public Startup()
     {
         InitializeComponent();
-        loginTabButton.Checked = true;
-        loginTabButton.Enabled = false;
-        formNavigator = new FormNavigation(this);
     }
 
     private void textBox4_TextChanged(object sender, System.EventArgs e)
@@ -36,42 +31,42 @@ public partial class Startup : Form
 
     private void LoginTabButtonClick(object sender, System.EventArgs e)
     {
-        // TODO: optimise tab changing code
-        loginTabButton.Enabled = false;
-        signupTabButton.Enabled = true;
-
         signupPanel.Enabled = false;
         signupPanel.Visible = false;
-
         loginPanel.Visible = true;
         loginPanel.Enabled = true;
     }
 
     private void SignupTabButtonClick(object sender, System.EventArgs e)
     {
-        signupTabButton.Enabled = false;
-        loginTabButton.Enabled = true;
-
         loginPanel.Enabled = false;
         loginPanel.Visible = false;
-
         signupPanel.Visible = true;
         signupPanel.Enabled = true;
     }
-
+    
     private void SignupSubmitButton_Click(object sender, System.EventArgs e)
     {
         Dictionary<string, string> formValues = 
-            formNavigator.GetEnteredValues(signupPanel);
-        Client.SignUp(formValues);
+            AppContext.formNavigator.GetEnteredValues(signupPanel);
+        AppContext.appService.SignUp(formValues);
     }
     
     private async void loginSubmitButton_Click(object sender, EventArgs e)
     {
         Dictionary<string, string> formValues = 
-            formNavigator.GetEnteredValues(loginPanel);
-        loginMessageLabel.Text = await Client.LogIn(formValues);
-        Console.WriteLine(loginMessageLabel.Text);
+            AppContext.formNavigator.GetEnteredValues(loginPanel);
+        string outcome = await AppContext.appService.LogIn(formValues);
+        
+        // TODO: Use typed strings
+        if (outcome == "Correct logins.")
+        {
+            AppContext.formManager.SwitchForm(this);
+        }
+        else
+        {
+            loginMessageLabel.Text = outcome;
+        }
         
     }
 }
