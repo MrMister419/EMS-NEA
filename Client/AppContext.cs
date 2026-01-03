@@ -10,6 +10,7 @@ static class AppContext
     public static FormNavigation formNavigator;
     public static FormManager formManager;
     public static AppService appService;
+    public static string email { get; set; }
     
     public static void Initialize()
     {

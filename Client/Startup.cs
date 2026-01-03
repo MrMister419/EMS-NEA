@@ -54,18 +54,18 @@ public partial class Startup : Form
     
     private async void loginSubmitButton_Click(object sender, EventArgs e)
     {
-        Dictionary<string, string> formValues = 
-            AppContext.formNavigator.GetEnteredValues(loginPanel);
-        string outcome = await AppContext.appService.LogIn(formValues);
+        Dictionary<string, string> formValues = AppContext.formNavigator.GetEnteredValues(loginPanel);
+        Dictionary<string, string> outcome = await AppContext.appService.LogIn(formValues);
         
-        // TODO: Use typed strings
-        if (outcome == "Correct logins.")
+        // TODO: Use typed strings, move this to AppService
+        if (outcome["successful"] == "true")
         {
+            AppContext.email = formValues["Email"];
             AppContext.formManager.SwitchForm(this);
         }
         else
         {
-            loginMessageLabel.Text = outcome;
+            loginMessageLabel.Text = outcome["outcome"];
         }
         
     }

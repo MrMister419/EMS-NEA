@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data.OleDb;
 
 namespace EMS_NEA;
@@ -93,5 +94,50 @@ internal class DatabaseManager
                 return "Correct logins.";
             }
         }
+    }
+
+    public void ChangeAlertChoice(bool alertChoice, string email)
+    {
+        Console.WriteLine("flag1");
+        const string query = 
+            "UPDATE [User] SET is_receiving = ?" +
+            "WHERE email_address = ?";
+
+        using (OleDbCommand command = new OleDbCommand(query, connection))
+        {
+            command.Parameters.AddWithValue("@is_receiving", alertChoice);
+            command.Parameters.AddWithValue("@email_address", email);
+            command.ExecuteNonQuery();
+            Console.WriteLine("Updated alert choice.");
+        }
+    }
+    
+    public Dictionary<string, string> RetrieveUserDetails(string email)
+    {
+        const string query = 
+            "SELECT first_name, last_name, phone_number FROM [User]" +
+            "WHERE email_address = ?";
+        
+        Dictionary<string, string> userDetails = new Dictionary<string, string>();
+
+        using (OleDbCommand command = new OleDbCommand(query, connection))
+        {
+            command.Parameters.AddWithValue("@email_address", email);
+            using (OleDbDataReader reader = command.ExecuteReader())
+            {
+                if (reader.Read())
+                {
+                    userDetails.Add("First Name", reader.GetString(0));
+                    userDetails.Add("Last Name", reader.GetString(1));
+                    userDetails.Add("Phone Number", reader.GetString(2));
+                }
+                else
+                {
+                    throw new Exception("User not found.");
+                }
+            }
+        }
+        
+        return userDetails;
     }
 }

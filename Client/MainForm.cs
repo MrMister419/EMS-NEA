@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Client
@@ -21,7 +22,7 @@ namespace Client
 
         }
 
-        private void groupBox1_Enter(object sender, EventArgs e)
+        private void DisplayDataGroupBoxEnter(object sender, EventArgs e)
         {
 
         }
@@ -48,14 +49,20 @@ namespace Client
 
         private void switchPanels(object buttonObject)
         {
-            RadioButton button = (RadioButton)buttonObject;
-            if (button.Checked)
+            if (buttonObject is RadioButton radioButton)
+            {
+                if (radioButton.Checked)
+                {
+                    switchPanelFrom(radioButton);
+                }
+            }
+            else if (buttonObject is Button button)
             {
                 switchPanelFrom(button);
             }
         }
 
-        private void switchPanelFrom(RadioButton button)
+        private void switchPanelFrom(ButtonBase button)
         {
             string tag = button.Tag.ToString();
 
@@ -86,7 +93,65 @@ namespace Client
 
         private void toggleAlertsCheckbox_CheckedChanged(object sender, EventArgs e)
         {
+            // TODO: disable for a few seconds
+            bool newChoice = toggleAlertsCheckbox.Checked;
+            AppContext.appService.ToggleAlertChoice(newChoice);
+        }
+
+        private async void viewAccountButton_Click(object sender, EventArgs e)
+        {
+            switchPanels(sender);
+            Dictionary<string, string> accountDetails = await AppContext.appService.GetAccountDetails();
+            foreach (KeyValuePair<string, string> entry in accountDetails)
+            {
+                Console.WriteLine( $"{entry.Key}: {entry.Value}");
+            }
             
+            displayAccountDetails(accountDetails);
+        }
+
+        private void displayAccountDetails(Dictionary<string, string> accountDetails)
+        {
+            accountDetails.Add("Email", AppContext.email);
+
+            List<Panel> fieldPanels = AppContext.formNavigator.GetControlsByType<Panel>(displayDataGroupBox);
+            Label fieldLabel = null;
+            TextBox fieldTextBox = null;
+            string fieldValue;
+            
+            foreach (Panel fieldPanel in fieldPanels)
+            {
+                foreach (Control childControl in fieldPanel.Controls)
+                {
+                    if (childControl is Label label)
+                    {
+                        fieldLabel = label;
+                    }
+                    else if (childControl is TextBox textBox)
+                    {
+                        fieldTextBox = textBox;
+                    }
+                }
+                
+                // TODO: Use tag instead of string comparison
+                fieldValue = accountDetails[fieldLabel.Text];
+                fieldTextBox.Text = fieldValue;
+            }
+        }
+
+        private void changeAccountButton_Click(object sender, EventArgs e)
+        {
+            switchPanels(sender);
+        }
+
+        private void changePasswordButton_Click(object sender, EventArgs e)
+        {
+            switchPanels(sender);
+        }
+
+        private void deleteAccountButton_Click(object sender, EventArgs e)
+        {
+            switchPanels(sender);
         }
     }
 }

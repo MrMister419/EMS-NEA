@@ -10,6 +10,7 @@ namespace Client;
 
 public class AppService
 {
+    // TODO: Use token for authentication
     private static HttpService httpService;
 
     public AppService()
@@ -26,18 +27,34 @@ public class AppService
         httpService.SendPOSTrequest(wrappedJson);
     }
 
-    public async Task<string> LogIn(Dictionary<string, string> formValues)
+    public async Task<Dictionary<string, string>> LogIn(Dictionary<string, string> formValues)
     {
         formValues["Password"] = Hash(formValues["Password"]);
         string wrappedJson = PackageJson(formValues, "CheckLogin");
         
-        string response = await httpService.SendPOSTrequest(wrappedJson);
+        Dictionary<string, string> response = await httpService.SendPOSTrequest(wrappedJson);
         return response;
     }
 
-    public void ToggleAlertChoice()
+    public void ToggleAlertChoice(bool newChoice)
     {
+        string alertChoice = newChoice.ToString();
+        Dictionary<string, string> payload = new Dictionary<string, string>();
+        payload.Add("Email", AppContext.email);
+        payload.Add("AlertChoice", alertChoice);
+        string wrappedJson = PackageJson(payload, "ToggleAlertChoice");
         
+        httpService.SendPOSTrequest(wrappedJson);
+    }
+
+    public async Task<Dictionary<string, string>> GetAccountDetails()
+    {
+        Dictionary<string, string> payload = new Dictionary<string, string>();
+        payload.Add("Email", AppContext.email);
+        
+        string wrappedJson = PackageJson(payload, "GetAccountDetails");
+        
+        return await httpService.SendPOSTrequest(wrappedJson);
     }
 
     private string PackageJson(Dictionary<string, string> payload, string type)
@@ -72,15 +89,18 @@ class HttpService
 {
     private readonly HttpClient HttpClient = new HttpClient();
     
-    public async Task<string> SendPOSTrequest(string json)
+    public async Task<Dictionary<string, string>> SendPOSTrequest(string json)
     {
-        string responseMessage = "";
+        string responseString = "";
+        Dictionary<string, string> responseJSON = new Dictionary<string, string>();
+        
         try
         {
             StringContent content = new StringContent(json, Encoding.UTF8, "application/json");
             HttpResponseMessage response = await HttpClient.PostAsync("http://localhost:50000", content);
 
-            responseMessage = await response.Content.ReadAsStringAsync();
+            responseString = await response.Content.ReadAsStringAsync();
+            responseJSON = JsonSerializer.Deserialize<Dictionary<string, string>>(responseString);
 
             Console.WriteLine("\nPOST request successful.");
         }
@@ -93,20 +113,20 @@ class HttpService
             Console.WriteLine(e);
         }
         
-        return responseMessage;
+        return responseJSON;
     }
 }
 
-class User
-{
-    public string Username { get; set; }
-    public string Email { get; set; }
-    public string Password { get; set; }
-
-    public User(string username, string email, string hashedPassword)
-    {
-        Username = username;
-        Email = email;
-        Password = hashedPassword;
-    }
-}
+// class User
+// {
+//     public string Username { get; set; }
+//     public string Email { get; set; }
+//     public string Password { get; set; }
+//
+//     public User(string username, string email, string hashedPassword)
+//     {
+//         Username = username;
+//         Email = email;
+//         Password = hashedPassword;
+//     }
+// }

@@ -25,11 +25,11 @@ class Server
         
     }
     
-    private static async Task<string> ProcessRequest(string receivedJson)
+    private static async Task<Dictionary<string, string>> ProcessRequest(string receivedJson)
     {
         string requestType = "";
         string payload = "";
-        string statusMessage = "";
+        Dictionary<string, string> statusMessage = new Dictionary<string, string>();
         
         // Get request type from JSON
         using (JsonDocument doc = JsonDocument.Parse(receivedJson))
@@ -54,6 +54,12 @@ class Server
                 break;
             case "CheckLogin":
                 statusMessage = await CheckLogin(payload);
+                break;
+            case "ToggleAlertChoice":
+                ToggleAlertChoice(payload);
+                break;
+            case "GetAccountDetails":
+                statusMessage = await GetAccountDetails(payload);
                 break;
             default:
                 Console.WriteLine("Unknown request type.");
@@ -90,21 +96,54 @@ class Server
         
     }
     
-    private static Task<string> CheckLogin(string loginJson)
+    // TODO: remove Task as not async? 
+    private static Task<Dictionary<string, string>> CheckLogin(string loginJson)
     {
         Console.WriteLine(loginJson);
         Dictionary<string, string> loginDetails = JsonSerializer.Deserialize<Dictionary<string, string>>(loginJson);
+        Dictionary<string, string> statusResult = new Dictionary<string, string>();
+        
         string email = loginDetails["Email"];
         string password = loginDetails["Password"];
         string outcome = database.CheckLoginDetails(email, password);
-        return Task.FromResult(outcome);
+        
+        statusResult.Add("outcome", outcome);
+        if (outcome == "Correct logins.")
+        {
+            statusResult.Add("successful", "true");
+        }
+        else
+        {
+            statusResult.Add("successful", "false");
+        }
+        
+        return Task.FromResult(statusResult);
+    }
+    
+    private static void ToggleAlertChoice(string alertChoiceJson)
+    {
+        Dictionary<string, string> data = JsonSerializer.Deserialize<Dictionary<string, string>>(alertChoiceJson);
+        string email = data["Email"];
+        bool alertChoice = (data["AlertChoice"] == "True");
+        
+        database.ChangeAlertChoice(alertChoice, email);
+    }
+
+    private static Task<Dictionary<string, string>> GetAccountDetails(string accountDetailsJson)
+    {
+        Dictionary<string, string> data = JsonSerializer.Deserialize<Dictionary<string, string>>(accountDetailsJson);
+        string email = data["Email"];
+        
+        Dictionary<string, string> userDetails = database.RetrieveUserDetails(email);
+        
+        return Task.FromResult(userDetails);
     }
 }
 
 class Listener
 {
     private readonly HttpListener listener = new HttpListener();
-    public Func<string, Task<string>> RequestReceived;
+    public Func<string, Task<Dictionary<string, string>>> RequestReceived;
     
     public async Task Listen()
     {
@@ -126,19 +165,20 @@ class Listener
                 Console.WriteLine(receivedJson);
             }
             
-            string responseMessage = await RequestReceived.Invoke(receivedJson);
+            Dictionary<string, string> responseMessage = await RequestReceived.Invoke(receivedJson);
 
             // Respond to POST request
             HttpListenerResponse response = context.Response;
 
-            if (responseMessage == "")
+            if (responseMessage.Count == 0)
             {
                 response.StatusCode = (int)HttpStatusCode.OK;
             }
             else
             {
-                response.ContentType = "text/plain";
-                byte[] buffer = System.Text.Encoding.UTF8.GetBytes(responseMessage);
+                response.ContentType = "application/json";
+                string responseMessageString = JsonSerializer.Serialize(responseMessage);
+                byte[] buffer = System.Text.Encoding.UTF8.GetBytes(responseMessageString);
                 response.ContentLength64 = buffer.Length;
                 response.OutputStream.Write(buffer, 0, buffer.Length);
             }
