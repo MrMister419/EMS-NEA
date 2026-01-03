@@ -29,7 +29,7 @@ class Server
     {
         string requestType = "";
         string payload = "";
-        Dictionary<string, string> statusMessage = new Dictionary<string, string>();
+        Dictionary<string, string> completionStatus = new Dictionary<string, string>();
         
         // Get request type from JSON
         using (JsonDocument doc = JsonDocument.Parse(receivedJson))
@@ -52,21 +52,24 @@ class Server
             case "UpdateEvent":
                 UpdateEvent(payload);
                 break;
-            case "CheckLogin":
-                statusMessage = await CheckLogin(payload);
+            case "Authenticate":
+                completionStatus = await Authenticate(payload);
                 break;
             case "ToggleAlertChoice":
                 ToggleAlertChoice(payload);
                 break;
             case "GetAccountDetails":
-                statusMessage = await GetAccountDetails(payload);
+                completionStatus = await GetAccountDetails(payload);
+                break;
+            case "ModifyAccountDetails":
+                completionStatus = await ModifyAccountDetails(payload);
                 break;
             default:
                 Console.WriteLine("Unknown request type.");
                 break;
         }
         
-        return statusMessage;
+        return completionStatus;
     }
 
     private static void CreateNewUser(string userJson)
@@ -97,7 +100,7 @@ class Server
     }
     
     // TODO: remove Task as not async? 
-    private static Task<Dictionary<string, string>> CheckLogin(string loginJson)
+    private static Task<Dictionary<string, string>> Authenticate(string loginJson)
     {
         Console.WriteLine(loginJson);
         Dictionary<string, string> loginDetails = JsonSerializer.Deserialize<Dictionary<string, string>>(loginJson);
@@ -137,6 +140,41 @@ class Server
         Dictionary<string, string> userDetails = database.RetrieveUserDetails(email);
         
         return Task.FromResult(userDetails);
+    }
+
+    private static async Task<Dictionary<string, string>> ModifyAccountDetails(string accountDetailsJson)
+    {
+        Dictionary<string, string> outcome = await Authenticate(accountDetailsJson);
+
+        if (outcome["successful"] == "true")
+        {
+            Dictionary<string, string> newAccountDetails = JsonSerializer.Deserialize<Dictionary<string, string>>(accountDetailsJson);
+            newAccountDetails.Remove("Password");
+
+            string oldEmail;
+            using (JsonDocument doc = JsonDocument.Parse(accountDetailsJson))
+            {
+                oldEmail = doc.RootElement.GetProperty("Email").GetString();
+            }
+
+            string updateCompletion = database.UpdateUserDetails(newAccountDetails, oldEmail);
+            
+            if (updateCompletion == "Update successful.")
+            {
+                outcome["outcome"] = "Update successful.";
+            }
+            else
+            {
+                outcome["outcome"] = "Server error.";
+                outcome["successful"] = "false";
+            }
+        }
+        else
+        {
+            outcome["outcome"] = "Incorrect password.";
+        }
+        
+        return outcome;
     }
 }
 

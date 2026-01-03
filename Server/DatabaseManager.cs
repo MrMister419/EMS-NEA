@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.OleDb;
+using System.Text;
 
 namespace EMS_NEA;
 
@@ -139,5 +140,32 @@ internal class DatabaseManager
         }
         
         return userDetails;
+    }
+    
+    public string UpdateUserDetails(Dictionary<string, string> newDetails, string oldEmail)
+    {
+        string query;
+        StringBuilder queryBuilder = new StringBuilder("UPDATE [User] SET ");
+
+        foreach (string field in newDetails.Keys)
+        {
+            queryBuilder.Append(field);
+            queryBuilder.Append(" = ?, ");
+        }
+        queryBuilder.Remove(queryBuilder.Length - 2, 2);
+        
+        queryBuilder.Append(" WHERE email_address = ?");
+        query = queryBuilder.ToString();
+
+        using (OleDbCommand command = new OleDbCommand(query, connection))
+        {
+            foreach (string fieldValue in newDetails.Values)
+            {
+                command.Parameters.AddWithValue("", fieldValue);
+            }
+            command.ExecuteNonQuery();
+            Console.WriteLine("Updated user details.");
+        }
+        return "Details updated.";
     }
 }

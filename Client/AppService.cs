@@ -27,10 +27,10 @@ public class AppService
         httpService.SendPOSTrequest(wrappedJson);
     }
 
-    public async Task<Dictionary<string, string>> LogIn(Dictionary<string, string> formValues)
+    public async Task<Dictionary<string, string>> Authenticate(Dictionary<string, string> formValues)
     {
         formValues["Password"] = Hash(formValues["Password"]);
-        string wrappedJson = PackageJson(formValues, "CheckLogin");
+        string wrappedJson = PackageJson(formValues, "Authenticate");
         
         Dictionary<string, string> response = await httpService.SendPOSTrequest(wrappedJson);
         return response;
@@ -55,6 +55,42 @@ public class AppService
         string wrappedJson = PackageJson(payload, "GetAccountDetails");
         
         return await httpService.SendPOSTrequest(wrappedJson);
+    }
+
+    public async Task<Dictionary<string, string>> ModifyAccountDetails(Dictionary<string, string> formValues)
+    {
+        RemoveNullEntries(formValues);
+        string json = JsonSerializer.Serialize(formValues);
+        Console.WriteLine(json);
+        
+        string passwordHash = Hash(formValues["ConfirmPassword"]);
+        
+        formValues.Remove("ConfirmPassword");
+        formValues.Add("Password", passwordHash);
+        formValues.Add("New Email", formValues["Email"]);
+        formValues["Email"] = AppContext.email;
+        
+        string wrappedJson = PackageJson(formValues, "ModifyAccountDetails");
+        
+        return await httpService.SendPOSTrequest(wrappedJson);
+    }
+    
+    private void RemoveNullEntries(Dictionary<string, string> dictionary)
+    {
+        List<string> keysToRemove = new List<string>();
+
+        foreach (KeyValuePair<string, string> entry in dictionary)
+        {
+            if (entry.Value == "" && entry.Key != "Email")
+            {
+                keysToRemove.Add(entry.Key);
+            }
+        }
+
+        foreach (string key in keysToRemove)
+        {
+            dictionary.Remove(key);
+        }
     }
 
     private string PackageJson(Dictionary<string, string> payload, string type)

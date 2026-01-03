@@ -55,7 +55,7 @@ public partial class Startup : Form
     private async void loginSubmitButton_Click(object sender, EventArgs e)
     {
         Dictionary<string, string> formValues = AppContext.formNavigator.GetEnteredValues(loginPanel);
-        Dictionary<string, string> outcome = await AppContext.appService.LogIn(formValues);
+        Dictionary<string, string> outcome = await AppContext.appService.Authenticate(formValues);
         
         // TODO: Use typed strings, move this to AppService
         if (outcome["successful"] == "true")
