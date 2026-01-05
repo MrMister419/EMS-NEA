@@ -117,6 +117,7 @@ partial class Startup
         maskedTextBox1.PasswordChar = '*';
         maskedTextBox1.Size = new System.Drawing.Size(228, 27);
         maskedTextBox1.TabIndex = 14;
+        maskedTextBox1.Tag = "Password";
         maskedTextBox1.UseSystemPasswordChar = true;
         // 
         // label6
@@ -150,6 +151,7 @@ partial class Startup
         textBox3.Name = "textBox3";
         textBox3.Size = new System.Drawing.Size(228, 27);
         textBox3.TabIndex = 12;
+        textBox3.Tag = "PhoneNumber";
         // 
         // panel5
         // 
@@ -174,6 +176,7 @@ partial class Startup
         textBox4.Name = "textBox4";
         textBox4.Size = new System.Drawing.Size(228, 27);
         textBox4.TabIndex = 10;
+        textBox4.Tag = "Email";
         // 
         // panel4
         // 
@@ -198,6 +201,7 @@ partial class Startup
         textBox2.Name = "textBox2";
         textBox2.Size = new System.Drawing.Size(228, 27);
         textBox2.TabIndex = 2;
+        textBox2.Tag = "LastName";
         // 
         // panel3
         // 
@@ -222,6 +226,7 @@ partial class Startup
         textBox1.Name = "textBox1";
         textBox1.Size = new System.Drawing.Size(228, 27);
         textBox1.TabIndex = 0;
+        textBox1.Tag = "FirstName";
         // 
         // signupPanel
         // 
@@ -304,6 +309,7 @@ partial class Startup
         maskedTextBox2.Name = "maskedTextBox2";
         maskedTextBox2.Size = new System.Drawing.Size(286, 27);
         maskedTextBox2.TabIndex = 10;
+        maskedTextBox2.Tag = "Password";
         maskedTextBox2.UseSystemPasswordChar = true;
         // 
         // label9
@@ -337,6 +343,7 @@ partial class Startup
         textBox7.Name = "textBox7";
         textBox7.Size = new System.Drawing.Size(286, 27);
         textBox7.TabIndex = 10;
+        textBox7.Tag = "Email";
         // 
         // label12
         // 
@@ -397,8 +404,8 @@ partial class Startup
         AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
         ClientSize = new System.Drawing.Size(790, 535);
         Controls.Add(panel8);
-        Controls.Add(loginPanel);
         Controls.Add(signupPanel);
+        Controls.Add(loginPanel);
         Name = "Startup";
         Text = "Signup";
         groupBox1.ResumeLayout(false);

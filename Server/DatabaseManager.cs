@@ -142,20 +142,21 @@ internal class DatabaseManager
         return userDetails;
     }
     
-    public string UpdateUserDetails(Dictionary<string, string> newDetails, string oldEmail)
+    public bool UpdateUserDetails(Dictionary<string, string> newDetails, string oldEmail)
     {
         string query;
         StringBuilder queryBuilder = new StringBuilder("UPDATE [User] SET ");
 
         foreach (string field in newDetails.Keys)
         {
-            queryBuilder.Append(field);
+            queryBuilder.Append(GetColumnName(field));
             queryBuilder.Append(" = ?, ");
         }
         queryBuilder.Remove(queryBuilder.Length - 2, 2);
         
         queryBuilder.Append(" WHERE email_address = ?");
         query = queryBuilder.ToString();
+        Console.WriteLine(query);
 
         using (OleDbCommand command = new OleDbCommand(query, connection))
         {
@@ -163,9 +164,56 @@ internal class DatabaseManager
             {
                 command.Parameters.AddWithValue("", fieldValue);
             }
+            command.Parameters.AddWithValue("", oldEmail);
+            
             command.ExecuteNonQuery();
             Console.WriteLine("Updated user details.");
         }
-        return "Details updated.";
+        return true;
+    }
+
+    public void FindUsersInVicinity(Location locationDetails)
+    {
+        const string query = "SELECT email_address, latitude, longitude FROM [User]";
+
+        double eventLatitude = locationDetails.latitude;
+        double eventLongitude = locationDetails.longitude;
+        
+        using (OleDbCommand command = new OleDbCommand(query, connection))
+        {
+            connection.Open();
+            using (OleDbDataReader reader = command.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    string email = reader.GetString(0);
+                    double userLatitude = reader.GetDouble(1);
+                    double userLongitude = reader.GetDouble(2);
+                    Console.WriteLine($"Email: {email}, Latitude: {userLatitude}, Longitude: {userLongitude}");
+
+                    Server.CheckDistances(eventLatitude, eventLongitude, userLatitude, userLongitude);
+                }
+            }
+        }
+    }
+
+    private string GetColumnName(string fieldTag)
+    {
+        switch (fieldTag)
+        {
+            case "FirstName":
+                return "first_name";
+            case "LastName":
+                return "last_name";
+            case "PhoneNumber":
+                return "phone_number";
+            case "Email":
+            case "NewEmail":
+                return "email_address";
+            case "Password":
+                return "password_hash";
+            default:
+                throw new Exception($"Invalid field tag {fieldTag}");
+        }
     }
 }

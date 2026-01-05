@@ -117,27 +117,30 @@ public partial class MainForm : Form
         accountDetails.Add("Email", AppContext.email);
 
         List<Panel> fieldPanels = AppContext.formNavigator.GetControlsByType<Panel>(displayDataGroupBox);
-        Label fieldLabel = null;
-        TextBox fieldTextBox = null;
+        TextBox fieldTextBox;
+        string fieldTag;
         string fieldValue;
 
         foreach (Panel fieldPanel in fieldPanels)
         {
+            fieldTextBox = null;
             foreach (Control childControl in fieldPanel.Controls)
             {
-                if (childControl is Label label)
-                {
-                    fieldLabel = label;
-                }
-                else if (childControl is TextBox textBox)
+                if (childControl is TextBox textBox)
                 {
                     fieldTextBox = textBox;
                 }
             }
 
-            // TODO: Use tag instead of string comparison
-            fieldValue = accountDetails[fieldLabel.Text];
-            fieldTextBox.Text = fieldValue;
+            if (fieldTextBox != null)
+            {
+                fieldTag = fieldTextBox.Tag.ToString();
+                if (accountDetails.ContainsKey(fieldTag))
+                {
+                    fieldValue = accountDetails[fieldTag];
+                    fieldTextBox.Text = fieldValue;
+                }
+            }
         }
     }
 
@@ -159,12 +162,14 @@ public partial class MainForm : Form
     private async void ConfirmAccountChangesButtonClick(object sender, EventArgs e)
     {
         Dictionary<string, string> formValues = AppContext.formNavigator.GetEnteredValues(modifyAccountPanel);
+        string newEmail = formValues["NewEmail"];
         Dictionary<string, string> outcome = await AppContext.appService.ModifyAccountDetails(formValues);
-        
+        Console.WriteLine(outcome["outcome"]);
+        Console.WriteLine(JsonSerializer.Serialize(formValues));
         // TODO: Use typed strings, move this to AppService
         if (outcome["successful"] == "true")
         {
-            AppContext.email = formValues["Email"];
+            AppContext.email = newEmail;
             modifyAccountResultLabel.Text = outcome["outcome"];
         }
         else
@@ -180,22 +185,18 @@ public partial class MainForm : Form
         }
     }
 
-    private void RemoveNullEntries(Dictionary<string, string> dictionary)
+    private void CprHelpButtonClick(object sender, EventArgs e)
     {
-        List<string> keysToRemove = new List<string>();
+        switchPanels(sender);
+    }
 
-        foreach (KeyValuePair<string, string> entry in dictionary)
-        {
-            if (entry.Value == "" && entry.Key != "Email")
-            {
-                keysToRemove.Add(entry.Key);
-            }
-        }
+    private void AedHelpButtonClick(object sender, EventArgs e)
+    {
+        switchPanels(sender);
+    }
 
-        foreach (string key in keysToRemove)
-        {
-            dictionary.Remove(key);
-        }
-        
+    private void LegalPageButtonClick(object sender, EventArgs e)
+    {
+        switchPanels(sender);
     }
 }

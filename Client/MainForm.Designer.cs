@@ -34,7 +34,13 @@
             accountBbutton = new System.Windows.Forms.RadioButton();
             informationButton = new System.Windows.Forms.RadioButton();
             mainAreaPanel = new System.Windows.Forms.Panel();
+            informationPanel = new System.Windows.Forms.Panel();
+            label1 = new System.Windows.Forms.Label();
+            legalPageButton = new System.Windows.Forms.Button();
+            aedHelpButton = new System.Windows.Forms.Button();
+            cprHelpButton = new System.Windows.Forms.Button();
             modifyAccountPanel = new System.Windows.Forms.Panel();
+            modifyAccountResultLabel = new System.Windows.Forms.Label();
             label12 = new System.Windows.Forms.Label();
             groupBox2 = new System.Windows.Forms.GroupBox();
             panel1 = new System.Windows.Forms.Panel();
@@ -95,11 +101,6 @@
             label26 = new System.Windows.Forms.Label();
             label25 = new System.Windows.Forms.Label();
             confirmDeleteButton = new System.Windows.Forms.Button();
-            informationPanel = new System.Windows.Forms.Panel();
-            label1 = new System.Windows.Forms.Label();
-            button3 = new System.Windows.Forms.Button();
-            button2 = new System.Windows.Forms.Button();
-            button1 = new System.Windows.Forms.Button();
             cprHelpPanel = new System.Windows.Forms.Panel();
             label2 = new System.Windows.Forms.Label();
             label3 = new System.Windows.Forms.Label();
@@ -109,9 +110,9 @@
             legalPanel = new System.Windows.Forms.Panel();
             label7 = new System.Windows.Forms.Label();
             label6 = new System.Windows.Forms.Label();
-            modifyAccountResultLabel = new System.Windows.Forms.Label();
             buttonsPanel.SuspendLayout();
             mainAreaPanel.SuspendLayout();
+            informationPanel.SuspendLayout();
             modifyAccountPanel.SuspendLayout();
             groupBox2.SuspendLayout();
             panel1.SuspendLayout();
@@ -133,7 +134,6 @@
             panel10.SuspendLayout();
             panel11.SuspendLayout();
             deleteAccountPanel.SuspendLayout();
-            informationPanel.SuspendLayout();
             cprHelpPanel.SuspendLayout();
             aedHelpPanel.SuspendLayout();
             legalPanel.SuspendLayout();
@@ -210,6 +210,7 @@
             // 
             // mainAreaPanel
             // 
+            mainAreaPanel.Controls.Add(informationPanel);
             mainAreaPanel.Controls.Add(modifyAccountPanel);
             mainAreaPanel.Controls.Add(accountPanel);
             mainAreaPanel.Controls.Add(viewAccountPanel);
@@ -217,7 +218,6 @@
             mainAreaPanel.Controls.Add(settingsPanel);
             mainAreaPanel.Controls.Add(changePasswordPanel);
             mainAreaPanel.Controls.Add(deleteAccountPanel);
-            mainAreaPanel.Controls.Add(informationPanel);
             mainAreaPanel.Controls.Add(cprHelpPanel);
             mainAreaPanel.Controls.Add(aedHelpPanel);
             mainAreaPanel.Controls.Add(legalPanel);
@@ -225,6 +225,69 @@
             mainAreaPanel.Name = "mainAreaPanel";
             mainAreaPanel.Size = new System.Drawing.Size(588, 533);
             mainAreaPanel.TabIndex = 1;
+            // 
+            // informationPanel
+            // 
+            informationPanel.Controls.Add(label1);
+            informationPanel.Controls.Add(legalPageButton);
+            informationPanel.Controls.Add(aedHelpButton);
+            informationPanel.Controls.Add(cprHelpButton);
+            informationPanel.Enabled = false;
+            informationPanel.Location = new System.Drawing.Point(0, 0);
+            informationPanel.Name = "informationPanel";
+            informationPanel.Size = new System.Drawing.Size(588, 533);
+            informationPanel.TabIndex = 5;
+            informationPanel.Tag = "information";
+            informationPanel.Visible = false;
+            // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.Font = new System.Drawing.Font("Segoe UI Semibold", 22.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 0);
+            label1.Location = new System.Drawing.Point(122, 2);
+            label1.Name = "label1";
+            label1.Size = new System.Drawing.Size(315, 50);
+            label1.TabIndex = 0;
+            label1.Text = "Information Page";
+            // 
+            // legalPageButton
+            // 
+            legalPageButton.Font = new System.Drawing.Font("Segoe UI", 12F);
+            legalPageButton.Location = new System.Drawing.Point(1, 214);
+            legalPageButton.Name = "legalPageButton";
+            legalPageButton.Size = new System.Drawing.Size(583, 69);
+            legalPageButton.TabIndex = 3;
+            legalPageButton.Tag = "legal";
+            legalPageButton.Text = "Legal";
+            legalPageButton.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            legalPageButton.UseVisualStyleBackColor = true;
+            legalPageButton.Click += LegalPageButtonClick;
+            // 
+            // aedHelpButton
+            // 
+            aedHelpButton.Font = new System.Drawing.Font("Segoe UI", 12F);
+            aedHelpButton.Location = new System.Drawing.Point(1, 139);
+            aedHelpButton.Name = "aedHelpButton";
+            aedHelpButton.Size = new System.Drawing.Size(583, 69);
+            aedHelpButton.TabIndex = 2;
+            aedHelpButton.Tag = "aedHelp";
+            aedHelpButton.Text = "Help with using AEDs";
+            aedHelpButton.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            aedHelpButton.UseVisualStyleBackColor = true;
+            aedHelpButton.Click += AedHelpButtonClick;
+            // 
+            // cprHelpButton
+            // 
+            cprHelpButton.Font = new System.Drawing.Font("Segoe UI", 12F);
+            cprHelpButton.Location = new System.Drawing.Point(1, 64);
+            cprHelpButton.Name = "cprHelpButton";
+            cprHelpButton.Size = new System.Drawing.Size(583, 69);
+            cprHelpButton.TabIndex = 1;
+            cprHelpButton.Tag = "cprHelp";
+            cprHelpButton.Text = "Help with CPR and First Aid";
+            cprHelpButton.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            cprHelpButton.UseVisualStyleBackColor = true;
+            cprHelpButton.Click += CprHelpButtonClick;
             // 
             // modifyAccountPanel
             // 
@@ -237,6 +300,14 @@
             modifyAccountPanel.Size = new System.Drawing.Size(588, 533);
             modifyAccountPanel.TabIndex = 8;
             modifyAccountPanel.Tag = "changeAccount";
+            // 
+            // modifyAccountResultLabel
+            // 
+            modifyAccountResultLabel.Font = new System.Drawing.Font("Segoe UI", 11F, System.Drawing.FontStyle.Italic);
+            modifyAccountResultLabel.Location = new System.Drawing.Point(282, 332);
+            modifyAccountResultLabel.Name = "modifyAccountResultLabel";
+            modifyAccountResultLabel.Size = new System.Drawing.Size(262, 56);
+            modifyAccountResultLabel.TabIndex = 4;
             // 
             // label12
             // 
@@ -276,6 +347,7 @@
             maskedTextBox1.Name = "maskedTextBox1";
             maskedTextBox1.Size = new System.Drawing.Size(228, 27);
             maskedTextBox1.TabIndex = 12;
+            maskedTextBox1.Tag = "ConfirmPassword";
             // 
             // label21
             // 
@@ -308,6 +380,7 @@
             textBox5.Name = "textBox5";
             textBox5.Size = new System.Drawing.Size(228, 27);
             textBox5.TabIndex = 12;
+            textBox5.Tag = "PhoneNumber";
             // 
             // panel7
             // 
@@ -332,6 +405,7 @@
             textBox6.Name = "textBox6";
             textBox6.Size = new System.Drawing.Size(228, 27);
             textBox6.TabIndex = 10;
+            textBox6.Tag = "NewEmail";
             // 
             // panel8
             // 
@@ -356,6 +430,7 @@
             textBox7.Name = "textBox7";
             textBox7.Size = new System.Drawing.Size(228, 27);
             textBox7.TabIndex = 2;
+            textBox7.Tag = "LastName";
             // 
             // panel9
             // 
@@ -380,6 +455,7 @@
             textBox8.Name = "textBox8";
             textBox8.Size = new System.Drawing.Size(228, 27);
             textBox8.TabIndex = 0;
+            textBox8.Tag = "FirstName";
             // 
             // confirmAccountChangesButton
             // 
@@ -526,6 +602,7 @@
             textBox3.ReadOnly = true;
             textBox3.Size = new System.Drawing.Size(228, 27);
             textBox3.TabIndex = 12;
+            textBox3.Tag = "PhoneNumber";
             // 
             // panel5
             // 
@@ -551,6 +628,7 @@
             textBox4.ReadOnly = true;
             textBox4.Size = new System.Drawing.Size(228, 27);
             textBox4.TabIndex = 10;
+            textBox4.Tag = "Email";
             // 
             // panel4
             // 
@@ -576,6 +654,7 @@
             textBox2.ReadOnly = true;
             textBox2.Size = new System.Drawing.Size(228, 27);
             textBox2.TabIndex = 2;
+            textBox2.Tag = "LastName";
             // 
             // panel3
             // 
@@ -601,6 +680,7 @@
             textBox1.ReadOnly = true;
             textBox1.Size = new System.Drawing.Size(228, 27);
             textBox1.TabIndex = 0;
+            textBox1.Tag = "FirstName";
             // 
             // feedPanel
             // 
@@ -724,6 +804,7 @@
             maskedTextBox3.Name = "maskedTextBox3";
             maskedTextBox3.Size = new System.Drawing.Size(228, 27);
             maskedTextBox3.TabIndex = 12;
+            maskedTextBox3.Tag = "NewPassword";
             // 
             // label24
             // 
@@ -748,6 +829,7 @@
             maskedTextBox2.Name = "maskedTextBox2";
             maskedTextBox2.Size = new System.Drawing.Size(228, 27);
             maskedTextBox2.TabIndex = 12;
+            maskedTextBox2.Tag = "OldPassword";
             // 
             // label23
             // 
@@ -807,63 +889,6 @@
             confirmDeleteButton.Text = "Confirm Deletion";
             confirmDeleteButton.UseVisualStyleBackColor = true;
             // 
-            // informationPanel
-            // 
-            informationPanel.Controls.Add(label1);
-            informationPanel.Controls.Add(button3);
-            informationPanel.Controls.Add(button2);
-            informationPanel.Controls.Add(button1);
-            informationPanel.Enabled = false;
-            informationPanel.Location = new System.Drawing.Point(0, 0);
-            informationPanel.Name = "informationPanel";
-            informationPanel.Size = new System.Drawing.Size(588, 533);
-            informationPanel.TabIndex = 5;
-            informationPanel.Tag = "information";
-            informationPanel.Visible = false;
-            // 
-            // label1
-            // 
-            label1.AutoSize = true;
-            label1.Font = new System.Drawing.Font("Segoe UI Semibold", 22.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 0);
-            label1.Location = new System.Drawing.Point(122, 2);
-            label1.Name = "label1";
-            label1.Size = new System.Drawing.Size(315, 50);
-            label1.TabIndex = 0;
-            label1.Text = "Information Page";
-            // 
-            // button3
-            // 
-            button3.Font = new System.Drawing.Font("Segoe UI", 12F);
-            button3.Location = new System.Drawing.Point(1, 214);
-            button3.Name = "button3";
-            button3.Size = new System.Drawing.Size(583, 69);
-            button3.TabIndex = 3;
-            button3.Text = "Legal";
-            button3.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            button3.UseVisualStyleBackColor = true;
-            // 
-            // button2
-            // 
-            button2.Font = new System.Drawing.Font("Segoe UI", 12F);
-            button2.Location = new System.Drawing.Point(1, 139);
-            button2.Name = "button2";
-            button2.Size = new System.Drawing.Size(583, 69);
-            button2.TabIndex = 2;
-            button2.Text = "Help with using AEDs";
-            button2.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            button2.UseVisualStyleBackColor = true;
-            // 
-            // button1
-            // 
-            button1.Font = new System.Drawing.Font("Segoe UI", 12F);
-            button1.Location = new System.Drawing.Point(1, 64);
-            button1.Name = "button1";
-            button1.Size = new System.Drawing.Size(583, 69);
-            button1.TabIndex = 1;
-            button1.Text = "Help with CPR and First Aid";
-            button1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            button1.UseVisualStyleBackColor = true;
-            // 
             // cprHelpPanel
             // 
             cprHelpPanel.Controls.Add(label2);
@@ -872,6 +897,7 @@
             cprHelpPanel.Name = "cprHelpPanel";
             cprHelpPanel.Size = new System.Drawing.Size(588, 532);
             cprHelpPanel.TabIndex = 4;
+            cprHelpPanel.Tag = "cprHelp";
             // 
             // label2
             // 
@@ -900,6 +926,7 @@
             aedHelpPanel.Name = "aedHelpPanel";
             aedHelpPanel.Size = new System.Drawing.Size(588, 532);
             aedHelpPanel.TabIndex = 6;
+            aedHelpPanel.Tag = "aedHelp";
             // 
             // label5
             // 
@@ -928,6 +955,7 @@
             legalPanel.Name = "legalPanel";
             legalPanel.Size = new System.Drawing.Size(588, 532);
             legalPanel.TabIndex = 7;
+            legalPanel.Tag = "legal";
             // 
             // label7
             // 
@@ -948,15 +976,6 @@
             label6.TabIndex = 1;
             label6.Text = "This page will display Terms and Conditions for using the application, and other legal statements.";
             // 
-            // modifyAccountResultLabel
-            // 
-            modifyAccountResultLabel.AutoSize = true;
-            modifyAccountResultLabel.Font = new System.Drawing.Font("Segoe UI", 11F, System.Drawing.FontStyle.Italic);
-            modifyAccountResultLabel.Location = new System.Drawing.Point(282, 332);
-            modifyAccountResultLabel.Name = "modifyAccountResultLabel";
-            modifyAccountResultLabel.Size = new System.Drawing.Size(0, 25);
-            modifyAccountResultLabel.TabIndex = 4;
-            // 
             // MainForm
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
@@ -969,6 +988,8 @@
             Load += MainForm_Load;
             buttonsPanel.ResumeLayout(false);
             mainAreaPanel.ResumeLayout(false);
+            informationPanel.ResumeLayout(false);
+            informationPanel.PerformLayout();
             modifyAccountPanel.ResumeLayout(false);
             modifyAccountPanel.PerformLayout();
             groupBox2.ResumeLayout(false);
@@ -1008,8 +1029,6 @@
             panel11.PerformLayout();
             deleteAccountPanel.ResumeLayout(false);
             deleteAccountPanel.PerformLayout();
-            informationPanel.ResumeLayout(false);
-            informationPanel.PerformLayout();
             cprHelpPanel.ResumeLayout(false);
             cprHelpPanel.PerformLayout();
             aedHelpPanel.ResumeLayout(false);
@@ -1028,9 +1047,9 @@
         private System.Windows.Forms.RadioButton settingsButton;
         private System.Windows.Forms.Panel mainAreaPanel;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Button button3;
-        private System.Windows.Forms.Button button2;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button legalPageButton;
+        private System.Windows.Forms.Button aedHelpButton;
+        private System.Windows.Forms.Button cprHelpButton;
         private System.Windows.Forms.Panel cprHelpPanel;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;

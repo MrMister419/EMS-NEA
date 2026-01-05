@@ -59,38 +59,36 @@ public class AppService
 
     public async Task<Dictionary<string, string>> ModifyAccountDetails(Dictionary<string, string> formValues)
     {
-        RemoveNullEntries(formValues);
-        string json = JsonSerializer.Serialize(formValues);
-        Console.WriteLine(json);
-        
+        formValues = RemoveNullEntries(formValues);
+
         string passwordHash = Hash(formValues["ConfirmPassword"]);
-        
         formValues.Remove("ConfirmPassword");
         formValues.Add("Password", passwordHash);
-        formValues.Add("New Email", formValues["Email"]);
-        formValues["Email"] = AppContext.email;
+        formValues.Add("OldEmail", AppContext.email);
         
         string wrappedJson = PackageJson(formValues, "ModifyAccountDetails");
         
         return await httpService.SendPOSTrequest(wrappedJson);
     }
     
-    private void RemoveNullEntries(Dictionary<string, string> dictionary)
+    private Dictionary<string, string> RemoveNullEntries(Dictionary<string, string> dictionary)
     {
         List<string> keysToRemove = new List<string>();
 
         foreach (KeyValuePair<string, string> entry in dictionary)
         {
-            if (entry.Value == "" && entry.Key != "Email")
+            if (entry.Value == "")
             {
                 keysToRemove.Add(entry.Key);
             }
         }
 
-        foreach (string key in keysToRemove)
+        for (int index = 0; index < keysToRemove.Count; index++)
         {
-            dictionary.Remove(key);
+            dictionary.Remove(keysToRemove[index]);
         }
+
+        return dictionary;
     }
 
     private string PackageJson(Dictionary<string, string> payload, string type)
@@ -127,6 +125,7 @@ class HttpService
     
     public async Task<Dictionary<string, string>> SendPOSTrequest(string json)
     {
+        Console.WriteLine(json);
         string responseString = "";
         Dictionary<string, string> responseJSON = new Dictionary<string, string>();
         

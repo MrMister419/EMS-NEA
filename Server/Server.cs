@@ -14,9 +14,22 @@ namespace EMS_NEA;
 class Server
 {
     private static DatabaseManager database;
+    private static HttpClient httpClient;
 
     public static async Task Main(string[] args)
     {
+        System.Net.ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls13;
+        HttpClientHandler handler = new HttpClientHandler
+        {
+            AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
+            UseCookies = false
+        };
+        httpClient = new HttpClient(handler)
+        {
+            Timeout = TimeSpan.FromSeconds(7)
+        };
+        httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("EMS-Server/1.0");
+        
         database = new DatabaseManager();
         Listener listener = new Listener();
         // Subscribe ProcessMessage as event handler
@@ -87,6 +100,8 @@ class Server
     {
         Event receivedEvent = Event.DeserializeEvent(eventJson);
         database.InsertEvent(receivedEvent);
+        
+        database.FindUsersInVicinity(receivedEvent.location);
     }
 
     private static void UpdateUser(string userUpdateJson)
@@ -100,10 +115,9 @@ class Server
     }
     
     // TODO: remove Task as not async? 
-    private static Task<Dictionary<string, string>> Authenticate(string loginJson)
+    private static Task<Dictionary<string, string>> Authenticate(Dictionary<string, string> loginDetails)
     {
-        Console.WriteLine(loginJson);
-        Dictionary<string, string> loginDetails = JsonSerializer.Deserialize<Dictionary<string, string>>(loginJson);
+        // TODO: deserialise function
         Dictionary<string, string> statusResult = new Dictionary<string, string>();
         
         string email = loginDetails["Email"];
@@ -122,10 +136,17 @@ class Server
         
         return Task.FromResult(statusResult);
     }
+
+    private static Task<Dictionary<string, string>> Authenticate(string loginJson)
+    {
+        Dictionary<string, string> loginDetails = DeserializeToDictionary(loginJson);
+
+        return Authenticate(loginDetails);
+    }
     
     private static void ToggleAlertChoice(string alertChoiceJson)
     {
-        Dictionary<string, string> data = JsonSerializer.Deserialize<Dictionary<string, string>>(alertChoiceJson);
+        Dictionary<string, string> data = DeserializeToDictionary(alertChoiceJson);
         string email = data["Email"];
         bool alertChoice = (data["AlertChoice"] == "True");
         
@@ -134,7 +155,7 @@ class Server
 
     private static Task<Dictionary<string, string>> GetAccountDetails(string accountDetailsJson)
     {
-        Dictionary<string, string> data = JsonSerializer.Deserialize<Dictionary<string, string>>(accountDetailsJson);
+        Dictionary<string, string> data = DeserializeToDictionary(accountDetailsJson);
         string email = data["Email"];
         
         Dictionary<string, string> userDetails = database.RetrieveUserDetails(email);
@@ -144,22 +165,30 @@ class Server
 
     private static async Task<Dictionary<string, string>> ModifyAccountDetails(string accountDetailsJson)
     {
-        Dictionary<string, string> outcome = await Authenticate(accountDetailsJson);
+        Dictionary<string, string> accountDetails = DeserializeToDictionary(accountDetailsJson);
+        
+        accountDetails.Add("Email", accountDetails["OldEmail"]);
+        accountDetails.Remove("OldEmail");
+        
+        Dictionary<string, string> outcome = await Authenticate(accountDetails);
 
         if (outcome["successful"] == "true")
         {
-            Dictionary<string, string> newAccountDetails = JsonSerializer.Deserialize<Dictionary<string, string>>(accountDetailsJson);
-            newAccountDetails.Remove("Password");
-
-            string oldEmail;
-            using (JsonDocument doc = JsonDocument.Parse(accountDetailsJson))
+            string oldEmail = accountDetails["Email"];
+            if (accountDetails.ContainsKey("NewEmail"))
             {
-                oldEmail = doc.RootElement.GetProperty("Email").GetString();
+                accountDetails["Email"] = accountDetails["NewEmail"];
+                accountDetails.Remove("NewEmail");
             }
-
-            string updateCompletion = database.UpdateUserDetails(newAccountDetails, oldEmail);
+            else
+            {
+                accountDetails.Remove("Email");
+            }
+            accountDetails.Remove("Password");
             
-            if (updateCompletion == "Update successful.")
+            bool updateCompletion = database.UpdateUserDetails(accountDetails, oldEmail);
+            
+            if (updateCompletion)
             {
                 outcome["outcome"] = "Update successful.";
             }
@@ -175,6 +204,40 @@ class Server
         }
         
         return outcome;
+    }
+
+    public static async Task<bool> CheckDistances(double lat1, double long1, double lat2, double long2)
+    {
+        string apiKey = "AIzaSyBR0vC11aRcwkXbXPfGr2utiILnF9EpLRY";
+        string origin = $"{lat1},{long1}";
+        string destination = $"{lat2},{long2}";
+        string url = $"https://maps.googleapis.com/maps/api/distancematrix/json?origins={origin}&destinations={destination}&key={apiKey}";
+        try
+        {
+            string json = await httpClient.GetStringAsync(url).ConfigureAwait(false);
+            Console.WriteLine("DistanceMatrix response: " + json);
+            
+            JsonDocument response = JsonDocument.Parse(json);
+
+            int seconds = response.RootElement
+                    .GetProperty("rows")[0]
+                    .GetProperty("elements")[0]
+                    .GetProperty("duration")
+                    .GetProperty("value")
+                    .GetInt32();
+
+            return (seconds / 60 < 7);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"DistanceMatrix call failed: {ex}");
+            return false;
+        }
+    }
+    
+    private static Dictionary<string, string> DeserializeToDictionary(string json)
+    {
+        return JsonSerializer.Deserialize<Dictionary<string, string>>(json);
     }
 }
 

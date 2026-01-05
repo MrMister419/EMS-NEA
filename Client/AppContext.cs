@@ -52,17 +52,21 @@ class FormNavigation
         
         foreach (Panel panel in fieldPanels)
         {
+            fieldName = "";
+            fieldEntry = "";
             foreach (Control childControl in panel.Controls)
             {
                 switch (childControl)
                 {
-                    case Label:
-                        fieldName = childControl.Text;
-                        fieldName = fieldName.Replace("*", "").Replace(" ", "");
-                        break;
                     case TextBox:
                     case MaskedTextBox:
                     {
+                        fieldName = childControl.Tag.ToString();
+                        if (fieldName == "")
+                        {
+                            continue;
+                        }
+
                         fieldEntry = childControl.Text.Trim();
 
                         if (childControl is MaskedTextBox)
@@ -76,7 +80,8 @@ class FormNavigation
                 }
                 
             }
-            formValues.Add(fieldName, fieldEntry);
+            
+            formValues[fieldName] = fieldEntry;
         }
         
         return formValues;

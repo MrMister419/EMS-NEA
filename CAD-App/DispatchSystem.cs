@@ -56,7 +56,6 @@ class DispatchSystem
 
     private static void StartCurrentEvent()
     {
-        var obj = sentEvents.Count;
         currentEvent["eventID"] = sentEvents.Count;
         currentEvent["startTimestamp"] = DateTime.Now.ToLongTimeString();
     }
