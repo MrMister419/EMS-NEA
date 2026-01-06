@@ -1,11 +1,12 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Client;
 
+/// <summary>
+/// Startup form handling user login and signup
+/// </summary>
 public partial class Startup : Form
 {
     
@@ -45,6 +46,7 @@ public partial class Startup : Form
         signupPanel.Enabled = true;
     }
     
+    // Submits signup form data to server
     private void SignupSubmitButton_Click(object sender, System.EventArgs e)
     {
         Dictionary<string, string> formValues = 
@@ -52,12 +54,12 @@ public partial class Startup : Form
         AppContext.appService.SignUp(formValues);
     }
     
+    // Authenticates user and switches to main form on success
     private async void loginSubmitButton_Click(object sender, EventArgs e)
     {
         Dictionary<string, string> formValues = AppContext.formNavigator.GetEnteredValues(loginPanel);
         Dictionary<string, string> outcome = await AppContext.appService.Authenticate(formValues);
         
-        // TODO: Use typed strings, move this to AppService
         if (outcome["successful"] == "true")
         {
             AppContext.email = formValues["Email"];

@@ -1,10 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using System.Windows.Forms;
 
 namespace Client;
 
+/// <summary>
+/// Holds global client application state and shared services
+/// </summary>
 static class AppContext
 {
     public static FormNavigation formNavigator;
@@ -13,6 +14,7 @@ static class AppContext
     public static string email { get; set; }
     public static bool isReceiving { get; set; }
     
+    // Initializes all shared application services
     public static void Initialize()
     {
         formNavigator = new FormNavigation();
@@ -21,9 +23,15 @@ static class AppContext
     }
 }
 
+/// <summary>
+/// Manages form switching and navigation between application windows
+/// </summary>
 class FormManager
 {
-    public async Task SwitchForm(Form currentForm)
+    // Switches between Startup and MainForm windows
+    // Parameters:
+    // - Form currentForm: the form to hide and switch from
+    public void SwitchForm(Form currentForm)
     {
         currentForm.Hide();
 
@@ -40,9 +48,17 @@ class FormManager
     }
 }
 
+/// <summary>
+/// Provides form navigation and control extraction utilities
+/// </summary>
 class FormNavigation
 { 
     
+    // Extracts user input values from form controls based on Tag property
+    // Parameters:
+    // - Panel formPanel: parent panel containing input fields
+    // Returns:
+    // Dictionary<string, string>: field names mapped to entered values
     public Dictionary<string, string> GetEnteredValues(Panel formPanel)
     {
         Dictionary<string, string> formValues = new Dictionary<string, string>();
@@ -88,6 +104,12 @@ class FormNavigation
         return formValues;
     }
 
+    // Recursively finds all controls of specified type within parent control
+    // Parameters:
+    // - Control parentControl: parent control to search within
+    // - bool getBaseControlsOnly: if true, only returns top-level controls of type
+    // Returns:
+    // List<type>: list of controls matching the specified type
     public List<type> GetControlsByType<type>(Control parentControl, bool getBaseControlsOnly = true) where type : Control
     {
         List<type> controls = new List<type>();
