@@ -67,6 +67,5 @@ public partial class Startup : Form
         {
             loginMessageLabel.Text = outcome["outcome"];
         }
-        
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.OleDb;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace EMS_NEA;
 
@@ -172,17 +173,19 @@ internal class DatabaseManager
         return true;
     }
 
-    public void FindUsersInVicinity(Location locationDetails)
+    public async Task<List<string>> FindUsersInVicinity(Location locationDetails)
     {
         const string query = "SELECT email_address, latitude, longitude FROM [User]";
-
         double eventLatitude = locationDetails.latitude;
         double eventLongitude = locationDetails.longitude;
+        bool inRange;
+        List<string> emailsInRange = new List<string>();
         
-        using (OleDbCommand command = new OleDbCommand(query, connection))
+        await using (OleDbCommand command = new OleDbCommand(query, connection))
         {
             connection.Open();
-            using (OleDbDataReader reader = command.ExecuteReader())
+            
+            await using (OleDbDataReader reader = command.ExecuteReader())
             {
                 while (reader.Read())
                 {
@@ -191,10 +194,17 @@ internal class DatabaseManager
                     double userLongitude = reader.GetDouble(2);
                     Console.WriteLine($"Email: {email}, Latitude: {userLatitude}, Longitude: {userLongitude}");
 
-                    Server.CheckDistances(eventLatitude, eventLongitude, userLatitude, userLongitude);
+                    inRange = await Server.CheckDistances(eventLatitude, eventLongitude, userLatitude, userLongitude);
+
+                    if (inRange)
+                    {
+                        emailsInRange.Add(email);
+                    }
                 }
             }
         }
+
+        return emailsInRange;
     }
 
     private string GetColumnName(string fieldTag)

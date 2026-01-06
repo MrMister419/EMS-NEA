@@ -36,7 +36,15 @@ public class AppService
         return response;
     }
 
-    public void ToggleAlertChoice(bool newChoice)
+    public async Task RequestEvent()
+    {
+        Dictionary<string, string> payload = new Dictionary<string, string>();
+        payload.Add("Email", AppContext.email);
+        string wrappedJson = PackageJson(payload, "RequestEvent");
+        await httpService.SendPOSTrequest(wrappedJson);
+    }
+
+    public async Task ToggleAlertChoice(bool newChoice)
     {
         string alertChoice = newChoice.ToString();
         Dictionary<string, string> payload = new Dictionary<string, string>();
@@ -45,6 +53,10 @@ public class AppService
         string wrappedJson = PackageJson(payload, "ToggleAlertChoice");
         
         httpService.SendPOSTrequest(wrappedJson);
+        if (newChoice)
+        {
+            await RequestEvent();
+        }
     }
 
     public async Task<Dictionary<string, string>> GetAccountDetails()

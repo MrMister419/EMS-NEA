@@ -8,6 +8,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using System.Data;
 using System.Data.OleDb;
+using System.Text;
 
 namespace EMS_NEA;
 
@@ -15,27 +16,21 @@ class Server
 {
     private static DatabaseManager database;
     private static HttpClient httpClient;
+    private static Listener listener;
+
 
     public static async Task Main(string[] args)
     {
-        System.Net.ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls13;
-        HttpClientHandler handler = new HttpClientHandler
-        {
-            AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
-            UseCookies = false
-        };
-        httpClient = new HttpClient(handler)
-        {
-            Timeout = TimeSpan.FromSeconds(7)
-        };
-        httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("EMS-Server/1.0");
-        
-        database = new DatabaseManager();
-        Listener listener = new Listener();
-        // Subscribe ProcessMessage as event handler
-        listener.RequestReceived = ProcessRequest;
+        InitialSetup();
         await listener.Listen();
-        
+    }
+
+    private static void InitialSetup()
+    {
+        httpClient = new HttpClient();
+        database = new DatabaseManager();
+        listener = new Listener();
+        listener.RequestReceived = ProcessRequest;
     }
     
     private static async Task<Dictionary<string, string>> ProcessRequest(string receivedJson)
@@ -57,7 +52,7 @@ class Server
                 CreateNewUser(payload);
                 break;
             case "NewEvent":
-                CreateNewEvent(payload);
+                HandleNewEvent(payload);
                 break;
             case "UpdateUser":
                 UpdateUser(payload);
@@ -78,7 +73,8 @@ class Server
                 completionStatus = await ModifyAccountDetails(payload);
                 break;
             default:
-                Console.WriteLine("Unknown request type.");
+                completionStatus["outcome"] = "Unknown request type.";
+                completionStatus["successful"] = "false";
                 break;
         }
         
@@ -96,12 +92,16 @@ class Server
         database.InsertUser(receivedUser);
     }
 
-    private static void CreateNewEvent(string eventJson)
+    private static async Task HandleNewEvent(string eventJson)
     {
         Event receivedEvent = Event.DeserializeEvent(eventJson);
         database.InsertEvent(receivedEvent);
         
-        database.FindUsersInVicinity(receivedEvent.location);
+        // TODO: only check users that are online
+        List<string> inVicinity = await database.FindUsersInVicinity(receivedEvent.location);
+        listener.NotifyWaitingClients(inVicinity, eventJson);
+        
+        
     }
 
     private static void UpdateUser(string userUpdateJson)
@@ -239,12 +239,14 @@ class Server
     {
         return JsonSerializer.Deserialize<Dictionary<string, string>>(json);
     }
+    
 }
 
 class Listener
 {
     private readonly HttpListener listener = new HttpListener();
     public Func<string, Task<Dictionary<string, string>>> RequestReceived;
+    private readonly List<PendingRequest> waitingClients = new List<PendingRequest>();
     
     public async Task Listen()
     {
@@ -266,11 +268,39 @@ class Listener
                 Console.WriteLine(receivedJson);
             }
             
+            string requestType = "";
+            string payload = "";
+            try
+            {
+                using (JsonDocument doc = JsonDocument.Parse(receivedJson))
+                {
+                    requestType = doc.RootElement.GetProperty("type").GetString();
+                    payload = doc.RootElement.GetProperty("payload").GetRawText();
+                }
+            }
+            catch (JsonException)
+            {
+                context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                context.Response.Close();
+                continue;
+            }
+            if (requestType == "RequestEvent")
+            {
+                string email = ExtractEmail(payload);
+                if (string.IsNullOrWhiteSpace(email))
+                {
+                    context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    context.Response.Close();
+                    continue;
+                }
+                lock (waitingClients)
+                {
+                    waitingClients.Add(new PendingRequest { Context = context, Email = email });
+                }
+                continue;
+            }
             Dictionary<string, string> responseMessage = await RequestReceived.Invoke(receivedJson);
-
-            // Respond to POST request
             HttpListenerResponse response = context.Response;
-
             if (responseMessage.Count == 0)
             {
                 response.StatusCode = (int)HttpStatusCode.OK;
@@ -279,13 +309,87 @@ class Listener
             {
                 response.ContentType = "application/json";
                 string responseMessageString = JsonSerializer.Serialize(responseMessage);
-                byte[] buffer = System.Text.Encoding.UTF8.GetBytes(responseMessageString);
+                byte[] buffer = Encoding.UTF8.GetBytes(responseMessageString);
                 response.ContentLength64 = buffer.Length;
-                response.OutputStream.Write(buffer, 0, buffer.Length);
+                await response.OutputStream.WriteAsync(buffer, 0, buffer.Length);
             }
             response.Close();
             Console.WriteLine("POST request answered.");
         }
+    }
+    
+    private string ExtractEmail(string payloadJson)
+    {
+        try
+        {
+            using (JsonDocument doc = JsonDocument.Parse(payloadJson))
+            {
+                if (doc.RootElement.TryGetProperty("Email", out JsonElement emailElement))
+                {
+                    return emailElement.GetString();
+                }
+            }
+        }
+        catch (JsonException) {}
+        
+        return string.Empty;
+    }
+    
+    public void NotifyWaitingClients(List<string> targetEmails, string eventPayloadJson)
+    {
+        if (targetEmails.Count == 0)
+        {
+            return;
+        }
+        List<PendingRequest> toRespond = new List<PendingRequest>();
+        lock (waitingClients)
+        {
+            List<PendingRequest> remaining = new List<PendingRequest>();
+            foreach (PendingRequest pending in waitingClients)
+            {
+                bool match = false;
+                foreach (string target in targetEmails)
+                {
+                    if (pending.Email == target)
+                    {
+                        match = true;
+                        break;
+                    }
+                }
+                if (match)
+                {
+                    toRespond.Add(pending);
+                }
+                else
+                {
+                    remaining.Add(pending);
+                }
+            }
+            waitingClients.Clear();
+            waitingClients.AddRange(remaining);
+        }
+        foreach (PendingRequest pending in toRespond)
+        {
+            try
+            {
+                HttpListenerResponse response = pending.Context.Response;
+                response.ContentType = "application/json";
+                byte[] buffer = Encoding.UTF8.GetBytes(eventPayloadJson);
+                response.ContentLength64 = buffer.Length;
+                response.OutputStream.Write(buffer, 0, buffer.Length);
+                response.Close();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Failed to notify waiting client: {ex}");
+            }
+        }
+    }
+    
+    private class PendingRequest
+    {
+        public HttpListenerContext Context { get; set; }
+        public string Email { get; set; }
     }
 }
 

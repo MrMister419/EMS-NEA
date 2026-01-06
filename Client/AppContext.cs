@@ -22,20 +22,21 @@ static class AppContext
 
 class FormManager
 {
-    public void SwitchForm(Form currentForm)
+    public async Task SwitchForm(Form currentForm)
     {
+        currentForm.Hide();
+
         if (currentForm is Startup)
         {
             Form mainForm = new MainForm();
             mainForm.Show();
+            AppContext.appService.RequestEvent();
         }
         else
         {
             Form startupForm = new Startup();
             startupForm.Show();
         }
-
-        currentForm.Hide();
     }
 }
 
