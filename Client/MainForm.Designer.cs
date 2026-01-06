@@ -985,7 +985,6 @@
             Controls.Add(buttonsPanel);
             Name = "MainForm";
             Text = "MainForm";
-            Load += MainForm_Load;
             buttonsPanel.ResumeLayout(false);
             mainAreaPanel.ResumeLayout(false);
             informationPanel.ResumeLayout(false);

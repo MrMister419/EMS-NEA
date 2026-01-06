@@ -20,6 +20,8 @@ class DispatchSystem
     public static async Task Main(string[] args)
     {
         eventsList = DeserializeEvents();
+        Console.WriteLine("Waiting to send.");
+        Console.Read();
         currentEvent = GetRandomEvent(eventsList);
         sentEvents = new List<Dictionary<string, object>>();
         Console.WriteLine(currentEvent);
@@ -51,6 +53,7 @@ class DispatchSystem
     private static Dictionary<string, object> GetRandomEvent(List<Dictionary<string, object>> events)
     {
         int index = Random.Next(0, events.Count - 1);
+        index = 0;
         return events[index];
     }
 

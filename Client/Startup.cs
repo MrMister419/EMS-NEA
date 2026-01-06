@@ -61,7 +61,12 @@ public partial class Startup : Form
         if (outcome["successful"] == "true")
         {
             AppContext.email = formValues["Email"];
+            await AppContext.appService.GetReceivingStatus();
             AppContext.formManager.SwitchForm(this);
+            if (AppContext.isReceiving)
+            {
+                AppContext.appService.RequestEvent();
+            }
         }
         else
         {

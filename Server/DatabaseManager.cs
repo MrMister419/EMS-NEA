@@ -114,6 +114,18 @@ internal class DatabaseManager
         }
     }
     
+    public bool GetReceivingStatus(string email)
+    {
+        const string query = "SELECT is_receiving FROM [User] WHERE email_address = ?";
+        
+        using (OleDbCommand command = new OleDbCommand(query, connection))
+        {
+            command.Parameters.AddWithValue("@email_address", email);
+            bool? result = (bool?) command.ExecuteScalar();
+            return result ?? false;
+        }
+    }
+
     public Dictionary<string, string> RetrieveUserDetails(string email)
     {
         const string query = 
@@ -196,14 +208,15 @@ internal class DatabaseManager
 
                     inRange = await Server.CheckDistances(eventLatitude, eventLongitude, userLatitude, userLongitude);
 
-                    if (inRange)
+                    if (inRange || true)
                     {
+                        Console.WriteLine($"Email {email} is in range.");
                         emailsInRange.Add(email);
                     }
+                    break;
                 }
             }
         }
-
         return emailsInRange;
     }
 

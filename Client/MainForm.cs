@@ -17,11 +17,7 @@ public partial class MainForm : Form
     {
         InitializeComponent();
         feedPanel.BringToFront();
-    }
-
-    private void MainForm_Load(object sender, EventArgs e)
-    {
-
+        toggleAlertsCheckbox.Checked = AppContext.isReceiving;
     }
 
     private void DisplayDataGroupBoxEnter(object sender, EventArgs e)

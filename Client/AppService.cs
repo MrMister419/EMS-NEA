@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Client;
@@ -36,15 +37,28 @@ public class AppService
         return response;
     }
 
-    public async Task RequestEvent()
+    public async Task GetReceivingStatus()
+    {
+        Dictionary<string, string> payload = new Dictionary<string, string>();
+        payload.Add("Email", AppContext.email);
+        string wrappedJson = PackageJson(payload, "GetReceivingStatus");
+        Dictionary<string, string> response = await httpService.SendPOSTrequest(wrappedJson);
+        if (response != null && response.ContainsKey("isReceiving"))
+        {
+            bool.TryParse(response["isReceiving"], out bool choice);
+            AppContext.isReceiving = choice;
+        }
+    }
+
+    public void RequestEvent()
     {
         Dictionary<string, string> payload = new Dictionary<string, string>();
         payload.Add("Email", AppContext.email);
         string wrappedJson = PackageJson(payload, "RequestEvent");
-        await httpService.SendPOSTrequest(wrappedJson);
+        Task.Run(async () => { await httpService.SendPOSTrequest(wrappedJson); });
     }
 
-    public async Task ToggleAlertChoice(bool newChoice)
+    public void ToggleAlertChoice(bool newChoice)
     {
         string alertChoice = newChoice.ToString();
         Dictionary<string, string> payload = new Dictionary<string, string>();
@@ -53,9 +67,10 @@ public class AppService
         string wrappedJson = PackageJson(payload, "ToggleAlertChoice");
         
         httpService.SendPOSTrequest(wrappedJson);
+        AppContext.isReceiving = newChoice;
         if (newChoice)
         {
-            await RequestEvent();
+            RequestEvent();
         }
     }
 
@@ -67,6 +82,14 @@ public class AppService
         string wrappedJson = PackageJson(payload, "GetAccountDetails");
         
         return await httpService.SendPOSTrequest(wrappedJson);
+    }
+
+    public void RequestEventIfReceiving(bool isReceiving)
+    {
+        if (isReceiving)
+        {
+            RequestEvent();
+        }
     }
 
     public async Task<Dictionary<string, string>> ModifyAccountDetails(Dictionary<string, string> formValues)
@@ -135,6 +158,11 @@ class HttpService
 {
     private readonly HttpClient HttpClient = new HttpClient();
     
+    public HttpService()
+    {
+        HttpClient.Timeout = TimeSpan.FromSeconds(120);
+    }
+    
     public async Task<Dictionary<string, string>> SendPOSTrequest(string json)
     {
         Console.WriteLine(json);
@@ -147,6 +175,7 @@ class HttpService
             HttpResponseMessage response = await HttpClient.PostAsync("http://localhost:50000", content);
 
             responseString = await response.Content.ReadAsStringAsync();
+            Console.WriteLine("response: " + responseString);
             responseJSON = JsonSerializer.Deserialize<Dictionary<string, string>>(responseString);
 
             Console.WriteLine("\nPOST request successful.");

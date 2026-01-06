@@ -64,13 +64,16 @@ class Server
                 completionStatus = await Authenticate(payload);
                 break;
             case "ToggleAlertChoice":
-                ToggleAlertChoice(payload);
+                completionStatus = ToggleAlertChoice(payload);
                 break;
             case "GetAccountDetails":
                 completionStatus = await GetAccountDetails(payload);
                 break;
             case "ModifyAccountDetails":
                 completionStatus = await ModifyAccountDetails(payload);
+                break;
+            case "GetReceivingStatus":
+                completionStatus = GetReceivingStatus(payload);
                 break;
             default:
                 completionStatus["outcome"] = "Unknown request type.";
@@ -144,13 +147,17 @@ class Server
         return Authenticate(loginDetails);
     }
     
-    private static void ToggleAlertChoice(string alertChoiceJson)
+    private static Dictionary<string, string> ToggleAlertChoice(string alertChoiceJson)
     {
         Dictionary<string, string> data = DeserializeToDictionary(alertChoiceJson);
         string email = data["Email"];
-        bool alertChoice = (data["AlertChoice"] == "True");
+        bool alertChoice = (data["AlertChoice"] == "true");
         
         database.ChangeAlertChoice(alertChoice, email);
+        
+        Dictionary<string, string> response = new Dictionary<string, string>();
+        response.Add("successful", "true");
+        return response;
     }
 
     private static Task<Dictionary<string, string>> GetAccountDetails(string accountDetailsJson)
@@ -235,6 +242,19 @@ class Server
         }
     }
     
+    private static Dictionary<string, string> GetReceivingStatus(string requestJson)
+    {
+        Dictionary<string, string> data = DeserializeToDictionary(requestJson);
+        string email = data["Email"];
+        Dictionary<string, string> response = new Dictionary<string, string>();
+
+        bool receiving = database.GetReceivingStatus(email);
+        response.Add("isReceiving", receiving.ToString());
+        response.Add("successful", "true");
+
+        return response;
+    }
+
     private static Dictionary<string, string> DeserializeToDictionary(string json)
     {
         return JsonSerializer.Deserialize<Dictionary<string, string>>(json);
