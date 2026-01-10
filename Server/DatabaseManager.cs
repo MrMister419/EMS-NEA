@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.OleDb;
+using System.Globalization;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -11,15 +12,13 @@ namespace Server;
 /// </summary>
 internal class DatabaseManager
 {
+    private string connectionString;
+    
     // Initializes and opens database connection
     public DatabaseManager()
     {
         string passkey = System.Environment.GetEnvironmentVariable("DBPasskey");
-        string connectionString =
-            $"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=EMS_NEA_Database.accdb;Jet OLEDB:Database Password={passkey};";
-        ServerContext.connection = new OleDbConnection(connectionString);
-        ServerContext.connection.Open();
-        Console.WriteLine("Connected to database: " + ServerContext.connection.State);
+        connectionString = $"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=EMS_NEA_Database.accdb;Jet OLEDB:Database Password={passkey};";
     }
 
 
@@ -28,25 +27,39 @@ internal class DatabaseManager
     // - Event eventToInsert: Event object containing incident details
     // Returns:
     // Task for the asyncronous operation with no return value
-    public async Task InsertEvent(Event eventToInsert)
+    public async Task<Dictionary<string, string>> InsertEvent(Event eventToInsert)
     {
         const string query =
             "INSERT INTO Incident (incident_type, description, address, latitude, longitude, status, start_time, resolved_time) " +
             "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        Dictionary<string, string> outcome;
 
-        await using (OleDbCommand command = new OleDbCommand(query, ServerContext.connection))
+        try
         {
-            command.Parameters.AddWithValue("@incident_type", eventToInsert.type);
-            command.Parameters.AddWithValue("@description", eventToInsert.description);
-            command.Parameters.AddWithValue("@address", eventToInsert.location.address);
-            command.Parameters.AddWithValue("@latitude", eventToInsert.location.latitude);
-            command.Parameters.AddWithValue("@longitude", eventToInsert.location.longitude);
-            command.Parameters.AddWithValue("@status", eventToInsert.status);
-            command.Parameters.AddWithValue("@start_time", eventToInsert.startTimestamp);
-            command.Parameters.AddWithValue("@resolved_time", eventToInsert.resolvedTimestamp);
+            await using (OleDbConnection connection = new OleDbConnection(connectionString))
+            await using (OleDbCommand command = new OleDbCommand(query, connection))
+            {
+                command.Parameters.AddWithValue("@incident_type", eventToInsert.type);
+                command.Parameters.AddWithValue("@description", eventToInsert.description);
+                command.Parameters.AddWithValue("@address", eventToInsert.location.address);
+                command.Parameters.AddWithValue("@latitude", eventToInsert.location.latitude);
+                command.Parameters.AddWithValue("@longitude", eventToInsert.location.longitude);
+                command.Parameters.AddWithValue("@status", eventToInsert.status);
+                command.Parameters.AddWithValue("@start_time", eventToInsert.startTimestamp);
+                command.Parameters.AddWithValue("@resolved_time", eventToInsert.resolvedTimestamp);
 
-            await command.ExecuteNonQueryAsync();
+                await command.ExecuteNonQueryAsync();
+            }
+
+            outcome = FormulateOutcome(true, "Event inserted successfully.");
         }
+        catch (Exception e)
+        {
+            Console.WriteLine("Error inserting event into database: " + e);
+            outcome = FormulateOutcome(false, "Error inserting event into database.");
+        }
+
+        return outcome;
     }
 
     // Inserts new user into database with default settings
@@ -54,26 +67,39 @@ internal class DatabaseManager
     // - User userToInsert: User object containing account details
     // Returns:
     // Task for the asyncronous operation with no return value
-    public async Task InsertUser(User userToInsert)
+    public async Task<Dictionary<string, string>> InsertUser(User userToInsert)
     {
         const string query =
             "INSERT INTO [User] (first_name, last_name, phone_number, email_address, password_hash, latitude, longitude, is_receiving) " +
             "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        Dictionary<string, string> outcome;
 
-        await using (OleDbCommand command = new OleDbCommand(query, ServerContext.connection))
+        try
         {
-            command.Parameters.AddWithValue("@first_name", userToInsert.firstName);
-            command.Parameters.AddWithValue("@last_name", userToInsert.lastName);
-            command.Parameters.AddWithValue("@phone_number", userToInsert.phoneNumber);
-            command.Parameters.AddWithValue("@email_address", userToInsert.email);
-            command.Parameters.AddWithValue("@password_hash", userToInsert.password);
-            command.Parameters.AddWithValue("@latitude", 0);
-            command.Parameters.AddWithValue("@longitude", 0);
-            command.Parameters.AddWithValue("@is_receiving", false);
+            await using (OleDbConnection connection = new OleDbConnection(connectionString))
+            await using (OleDbCommand command = new OleDbCommand(query, connection))
+            {
+                command.Parameters.AddWithValue("@first_name", userToInsert.firstName);
+                command.Parameters.AddWithValue("@last_name", userToInsert.lastName);
+                command.Parameters.AddWithValue("@phone_number", userToInsert.phoneNumber);
+                command.Parameters.AddWithValue("@email_address", userToInsert.email);
+                command.Parameters.AddWithValue("@password_hash", userToInsert.password);
+                command.Parameters.AddWithValue("@latitude", 0);
+                command.Parameters.AddWithValue("@longitude", 0);
+                command.Parameters.AddWithValue("@is_receiving", false);
             
-            await command.ExecuteNonQueryAsync();
-            Console.WriteLine("Inserted user into database.");
+                await command.ExecuteNonQueryAsync();
+                Console.WriteLine("Inserted user into database.");
+            }
+            outcome = FormulateOutcome(true, "User added successfully.");
         }
+        catch (Exception e)
+        {
+            Console.WriteLine("Error inserting user into database: " + e);
+            outcome = FormulateOutcome(false, "Error inserting user into database.");
+        }
+
+        return outcome;
     }
 
     // Verifies user login credentials against database
@@ -82,29 +108,43 @@ internal class DatabaseManager
     // - string passwordHash: hashed password to verify
     // Returns:
     // Task<string>: outcome message describing authentication result
-    public async Task<string> CheckLoginDetails(string email, string passwordHash)
+    public async Task<Dictionary<string, string>> CheckLoginDetails(string email, string passwordHash)
     {
         const string query = 
             "SELECT password_hash FROM [User] WHERE email_address = ?";
+        Dictionary<string, string> outcome;
 
-        await using (OleDbCommand command = new OleDbCommand(query, ServerContext.connection))
+        try
         {
-            command.Parameters.AddWithValue("@email_address", email);
+            await using (OleDbConnection connection = new OleDbConnection(connectionString))
+            await using (OleDbCommand command = new OleDbCommand(query, connection))
+            {
+                command.Parameters.AddWithValue("@email_address", email);
 
-            string? retrievedHash = (string?) await command.ExecuteScalarAsync();
+                // Returns null if email is not found
+                string? retrievedHash = (string?) await command.ExecuteScalarAsync();
 
-            if (retrievedHash == null)
-            {
-                return "Email not found.";
-            } else if (retrievedHash != passwordHash)
-            {
-                return "Incorrect password.";
+                if (retrievedHash == null)
+                {
+                    outcome = FormulateOutcome(false, "User not found.");
+                } else if (retrievedHash != passwordHash)
+                {
+                    outcome = FormulateOutcome(false, "Incorrect password.");
+                }
+                else
+                {
+                    outcome = FormulateOutcome(true, "Correct logins.");
+                }
             }
-            else
-            {
-                return "Correct logins.";
-            }
+
         }
+        catch (Exception e)
+        {
+            Console.WriteLine("Error checking login details: " + e);
+            outcome = FormulateOutcome(false, "Error checking login details.");
+        }
+        
+        return outcome;
     }
 
     // Updates user alert preference in database
@@ -113,19 +153,30 @@ internal class DatabaseManager
     // - string email: user email address
     // Returns:
     // Task for the asyncronous operation with no return value
-    public async Task ChangeAlertChoice(bool alertChoice, string email)
+    public async Task<Dictionary<string, string>> ChangeAlertChoice(bool alertChoice, string email)
     {
         const string query = 
-            "UPDATE [User] SET is_receiving = ?" +
-            "WHERE email_address = ?";
+            "UPDATE [User] SET is_receiving = ? WHERE email_address = ?";
+        Dictionary<string, string> outcome;
 
-        await using (OleDbCommand command = new OleDbCommand(query, ServerContext.connection))
+        try
         {
-            command.Parameters.AddWithValue("@is_receiving", alertChoice);
-            command.Parameters.AddWithValue("@email_address", email);
-            await command.ExecuteNonQueryAsync();
-            Console.WriteLine("Updated alert choice.");
+            await using (OleDbConnection connection = new OleDbConnection(connectionString))
+            await using (OleDbCommand command = new OleDbCommand(query, connection))
+            {
+                command.Parameters.AddWithValue("@is_receiving", alertChoice);
+                command.Parameters.AddWithValue("@email_address", email);
+                await command.ExecuteNonQueryAsync();
+            }
+            outcome = FormulateOutcome(true, "Alert preference updated successfully.");
         }
+        catch (Exception e)
+        {
+            Console.WriteLine("Error updating alert choice: " + e);
+            outcome = FormulateOutcome(false, "Error updating alert choice.");
+        }
+        
+        return outcome;
     }
     
     // Retrieves user alert receiving status from database
@@ -133,16 +184,39 @@ internal class DatabaseManager
     // - string email: user email address
     // Returns:
     // Task<bool>: true if user is receiving alerts, false otherwise
-    public async Task<bool> GetReceivingStatus(string email)
+    public async Task<Dictionary<string, string>> GetReceivingStatus(string email)
     {
         const string query = "SELECT is_receiving FROM [User] WHERE email_address = ?";
-
-        await using (OleDbCommand command = new OleDbCommand(query, ServerContext.connection))
+        Dictionary<string, string> outcome;
+        Dictionary<string, string> receivingStatus = new Dictionary<string, string>();
+        
+        try
         {
-            command.Parameters.AddWithValue("@email_address", email);
-            bool? result = (bool?) await command.ExecuteScalarAsync();
-            return result ?? false;
+            bool? result;
+            await using (OleDbConnection connection = new OleDbConnection(connectionString))
+            await using (OleDbCommand command = new OleDbCommand(query, connection))
+            {
+                command.Parameters.AddWithValue("@email_address", email);
+                result = (bool?) await command.ExecuteScalarAsync();
+            }
+            
+            if (result != null)
+            {
+                receivingStatus.Add("isReceiving", result.Value.ToString());
+                outcome = FormulateOutcome(true, "Status retrieved.", receivingStatus);
+            }
+            else
+            {
+                outcome = FormulateOutcome(false, "Email not found.");
+            }
         }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            outcome = FormulateOutcome(false, "Error retrieving status.");
+        }
+        
+        return outcome;
     }
 
     // Retrieves user account details from database
@@ -153,30 +227,40 @@ internal class DatabaseManager
     public async Task<Dictionary<string, string>> RetrieveUserDetails(string email)
     {
         const string query = 
-            "SELECT first_name, last_name, phone_number FROM [User]" +
-            "WHERE email_address = ?";
-
+            "SELECT first_name, last_name, phone_number FROM [User] WHERE email_address = ?";
+        Dictionary<string, string> outcome;
         Dictionary<string, string> userDetails = new Dictionary<string, string>();
 
-        await using (OleDbCommand command = new OleDbCommand(query, ServerContext.connection))
+        try
         {
-            command.Parameters.AddWithValue("@email_address", email);
-            await using (OleDbDataReader reader = (OleDbDataReader)await command.ExecuteReaderAsync())
+            await using (OleDbConnection connection = new OleDbConnection(connectionString))
+            await using (OleDbCommand command = new OleDbCommand(query, connection))
             {
-                if (await reader.ReadAsync())
+                command.Parameters.AddWithValue("@email_address", email);
+                await using (OleDbDataReader reader = (OleDbDataReader)await command.ExecuteReaderAsync())
                 {
-                    userDetails.Add("First Name", reader.GetString(0));
-                    userDetails.Add("Last Name", reader.GetString(1));
-                    userDetails.Add("Phone Number", reader.GetString(2));
-                }
-                else
-                {
-                    throw new Exception("User not found.");
+                    if (await reader.ReadAsync())
+                    {
+                        userDetails.Add("First Name", reader.GetString(0));
+                        userDetails.Add("Last Name", reader.GetString(1));
+                        userDetails.Add("Phone Number", reader.GetString(2));
+                        
+                        outcome = FormulateOutcome(true, "User details retrieved.", userDetails);
+                    }
+                    else
+                    {
+                        outcome = FormulateOutcome(false, "Email not found.");
+                    }
                 }
             }
         }
+        catch (Exception e)
+        {
+            Console.WriteLine("Error retrieving user details: " + e);
+            outcome = FormulateOutcome(false, "Error retrieving user details.");
+        }
         
-        return userDetails;
+        return outcome;
     }
     
     // Updates user account details
@@ -185,8 +269,9 @@ internal class DatabaseManager
     // - string oldEmail: current email address for user identification
     // Returns:
     // Task<bool>: true if update successful
-    public async Task<bool> UpdateUserDetails(Dictionary<string, string> newDetails, string oldEmail)
+    public async Task<Dictionary<string, string>> UpdateUserDetails(Dictionary<string, string> newDetails, string oldEmail)
     {
+        Dictionary<string, string> outcome;
         string query;
         StringBuilder queryBuilder = new StringBuilder("UPDATE [User] SET ");
 
@@ -199,20 +284,29 @@ internal class DatabaseManager
         
         queryBuilder.Append(" WHERE email_address = ?");
         query = queryBuilder.ToString();
-        Console.WriteLine(query);
 
-        await using (OleDbCommand command = new OleDbCommand(query, ServerContext.connection))
+        try
         {
-            foreach (string fieldValue in newDetails.Values)
+            await using (OleDbConnection connection = new OleDbConnection(connectionString))
+            await using (OleDbCommand command = new OleDbCommand(query, connection))
             {
-                command.Parameters.AddWithValue("", fieldValue);
-            }
-            command.Parameters.AddWithValue("", oldEmail);
+                foreach (string fieldValue in newDetails.Values)
+                {
+                    command.Parameters.AddWithValue("", fieldValue);
+                }
+                command.Parameters.AddWithValue("", oldEmail);
             
-            await command.ExecuteNonQueryAsync();
-            Console.WriteLine("Updated user details.");
+                await command.ExecuteNonQueryAsync();
+            }
+            outcome = FormulateOutcome(true, "Details updated successfully.");
         }
-        return true;
+        catch (Exception e)
+        {
+            Console.WriteLine("Error updating details: " + e);
+            outcome = FormulateOutcome(false, "Error updating details.");
+        }
+        
+        return outcome;
     }
 
     // Finds all users in vicinity of incident location
@@ -223,21 +317,76 @@ internal class DatabaseManager
     // Task<List<string>>: list of user emails in vicinity
     public async Task<List<string>> FindUsersInVicinity(Location locationDetails)
     {
+        // TODO: optimise
         const string query = "SELECT email_address FROM [User]";
         List<string> emailsInRange = new List<string>();
 
-        await using (OleDbCommand command = new OleDbCommand(query, ServerContext.connection))
+        await using (OleDbConnection connection = new OleDbConnection(connectionString))
+        await using (OleDbCommand command = new OleDbCommand(query, connection))
+        await using (OleDbDataReader reader = (OleDbDataReader)await command.ExecuteReaderAsync())
         {
-            await using (OleDbDataReader reader = (OleDbDataReader)await command.ExecuteReaderAsync())
+            if (await reader.ReadAsync())
             {
-                if (await reader.ReadAsync())
-                {
-                    string email = reader.GetString(0);
-                    emailsInRange.Add(email);
-                }
+                string email = reader.GetString(0);
+                emailsInRange.Add(email);
             }
         }
         return emailsInRange;
+    }
+
+    public async Task<Dictionary<string, string>> GetUserLocation(string email)
+    {
+        const string query = "SELECT latitude, longitude FROM [User] WHERE email_address = ?";
+        Dictionary<string, string> location = new Dictionary<string, string>();
+        Dictionary<string, string> outcome;
+
+        try
+        {
+            await using (OleDbConnection connection = new OleDbConnection(connectionString))
+            await using (OleDbCommand command = new OleDbCommand(query, connection))
+            {
+                command.Parameters.AddWithValue("@email_address", email);
+                await using (OleDbDataReader reader = (OleDbDataReader)await command.ExecuteReaderAsync())
+                {
+                    if (await reader.ReadAsync())
+                    {
+                        string latitude = reader.GetDouble(0).ToString(CultureInfo.InvariantCulture);
+                        string longitude = reader.GetDouble(1).ToString(CultureInfo.InvariantCulture);
+                        location.Add("Latitude", latitude);
+                        location.Add("Longitude", longitude);
+                        outcome = FormulateOutcome(true, "Location retrieved.", location);
+                    }
+                    else
+                    {
+                        outcome = FormulateOutcome(false, "Email not found.");
+                    }
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("Error retrieving location: " + e);
+            outcome = FormulateOutcome(false, "Error retrieving location.");
+        }
+        
+        return outcome;
+    }
+
+    private Dictionary<string, string> FormulateOutcome(bool success, string outcomeMessage, Dictionary<string, string>? data = null)
+    {
+        Dictionary<string, string> outcome = new Dictionary<string, string>();
+        outcome.Add("Success", success.ToString());
+        outcome.Add("Outcome", outcomeMessage);
+
+        if (data != null)
+        {
+            foreach (KeyValuePair<string, string> entry in data)
+            {
+                outcome.Add(entry.Key, entry.Value);
+            }
+        }
+        
+        return outcome;
     }
 
     // Maps form field tags to database column names

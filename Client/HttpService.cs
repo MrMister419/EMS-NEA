@@ -19,41 +19,42 @@ class HttpService
         HttpClient.Timeout = TimeSpan.FromSeconds(60);
     }
     
-    public async Task<Dictionary<string, string>> SendPOSTrequest(string json)
+    public async Task<string?> SendPOSTrequest(string json)
     {
         Console.WriteLine("\nSending POST request: " + json);
-        Dictionary<string, string> responseJSON = new Dictionary<string, string>();
-        
+        string responseString = "";
+
         try
         {
-            StringContent content = new StringContent(json, Encoding.UTF8, mediaType:"application/json");
+            StringContent content = new StringContent(json, Encoding.UTF8, mediaType: "application/json");
             HttpResponseMessage response = await HttpClient.PostAsync("http://localhost:50000", content);
 
-            string responseString = await response.Content.ReadAsStringAsync();
+            responseString = await response.Content.ReadAsStringAsync();
             Console.WriteLine("response received: " + responseString);
-            
+
             if (!string.IsNullOrWhiteSpace(responseString))
             {
-                try
-                {
-                    responseJSON = JsonSerializer.Deserialize<Dictionary<string, string>>(responseString);
-                    Console.WriteLine("POST request successful.");
-                }
-                catch (JsonException e)
-                {
-                    Console.WriteLine("Error parsing JSON: " + e);
-                }
+                Console.WriteLine("POST request successful.");
+            }
+            else
+            {
+                Console.WriteLine("Invalid format received on POST response.");
+                return null;
             }
         }
         catch (HttpRequestException e)
         {
             Console.WriteLine("Connection error: " + e);
         }
+        catch (TaskCanceledException)
+        {
+            Console.WriteLine("Request timed out");
+        }
         catch (Exception e)
         {
             Console.WriteLine("POST failed: " + e);
         }
         
-        return responseJSON;
+        return responseString;
     }
 }

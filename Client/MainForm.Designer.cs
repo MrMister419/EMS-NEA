@@ -34,11 +34,16 @@
             accountBbutton = new System.Windows.Forms.RadioButton();
             informationButton = new System.Windows.Forms.RadioButton();
             mainAreaPanel = new System.Windows.Forms.Panel();
-            informationPanel = new System.Windows.Forms.Panel();
-            label1 = new System.Windows.Forms.Label();
-            legalPageButton = new System.Windows.Forms.Button();
-            aedHelpButton = new System.Windows.Forms.Button();
-            cprHelpButton = new System.Windows.Forms.Button();
+            changePasswordPanel = new System.Windows.Forms.Panel();
+            label22 = new System.Windows.Forms.Label();
+            groupBox3 = new System.Windows.Forms.GroupBox();
+            panel10 = new System.Windows.Forms.Panel();
+            maskedTextBox3 = new System.Windows.Forms.MaskedTextBox();
+            label24 = new System.Windows.Forms.Label();
+            panel11 = new System.Windows.Forms.Panel();
+            maskedTextBox2 = new System.Windows.Forms.MaskedTextBox();
+            label23 = new System.Windows.Forms.Label();
+            changePasswordButton = new System.Windows.Forms.Button();
             eventPanel = new System.Windows.Forms.Panel();
             button2 = new System.Windows.Forms.Button();
             button1 = new System.Windows.Forms.Button();
@@ -51,7 +56,12 @@
             label29 = new System.Windows.Forms.Label();
             label28 = new System.Windows.Forms.Label();
             label27 = new System.Windows.Forms.Label();
-            webView21 = new Microsoft.Web.WebView2.WinForms.WebView2();
+            webView = new Microsoft.Web.WebView2.WinForms.WebView2();
+            informationPanel = new System.Windows.Forms.Panel();
+            label1 = new System.Windows.Forms.Label();
+            legalPageButton = new System.Windows.Forms.Button();
+            aedHelpButton = new System.Windows.Forms.Button();
+            cprHelpButton = new System.Windows.Forms.Button();
             modifyAccountPanel = new System.Windows.Forms.Panel();
             modifyAccountResultLabel = new System.Windows.Forms.Label();
             label12 = new System.Windows.Forms.Label();
@@ -74,10 +84,10 @@
             confirmAccountChangesButton = new System.Windows.Forms.Button();
             accountPanel = new System.Windows.Forms.Panel();
             label8 = new System.Windows.Forms.Label();
-            viewAccountButton = new System.Windows.Forms.Button();
-            changeAccountButton = new System.Windows.Forms.Button();
-            changePasswordButton = new System.Windows.Forms.Button();
-            deleteAccountButton = new System.Windows.Forms.Button();
+            viewAccountDetailsPanelButton = new System.Windows.Forms.Button();
+            changeToAccountPanelButton = new System.Windows.Forms.Button();
+            changeToPasswordPanelButton = new System.Windows.Forms.Button();
+            deleteAccountPanelButton = new System.Windows.Forms.Button();
             viewAccountPanel = new System.Windows.Forms.Panel();
             label11 = new System.Windows.Forms.Label();
             displayDataGroupBox = new System.Windows.Forms.GroupBox();
@@ -95,21 +105,11 @@
             textBox1 = new System.Windows.Forms.TextBox();
             feedPanel = new System.Windows.Forms.Panel();
             label10 = new System.Windows.Forms.Label();
-            flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
+            flowLayoutPanel = new System.Windows.Forms.FlowLayoutPanel();
             settingsPanel = new System.Windows.Forms.Panel();
             signOutButton = new System.Windows.Forms.Button();
             toggleAlertsCheckbox = new System.Windows.Forms.CheckBox();
             label9 = new System.Windows.Forms.Label();
-            changePasswordPanel = new System.Windows.Forms.Panel();
-            label22 = new System.Windows.Forms.Label();
-            groupBox3 = new System.Windows.Forms.GroupBox();
-            panel10 = new System.Windows.Forms.Panel();
-            maskedTextBox3 = new System.Windows.Forms.MaskedTextBox();
-            label24 = new System.Windows.Forms.Label();
-            panel11 = new System.Windows.Forms.Panel();
-            maskedTextBox2 = new System.Windows.Forms.MaskedTextBox();
-            label23 = new System.Windows.Forms.Label();
-            button5 = new System.Windows.Forms.Button();
             deleteAccountPanel = new System.Windows.Forms.Panel();
             label26 = new System.Windows.Forms.Label();
             label25 = new System.Windows.Forms.Label();
@@ -125,10 +125,14 @@
             label6 = new System.Windows.Forms.Label();
             buttonsPanel.SuspendLayout();
             mainAreaPanel.SuspendLayout();
-            informationPanel.SuspendLayout();
+            changePasswordPanel.SuspendLayout();
+            groupBox3.SuspendLayout();
+            panel10.SuspendLayout();
+            panel11.SuspendLayout();
             eventPanel.SuspendLayout();
             eventDetailsPanel.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)webView21).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)webView).BeginInit();
+            informationPanel.SuspendLayout();
             modifyAccountPanel.SuspendLayout();
             groupBox2.SuspendLayout();
             panel1.SuspendLayout();
@@ -145,10 +149,6 @@
             panel3.SuspendLayout();
             feedPanel.SuspendLayout();
             settingsPanel.SuspendLayout();
-            changePasswordPanel.SuspendLayout();
-            groupBox3.SuspendLayout();
-            panel10.SuspendLayout();
-            panel11.SuspendLayout();
             deleteAccountPanel.SuspendLayout();
             cprHelpPanel.SuspendLayout();
             aedHelpPanel.SuspendLayout();
@@ -243,6 +243,240 @@
             mainAreaPanel.Size = new System.Drawing.Size(588, 533);
             mainAreaPanel.TabIndex = 1;
             // 
+            // changePasswordPanel
+            // 
+            changePasswordPanel.Controls.Add(label22);
+            changePasswordPanel.Controls.Add(groupBox3);
+            changePasswordPanel.Controls.Add(changePasswordButton);
+            changePasswordPanel.Location = new System.Drawing.Point(0, 0);
+            changePasswordPanel.Name = "changePasswordPanel";
+            changePasswordPanel.Size = new System.Drawing.Size(588, 533);
+            changePasswordPanel.TabIndex = 9;
+            changePasswordPanel.Tag = "changePassword";
+            // 
+            // label22
+            // 
+            label22.AutoSize = true;
+            label22.Font = new System.Drawing.Font("Segoe UI Semibold", 22.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 0);
+            label22.Location = new System.Drawing.Point(138, 3);
+            label22.Name = "label22";
+            label22.Size = new System.Drawing.Size(318, 50);
+            label22.TabIndex = 0;
+            label22.Text = "Change Password";
+            // 
+            // groupBox3
+            // 
+            groupBox3.Controls.Add(panel10);
+            groupBox3.Controls.Add(panel11);
+            groupBox3.Location = new System.Drawing.Point(20, 85);
+            groupBox3.Name = "groupBox3";
+            groupBox3.Size = new System.Drawing.Size(537, 112);
+            groupBox3.TabIndex = 2;
+            groupBox3.TabStop = false;
+            // 
+            // panel10
+            // 
+            panel10.Controls.Add(maskedTextBox3);
+            panel10.Controls.Add(label24);
+            panel10.Location = new System.Drawing.Point(12, 24);
+            panel10.Name = "panel10";
+            panel10.Size = new System.Drawing.Size(249, 71);
+            panel10.TabIndex = 20;
+            // 
+            // maskedTextBox3
+            // 
+            maskedTextBox3.Location = new System.Drawing.Point(3, 33);
+            maskedTextBox3.Name = "maskedTextBox3";
+            maskedTextBox3.Size = new System.Drawing.Size(228, 27);
+            maskedTextBox3.TabIndex = 12;
+            maskedTextBox3.Tag = "NewPassword";
+            maskedTextBox3.UseSystemPasswordChar = true;
+            // 
+            // label24
+            // 
+            label24.Location = new System.Drawing.Point(3, 11);
+            label24.Name = "label24";
+            label24.Size = new System.Drawing.Size(133, 17);
+            label24.TabIndex = 11;
+            label24.Text = "New Password";
+            // 
+            // panel11
+            // 
+            panel11.Controls.Add(maskedTextBox2);
+            panel11.Controls.Add(label23);
+            panel11.Location = new System.Drawing.Point(275, 23);
+            panel11.Name = "panel11";
+            panel11.Size = new System.Drawing.Size(249, 71);
+            panel11.TabIndex = 19;
+            // 
+            // maskedTextBox2
+            // 
+            maskedTextBox2.Location = new System.Drawing.Point(3, 33);
+            maskedTextBox2.Name = "maskedTextBox2";
+            maskedTextBox2.Size = new System.Drawing.Size(228, 27);
+            maskedTextBox2.TabIndex = 12;
+            maskedTextBox2.Tag = "OldPassword";
+            maskedTextBox2.UseSystemPasswordChar = true;
+            // 
+            // label23
+            // 
+            label23.Location = new System.Drawing.Point(3, 11);
+            label23.Name = "label23";
+            label23.Size = new System.Drawing.Size(133, 17);
+            label23.TabIndex = 11;
+            label23.Text = "Old Password";
+            // 
+            // changePasswordButton
+            // 
+            changePasswordButton.Font = new System.Drawing.Font("Segoe UI", 12F);
+            changePasswordButton.Location = new System.Drawing.Point(23, 247);
+            changePasswordButton.Name = "changePasswordButton";
+            changePasswordButton.Size = new System.Drawing.Size(136, 54);
+            changePasswordButton.TabIndex = 3;
+            changePasswordButton.Text = "Submit";
+            changePasswordButton.UseVisualStyleBackColor = true;
+            changePasswordButton.Click += ChangePasswordButtonClick;
+            // 
+            // eventPanel
+            // 
+            eventPanel.Controls.Add(button2);
+            eventPanel.Controls.Add(button1);
+            eventPanel.Controls.Add(eventDetailsPanel);
+            eventPanel.Controls.Add(webView);
+            eventPanel.Enabled = false;
+            eventPanel.Location = new System.Drawing.Point(0, 0);
+            eventPanel.Name = "eventPanel";
+            eventPanel.Size = new System.Drawing.Size(588, 533);
+            eventPanel.TabIndex = 6;
+            eventPanel.Tag = "Client.Event";
+            eventPanel.Visible = false;
+            // 
+            // button2
+            // 
+            button2.Location = new System.Drawing.Point(320, 465);
+            button2.Name = "button2";
+            button2.Size = new System.Drawing.Size(227, 53);
+            button2.TabIndex = 3;
+            button2.Tag = "ignore";
+            button2.Text = "Ignore Incident";
+            button2.UseVisualStyleBackColor = true;
+            // 
+            // button1
+            // 
+            button1.Location = new System.Drawing.Point(19, 465);
+            button1.Name = "button1";
+            button1.Size = new System.Drawing.Size(227, 53);
+            button1.TabIndex = 2;
+            button1.Tag = "respond";
+            button1.Text = "Respond to Incident";
+            button1.UseVisualStyleBackColor = true;
+            // 
+            // eventDetailsPanel
+            // 
+            eventDetailsPanel.Controls.Add(label31);
+            eventDetailsPanel.Controls.Add(label32);
+            eventDetailsPanel.Controls.Add(label33);
+            eventDetailsPanel.Controls.Add(label34);
+            eventDetailsPanel.Controls.Add(label30);
+            eventDetailsPanel.Controls.Add(label29);
+            eventDetailsPanel.Controls.Add(label28);
+            eventDetailsPanel.Controls.Add(label27);
+            eventDetailsPanel.Location = new System.Drawing.Point(8, 273);
+            eventDetailsPanel.Name = "eventDetailsPanel";
+            eventDetailsPanel.Size = new System.Drawing.Size(577, 168);
+            eventDetailsPanel.TabIndex = 1;
+            // 
+            // label31
+            // 
+            label31.AutoSize = true;
+            label31.Font = new System.Drawing.Font("Segoe UI", 11F);
+            label31.Location = new System.Drawing.Point(341, 138);
+            label31.Name = "label31";
+            label31.Size = new System.Drawing.Size(0, 25);
+            label31.TabIndex = 7;
+            label31.Tag = "Time resolved";
+            // 
+            // label32
+            // 
+            label32.AutoSize = true;
+            label32.Font = new System.Drawing.Font("Segoe UI", 11F);
+            label32.Location = new System.Drawing.Point(342, 99);
+            label32.Name = "label32";
+            label32.Size = new System.Drawing.Size(0, 25);
+            label32.TabIndex = 6;
+            label32.Tag = "Time started";
+            // 
+            // label33
+            // 
+            label33.AutoSize = true;
+            label33.Font = new System.Drawing.Font("Segoe UI", 11F);
+            label33.Location = new System.Drawing.Point(341, 57);
+            label33.Name = "label33";
+            label33.Size = new System.Drawing.Size(0, 25);
+            label33.TabIndex = 5;
+            label33.Tag = "Longitude";
+            // 
+            // label34
+            // 
+            label34.AutoSize = true;
+            label34.Font = new System.Drawing.Font("Segoe UI", 11F);
+            label34.Location = new System.Drawing.Point(341, 17);
+            label34.Name = "label34";
+            label34.Size = new System.Drawing.Size(0, 25);
+            label34.TabIndex = 4;
+            label34.Tag = "Latitude";
+            // 
+            // label30
+            // 
+            label30.AutoSize = true;
+            label30.Font = new System.Drawing.Font("Segoe UI", 11F);
+            label30.Location = new System.Drawing.Point(16, 138);
+            label30.Name = "label30";
+            label30.Size = new System.Drawing.Size(0, 25);
+            label30.TabIndex = 3;
+            label30.Tag = "Status";
+            // 
+            // label29
+            // 
+            label29.AutoSize = true;
+            label29.Font = new System.Drawing.Font("Segoe UI", 11F);
+            label29.Location = new System.Drawing.Point(16, 99);
+            label29.Name = "label29";
+            label29.Size = new System.Drawing.Size(0, 25);
+            label29.TabIndex = 2;
+            label29.Tag = "Address";
+            // 
+            // label28
+            // 
+            label28.AutoSize = true;
+            label28.Font = new System.Drawing.Font("Segoe UI", 11F);
+            label28.Location = new System.Drawing.Point(15, 57);
+            label28.Name = "label28";
+            label28.Size = new System.Drawing.Size(0, 25);
+            label28.TabIndex = 1;
+            label28.Tag = "Description";
+            // 
+            // label27
+            // 
+            label27.AutoSize = true;
+            label27.Font = new System.Drawing.Font("Segoe UI", 11F);
+            label27.Location = new System.Drawing.Point(15, 17);
+            label27.Name = "label27";
+            label27.Size = new System.Drawing.Size(0, 25);
+            label27.TabIndex = 0;
+            label27.Tag = "Type";
+            // 
+            // webView
+            // 
+            webView.AllowExternalDrop = true;
+            webView.CreationProperties = null;
+            webView.DefaultBackgroundColor = System.Drawing.Color.White;
+            webView.Location = new System.Drawing.Point(7, 3);
+            webView.Name = "webView";
+            webView.Size = new System.Drawing.Size(577, 264);
+            webView.TabIndex = 0;
+            webView.ZoomFactor = 1D;
+            // 
             // informationPanel
             // 
             informationPanel.Controls.Add(label1);
@@ -306,146 +540,6 @@
             cprHelpButton.UseVisualStyleBackColor = true;
             cprHelpButton.Click += CprHelpButtonClick;
             // 
-            // eventPanel
-            // 
-            eventPanel.Controls.Add(button2);
-            eventPanel.Controls.Add(button1);
-            eventPanel.Controls.Add(eventDetailsPanel);
-            eventPanel.Controls.Add(webView21);
-            eventPanel.Enabled = false;
-            eventPanel.Location = new System.Drawing.Point(0, 0);
-            eventPanel.Name = "eventPanel";
-            eventPanel.Size = new System.Drawing.Size(588, 533);
-            eventPanel.TabIndex = 6;
-            eventPanel.Tag = "information";
-            eventPanel.Visible = false;
-            // 
-            // button2
-            // 
-            button2.Location = new System.Drawing.Point(320, 465);
-            button2.Name = "button2";
-            button2.Size = new System.Drawing.Size(227, 53);
-            button2.TabIndex = 3;
-            button2.Tag = "ignore";
-            button2.Text = "Ignore Incident";
-            button2.UseVisualStyleBackColor = true;
-            // 
-            // button1
-            // 
-            button1.Location = new System.Drawing.Point(19, 465);
-            button1.Name = "button1";
-            button1.Size = new System.Drawing.Size(227, 53);
-            button1.TabIndex = 2;
-            button1.Tag = "respond";
-            button1.Text = "Respond to Incident";
-            button1.UseVisualStyleBackColor = true;
-            // 
-            // eventDetailsPanel
-            // 
-            eventDetailsPanel.Controls.Add(label31);
-            eventDetailsPanel.Controls.Add(label32);
-            eventDetailsPanel.Controls.Add(label33);
-            eventDetailsPanel.Controls.Add(label34);
-            eventDetailsPanel.Controls.Add(label30);
-            eventDetailsPanel.Controls.Add(label29);
-            eventDetailsPanel.Controls.Add(label28);
-            eventDetailsPanel.Controls.Add(label27);
-            eventDetailsPanel.Location = new System.Drawing.Point(8, 273);
-            eventDetailsPanel.Name = "eventDetailsPanel";
-            eventDetailsPanel.Size = new System.Drawing.Size(577, 168);
-            eventDetailsPanel.TabIndex = 1;
-            // 
-            // label31
-            // 
-            label31.AutoSize = true;
-            label31.Font = new System.Drawing.Font("Segoe UI", 11F);
-            label31.Location = new System.Drawing.Point(284, 138);
-            label31.Name = "label31";
-            label31.Size = new System.Drawing.Size(0, 25);
-            label31.TabIndex = 7;
-            label31.Tag = "endTime";
-            // 
-            // label32
-            // 
-            label32.AutoSize = true;
-            label32.Font = new System.Drawing.Font("Segoe UI", 11F);
-            label32.Location = new System.Drawing.Point(285, 99);
-            label32.Name = "label32";
-            label32.Size = new System.Drawing.Size(0, 25);
-            label32.TabIndex = 6;
-            label32.Tag = "startTime";
-            // 
-            // label33
-            // 
-            label33.AutoSize = true;
-            label33.Font = new System.Drawing.Font("Segoe UI", 11F);
-            label33.Location = new System.Drawing.Point(284, 57);
-            label33.Name = "label33";
-            label33.Size = new System.Drawing.Size(0, 25);
-            label33.TabIndex = 5;
-            label33.Tag = "longitude";
-            // 
-            // label34
-            // 
-            label34.AutoSize = true;
-            label34.Font = new System.Drawing.Font("Segoe UI", 11F);
-            label34.Location = new System.Drawing.Point(284, 17);
-            label34.Name = "label34";
-            label34.Size = new System.Drawing.Size(0, 25);
-            label34.TabIndex = 4;
-            label34.Tag = "latitude";
-            // 
-            // label30
-            // 
-            label30.AutoSize = true;
-            label30.Font = new System.Drawing.Font("Segoe UI", 11F);
-            label30.Location = new System.Drawing.Point(16, 138);
-            label30.Name = "label30";
-            label30.Size = new System.Drawing.Size(0, 25);
-            label30.TabIndex = 3;
-            label30.Tag = "status";
-            // 
-            // label29
-            // 
-            label29.AutoSize = true;
-            label29.Font = new System.Drawing.Font("Segoe UI", 11F);
-            label29.Location = new System.Drawing.Point(16, 99);
-            label29.Name = "label29";
-            label29.Size = new System.Drawing.Size(0, 25);
-            label29.TabIndex = 2;
-            label29.Tag = "address";
-            // 
-            // label28
-            // 
-            label28.AutoSize = true;
-            label28.Font = new System.Drawing.Font("Segoe UI", 11F);
-            label28.Location = new System.Drawing.Point(15, 57);
-            label28.Name = "label28";
-            label28.Size = new System.Drawing.Size(0, 25);
-            label28.TabIndex = 1;
-            label28.Tag = "description";
-            // 
-            // label27
-            // 
-            label27.AutoSize = true;
-            label27.Font = new System.Drawing.Font("Segoe UI", 11F);
-            label27.Location = new System.Drawing.Point(15, 17);
-            label27.Name = "label27";
-            label27.Size = new System.Drawing.Size(0, 25);
-            label27.TabIndex = 0;
-            label27.Tag = "type";
-            // 
-            // webView21
-            // 
-            webView21.AllowExternalDrop = true;
-            webView21.CreationProperties = null;
-            webView21.DefaultBackgroundColor = System.Drawing.Color.White;
-            webView21.Location = new System.Drawing.Point(7, 3);
-            webView21.Name = "webView21";
-            webView21.Size = new System.Drawing.Size(577, 264);
-            webView21.TabIndex = 0;
-            webView21.ZoomFactor = 1D;
-            // 
             // modifyAccountPanel
             // 
             modifyAccountPanel.Controls.Add(modifyAccountResultLabel);
@@ -505,6 +599,7 @@
             maskedTextBox1.Size = new System.Drawing.Size(228, 27);
             maskedTextBox1.TabIndex = 12;
             maskedTextBox1.Tag = "ConfirmPassword";
+            maskedTextBox1.UseSystemPasswordChar = true;
             // 
             // label21
             // 
@@ -628,10 +723,10 @@
             // accountPanel
             // 
             accountPanel.Controls.Add(label8);
-            accountPanel.Controls.Add(viewAccountButton);
-            accountPanel.Controls.Add(changeAccountButton);
-            accountPanel.Controls.Add(changePasswordButton);
-            accountPanel.Controls.Add(deleteAccountButton);
+            accountPanel.Controls.Add(viewAccountDetailsPanelButton);
+            accountPanel.Controls.Add(changeToAccountPanelButton);
+            accountPanel.Controls.Add(changeToPasswordPanelButton);
+            accountPanel.Controls.Add(deleteAccountPanelButton);
             accountPanel.Enabled = false;
             accountPanel.Location = new System.Drawing.Point(0, 0);
             accountPanel.Name = "accountPanel";
@@ -650,57 +745,57 @@
             label8.TabIndex = 0;
             label8.Text = "Account Management";
             // 
-            // viewAccountButton
+            // viewAccountDetailsPanelButton
             // 
-            viewAccountButton.Font = new System.Drawing.Font("Segoe UI", 12F);
-            viewAccountButton.Location = new System.Drawing.Point(3, 69);
-            viewAccountButton.Name = "viewAccountButton";
-            viewAccountButton.Size = new System.Drawing.Size(583, 69);
-            viewAccountButton.TabIndex = 2;
-            viewAccountButton.Tag = "viewAccount";
-            viewAccountButton.Text = "View Account Data";
-            viewAccountButton.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            viewAccountButton.UseVisualStyleBackColor = true;
-            viewAccountButton.Click += viewAccountButton_Click;
+            viewAccountDetailsPanelButton.Font = new System.Drawing.Font("Segoe UI", 12F);
+            viewAccountDetailsPanelButton.Location = new System.Drawing.Point(3, 69);
+            viewAccountDetailsPanelButton.Name = "viewAccountDetailsPanelButton";
+            viewAccountDetailsPanelButton.Size = new System.Drawing.Size(583, 69);
+            viewAccountDetailsPanelButton.TabIndex = 2;
+            viewAccountDetailsPanelButton.Tag = "viewAccount";
+            viewAccountDetailsPanelButton.Text = "View Account Data";
+            viewAccountDetailsPanelButton.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            viewAccountDetailsPanelButton.UseVisualStyleBackColor = true;
+            viewAccountDetailsPanelButton.Click += ViewAccountDetailsPanel;
             // 
-            // changeAccountButton
+            // changeToAccountPanelButton
             // 
-            changeAccountButton.Font = new System.Drawing.Font("Segoe UI", 12F);
-            changeAccountButton.Location = new System.Drawing.Point(3, 143);
-            changeAccountButton.Name = "changeAccountButton";
-            changeAccountButton.Size = new System.Drawing.Size(583, 69);
-            changeAccountButton.TabIndex = 3;
-            changeAccountButton.Tag = "changeAccount";
-            changeAccountButton.Text = "Change Account Data";
-            changeAccountButton.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            changeAccountButton.UseVisualStyleBackColor = true;
-            changeAccountButton.Click += changeAccountButton_Click;
+            changeToAccountPanelButton.Font = new System.Drawing.Font("Segoe UI", 12F);
+            changeToAccountPanelButton.Location = new System.Drawing.Point(3, 143);
+            changeToAccountPanelButton.Name = "changeToAccountPanelButton";
+            changeToAccountPanelButton.Size = new System.Drawing.Size(583, 69);
+            changeToAccountPanelButton.TabIndex = 3;
+            changeToAccountPanelButton.Tag = "changeAccount";
+            changeToAccountPanelButton.Text = "Change Account Data";
+            changeToAccountPanelButton.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            changeToAccountPanelButton.UseVisualStyleBackColor = true;
+            changeToAccountPanelButton.Click += accountPanelButton_Click;
             // 
-            // changePasswordButton
+            // changeToPasswordPanelButton
             // 
-            changePasswordButton.Font = new System.Drawing.Font("Segoe UI", 12F);
-            changePasswordButton.Location = new System.Drawing.Point(3, 217);
-            changePasswordButton.Name = "changePasswordButton";
-            changePasswordButton.Size = new System.Drawing.Size(583, 69);
-            changePasswordButton.TabIndex = 4;
-            changePasswordButton.Tag = "changePassword";
-            changePasswordButton.Text = "Change Password";
-            changePasswordButton.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            changePasswordButton.UseVisualStyleBackColor = true;
-            changePasswordButton.Click += changePasswordButton_Click;
+            changeToPasswordPanelButton.Font = new System.Drawing.Font("Segoe UI", 12F);
+            changeToPasswordPanelButton.Location = new System.Drawing.Point(3, 217);
+            changeToPasswordPanelButton.Name = "changeToPasswordPanelButton";
+            changeToPasswordPanelButton.Size = new System.Drawing.Size(583, 69);
+            changeToPasswordPanelButton.TabIndex = 4;
+            changeToPasswordPanelButton.Tag = "changePassword";
+            changeToPasswordPanelButton.Text = "Change Password";
+            changeToPasswordPanelButton.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            changeToPasswordPanelButton.UseVisualStyleBackColor = true;
+            changeToPasswordPanelButton.Click += ChangeToPasswordPanel;
             // 
-            // deleteAccountButton
+            // deleteAccountPanelButton
             // 
-            deleteAccountButton.Font = new System.Drawing.Font("Segoe UI", 12F);
-            deleteAccountButton.Location = new System.Drawing.Point(3, 291);
-            deleteAccountButton.Name = "deleteAccountButton";
-            deleteAccountButton.Size = new System.Drawing.Size(583, 69);
-            deleteAccountButton.TabIndex = 5;
-            deleteAccountButton.Tag = "deleteAccount";
-            deleteAccountButton.Text = "Delete Account";
-            deleteAccountButton.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            deleteAccountButton.UseVisualStyleBackColor = true;
-            deleteAccountButton.Click += deleteAccountButton_Click;
+            deleteAccountPanelButton.Font = new System.Drawing.Font("Segoe UI", 12F);
+            deleteAccountPanelButton.Location = new System.Drawing.Point(3, 291);
+            deleteAccountPanelButton.Name = "deleteAccountPanelButton";
+            deleteAccountPanelButton.Size = new System.Drawing.Size(583, 69);
+            deleteAccountPanelButton.TabIndex = 5;
+            deleteAccountPanelButton.Tag = "deleteAccount";
+            deleteAccountPanelButton.Text = "Delete Account";
+            deleteAccountPanelButton.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            deleteAccountPanelButton.UseVisualStyleBackColor = true;
+            deleteAccountPanelButton.Click += DeleteAccountPanel;
             // 
             // viewAccountPanel
             // 
@@ -758,7 +853,7 @@
             textBox3.ReadOnly = true;
             textBox3.Size = new System.Drawing.Size(228, 27);
             textBox3.TabIndex = 12;
-            textBox3.Tag = "PhoneNumber";
+            textBox3.Tag = "Phone Number";
             // 
             // panel5
             // 
@@ -810,7 +905,7 @@
             textBox2.ReadOnly = true;
             textBox2.Size = new System.Drawing.Size(228, 27);
             textBox2.TabIndex = 2;
-            textBox2.Tag = "LastName";
+            textBox2.Tag = "Last Name";
             // 
             // panel3
             // 
@@ -836,12 +931,12 @@
             textBox1.ReadOnly = true;
             textBox1.Size = new System.Drawing.Size(228, 27);
             textBox1.TabIndex = 0;
-            textBox1.Tag = "FirstName";
+            textBox1.Tag = "First Name";
             // 
             // feedPanel
             // 
             feedPanel.Controls.Add(label10);
-            feedPanel.Controls.Add(flowLayoutPanel1);
+            feedPanel.Controls.Add(flowLayoutPanel);
             feedPanel.Location = new System.Drawing.Point(0, 0);
             feedPanel.Name = "feedPanel";
             feedPanel.Size = new System.Drawing.Size(588, 533);
@@ -858,15 +953,15 @@
             label10.TabIndex = 0;
             label10.Text = "Incident Feed";
             // 
-            // flowLayoutPanel1
+            // flowLayoutPanel
             // 
-            flowLayoutPanel1.AutoScroll = true;
-            flowLayoutPanel1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            flowLayoutPanel1.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
-            flowLayoutPanel1.Location = new System.Drawing.Point(10, 66);
-            flowLayoutPanel1.Name = "flowLayoutPanel1";
-            flowLayoutPanel1.Size = new System.Drawing.Size(567, 455);
-            flowLayoutPanel1.TabIndex = 1;
+            flowLayoutPanel.AutoScroll = true;
+            flowLayoutPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            flowLayoutPanel.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
+            flowLayoutPanel.Location = new System.Drawing.Point(10, 85);
+            flowLayoutPanel.Name = "flowLayoutPanel";
+            flowLayoutPanel.Size = new System.Drawing.Size(567, 436);
+            flowLayoutPanel.TabIndex = 1;
             // 
             // settingsPanel
             // 
@@ -914,97 +1009,6 @@
             label9.TabIndex = 0;
             label9.Text = "Settings";
             // 
-            // changePasswordPanel
-            // 
-            changePasswordPanel.Controls.Add(label22);
-            changePasswordPanel.Controls.Add(groupBox3);
-            changePasswordPanel.Controls.Add(button5);
-            changePasswordPanel.Location = new System.Drawing.Point(0, 0);
-            changePasswordPanel.Name = "changePasswordPanel";
-            changePasswordPanel.Size = new System.Drawing.Size(588, 533);
-            changePasswordPanel.TabIndex = 9;
-            changePasswordPanel.Tag = "changePassword";
-            // 
-            // label22
-            // 
-            label22.AutoSize = true;
-            label22.Font = new System.Drawing.Font("Segoe UI Semibold", 22.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 0);
-            label22.Location = new System.Drawing.Point(138, 3);
-            label22.Name = "label22";
-            label22.Size = new System.Drawing.Size(318, 50);
-            label22.TabIndex = 0;
-            label22.Text = "Change Password";
-            // 
-            // groupBox3
-            // 
-            groupBox3.Controls.Add(panel10);
-            groupBox3.Controls.Add(panel11);
-            groupBox3.Location = new System.Drawing.Point(20, 85);
-            groupBox3.Name = "groupBox3";
-            groupBox3.Size = new System.Drawing.Size(537, 112);
-            groupBox3.TabIndex = 2;
-            groupBox3.TabStop = false;
-            // 
-            // panel10
-            // 
-            panel10.Controls.Add(maskedTextBox3);
-            panel10.Controls.Add(label24);
-            panel10.Location = new System.Drawing.Point(12, 24);
-            panel10.Name = "panel10";
-            panel10.Size = new System.Drawing.Size(249, 71);
-            panel10.TabIndex = 20;
-            // 
-            // maskedTextBox3
-            // 
-            maskedTextBox3.Location = new System.Drawing.Point(3, 33);
-            maskedTextBox3.Name = "maskedTextBox3";
-            maskedTextBox3.Size = new System.Drawing.Size(228, 27);
-            maskedTextBox3.TabIndex = 12;
-            maskedTextBox3.Tag = "NewPassword";
-            // 
-            // label24
-            // 
-            label24.Location = new System.Drawing.Point(3, 11);
-            label24.Name = "label24";
-            label24.Size = new System.Drawing.Size(133, 17);
-            label24.TabIndex = 11;
-            label24.Text = "New Password";
-            // 
-            // panel11
-            // 
-            panel11.Controls.Add(maskedTextBox2);
-            panel11.Controls.Add(label23);
-            panel11.Location = new System.Drawing.Point(275, 23);
-            panel11.Name = "panel11";
-            panel11.Size = new System.Drawing.Size(249, 71);
-            panel11.TabIndex = 19;
-            // 
-            // maskedTextBox2
-            // 
-            maskedTextBox2.Location = new System.Drawing.Point(3, 33);
-            maskedTextBox2.Name = "maskedTextBox2";
-            maskedTextBox2.Size = new System.Drawing.Size(228, 27);
-            maskedTextBox2.TabIndex = 12;
-            maskedTextBox2.Tag = "OldPassword";
-            // 
-            // label23
-            // 
-            label23.Location = new System.Drawing.Point(3, 11);
-            label23.Name = "label23";
-            label23.Size = new System.Drawing.Size(133, 17);
-            label23.TabIndex = 11;
-            label23.Text = "Old Password";
-            // 
-            // button5
-            // 
-            button5.Font = new System.Drawing.Font("Segoe UI", 12F);
-            button5.Location = new System.Drawing.Point(23, 247);
-            button5.Name = "button5";
-            button5.Size = new System.Drawing.Size(136, 54);
-            button5.TabIndex = 3;
-            button5.Text = "Submit";
-            button5.UseVisualStyleBackColor = true;
-            // 
             // deleteAccountPanel
             // 
             deleteAccountPanel.Controls.Add(label26);
@@ -1044,6 +1048,7 @@
             confirmDeleteButton.TabIndex = 3;
             confirmDeleteButton.Text = "Confirm Deletion";
             confirmDeleteButton.UseVisualStyleBackColor = true;
+            confirmDeleteButton.Click += confirmDeleteButton_Click;
             // 
             // cprHelpPanel
             // 
@@ -1143,12 +1148,19 @@
             Text = "MainForm";
             buttonsPanel.ResumeLayout(false);
             mainAreaPanel.ResumeLayout(false);
-            informationPanel.ResumeLayout(false);
-            informationPanel.PerformLayout();
+            changePasswordPanel.ResumeLayout(false);
+            changePasswordPanel.PerformLayout();
+            groupBox3.ResumeLayout(false);
+            panel10.ResumeLayout(false);
+            panel10.PerformLayout();
+            panel11.ResumeLayout(false);
+            panel11.PerformLayout();
             eventPanel.ResumeLayout(false);
             eventDetailsPanel.ResumeLayout(false);
             eventDetailsPanel.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)webView21).EndInit();
+            ((System.ComponentModel.ISupportInitialize)webView).EndInit();
+            informationPanel.ResumeLayout(false);
+            informationPanel.PerformLayout();
             modifyAccountPanel.ResumeLayout(false);
             modifyAccountPanel.PerformLayout();
             groupBox2.ResumeLayout(false);
@@ -1179,13 +1191,6 @@
             feedPanel.PerformLayout();
             settingsPanel.ResumeLayout(false);
             settingsPanel.PerformLayout();
-            changePasswordPanel.ResumeLayout(false);
-            changePasswordPanel.PerformLayout();
-            groupBox3.ResumeLayout(false);
-            panel10.ResumeLayout(false);
-            panel10.PerformLayout();
-            panel11.ResumeLayout(false);
-            panel11.PerformLayout();
             deleteAccountPanel.ResumeLayout(false);
             deleteAccountPanel.PerformLayout();
             cprHelpPanel.ResumeLayout(false);
@@ -1225,10 +1230,10 @@
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.Panel feedPanel;
         private System.Windows.Forms.Label label10;
-        private System.Windows.Forms.Button changeAccountButton;
-        private System.Windows.Forms.Button viewAccountButton;
-        private System.Windows.Forms.Button deleteAccountButton;
-        private System.Windows.Forms.Button changePasswordButton;
+        private System.Windows.Forms.Button changeToAccountPanelButton;
+        private System.Windows.Forms.Button viewAccountDetailsPanelButton;
+        private System.Windows.Forms.Button deleteAccountPanelButton;
+        private System.Windows.Forms.Button changeToPasswordPanelButton;
         private System.Windows.Forms.Panel viewAccountPanel;
         private System.Windows.Forms.Label label11;
         private System.Windows.Forms.GroupBox displayDataGroupBox;
@@ -1269,7 +1274,7 @@
         private System.Windows.Forms.Panel panel11;
         private System.Windows.Forms.MaskedTextBox maskedTextBox2;
         private System.Windows.Forms.Label label23;
-        private System.Windows.Forms.Button button5;
+        private System.Windows.Forms.Button changePasswordButton;
         private System.Windows.Forms.Panel panel10;
         private System.Windows.Forms.MaskedTextBox maskedTextBox3;
         private System.Windows.Forms.Label label24;
@@ -1279,10 +1284,10 @@
         private System.Windows.Forms.Label label26;
         private System.Windows.Forms.CheckBox toggleAlertsCheckbox;
         private System.Windows.Forms.Button signOutButton;
-        private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel1;
+        private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel;
         private System.Windows.Forms.Label modifyAccountResultLabel;
         private System.Windows.Forms.Panel eventPanel;
-        private Microsoft.Web.WebView2.WinForms.WebView2 webView21;
+        private Microsoft.Web.WebView2.WinForms.WebView2 webView;
         private System.Windows.Forms.Panel eventDetailsPanel;
         private System.Windows.Forms.Label label31;
         private System.Windows.Forms.Label label32;

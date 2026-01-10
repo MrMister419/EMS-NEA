@@ -45,16 +45,26 @@ public partial class Startup : Form
     private async void LoginSubmitButton_Click(object sender, EventArgs e)
     {
         Dictionary<string, string> formValues = AppContext.formNavigator.GetEnteredValues(loginPanel);
-        Dictionary<string, string> outcome = await AppContext.appService.Authenticate(formValues);
-        
-        if (outcome["successful"] == "true")
+        Dictionary<string, string>? outcome = await AppContext.appService.Authenticate(formValues);
+
+        // Check response is valid
+        if (outcome == null || !outcome.ContainsKey("outcome") || !outcome.ContainsKey("successful"))
         {
+            Console.WriteLine("Login failed: invalid server response.");
+        }
+        // Login successful
+        else if (outcome["successful"] == "true")
+        {
+            Console.WriteLine("Login success.");
+            
             AppContext.email = formValues["Email"];
             await AppContext.appService.GetReceivingStatus();
             AppContext.formManager.SwitchForm(this);
         }
+        // Login failed
         else
         {
+            Console.WriteLine("Login failed: invalid logins.");
             loginMessageLabel.Text = outcome["outcome"];
         }
     }

@@ -9,11 +9,10 @@ namespace Server;
 /// </summary>
 static class ServerContext
 {
-    public static RequestHandler requestHandler;
+    private static RequestHandler requestHandler;
     public static DatabaseManager database;
     public static HttpClient httpClient;
     public static Listener listener;
-    public static OleDbConnection connection;
 
     // Initializes all server components and starts listening for requests
     // Returns:

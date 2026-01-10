@@ -15,11 +15,19 @@ public class AppService
 {
     // TODO: Use token for authentication
     private static HttpService httpService;
-    private Action<Dictionary<string, string>> eventReceivedHandler;
+    private Action<string> eventReceivedHandler;
 
     public AppService()
     {
         httpService = new HttpService();
+    }
+    
+    private async Task<Dictionary<string, string>?> POSTandDeserialize(string wrappedJson)
+    {
+        string? responseString = await httpService.SendPOSTrequest(wrappedJson);
+        Dictionary<string, string>? response = AppContext.DeserializeToDictionary(responseString);
+        
+        return response;
     }
     
     // Sends user signup request to server
@@ -27,7 +35,7 @@ public class AppService
     // - Dictionary<string, string> formValues: user registration data
     public async Task SignUp(Dictionary<string, string> formValues)
     {
-        formValues["Password"] = Hash(formValues["Password"]);
+        formValues["Password"] = AppContext.Hash(formValues["Password"]);
         string wrappedJson = PackageJson(formValues, "NewUser");
         
         await httpService.SendPOSTrequest(wrappedJson);
@@ -38,13 +46,12 @@ public class AppService
     // - Dictionary<string, string> formValues: email and password
     // Returns:
     // Task<Dictionary<string, string>>: authentication result with outcome and success status
-    public async Task<Dictionary<string, string>> Authenticate(Dictionary<string, string> formValues)
+    public async Task<Dictionary<string, string>?> Authenticate(Dictionary<string, string> formValues)
     {
-        formValues["Password"] = Hash(formValues["Password"]);
+        formValues["Password"] = AppContext.Hash(formValues["Password"]);
         string wrappedJson = PackageJson(formValues, "Authenticate");
         
-        Dictionary<string, string> response = await httpService.SendPOSTrequest(wrappedJson);
-
+        Dictionary<string, string>? response = await POSTandDeserialize(wrappedJson);
         return response;
     }
     
@@ -53,10 +60,13 @@ public class AppService
     // Task for the asyncronous operation with no return value
     public async Task GetReceivingStatus()
     {
+        // Creates POST request string
         Dictionary<string, string> payload = new Dictionary<string, string>();
         payload.Add("Email", AppContext.email);
         string wrappedJson = PackageJson(payload, "GetReceivingStatus");
-        Dictionary<string, string> response = await httpService.SendPOSTrequest(wrappedJson);
+        
+        Dictionary<string, string>? response = await POSTandDeserialize(wrappedJson);
+        
         if (response != null && response.ContainsKey("isReceiving"))
         {
             bool.TryParse(response["isReceiving"], out bool choice);
@@ -94,9 +104,14 @@ public class AppService
     // Task for the asyncronous operation with no return value
     private async Task ListenForEvent(string wrappedJson)
     {
-        Dictionary<string, string> eventData = await httpService.SendPOSTrequest(wrappedJson);
+        // Waits here until long-poll is answered
+        string? eventData = await httpService.SendPOSTrequest(wrappedJson);
 
-        if (eventData.Count > 0)
+        if (string.IsNullOrWhiteSpace(eventData))
+        {
+            Console.WriteLine("No event data received.");
+        }
+        else
         {
             eventReceivedHandler.Invoke(eventData);
         }
@@ -112,10 +127,12 @@ public class AppService
     // - bool newChoice: new alert receiving preference
     public async Task ToggleAlertChoice(bool newChoice)
     {
-        string alertChoice = newChoice.ToString();
+        // Create POST request string
         Dictionary<string, string> payload = new Dictionary<string, string>();
+        string alertChoice = newChoice.ToString();
         payload.Add("Email", AppContext.email);
         payload.Add("AlertChoice", alertChoice);
+        
         string wrappedJson = PackageJson(payload, "ToggleAlertChoice");
         
         await httpService.SendPOSTrequest(wrappedJson);
@@ -129,14 +146,15 @@ public class AppService
     // Retrieves user account details from server
     // Returns:
     // Task<Dictionary<string, string>>: user account information
-    public async Task<Dictionary<string, string>> GetAccountDetails()
+    public async Task<Dictionary<string, string>?> GetAccountDetails()
     {
         Dictionary<string, string> payload = new Dictionary<string, string>();
         payload.Add("Email", AppContext.email);
         
         string wrappedJson = PackageJson(payload, "GetAccountDetails");
         
-        return await httpService.SendPOSTrequest(wrappedJson);
+        Dictionary<string, string>? response = await POSTandDeserialize(wrappedJson);
+        return response;
     }
 
     // Sends updated account details to server after password verification
@@ -144,18 +162,19 @@ public class AppService
     // - Dictionary<string, string> formValues: updated account fields
     // Returns:
     // Task<Dictionary<string, string>>: update result with outcome and success status
-    public async Task<Dictionary<string, string>> ModifyAccountDetails(Dictionary<string, string> formValues)
+    public async Task<Dictionary<string, string>?> ModifyAccountDetails(Dictionary<string, string> formValues)
     {
         formValues = RemoveNullEntries(formValues);
 
-        string passwordHash = Hash(formValues["ConfirmPassword"]);
+        string passwordHash = AppContext.Hash(formValues["ConfirmPassword"]);
         formValues.Remove("ConfirmPassword");
         formValues.Add("Password", passwordHash);
         formValues.Add("OldEmail", AppContext.email);
         
         string wrappedJson = PackageJson(formValues, "ModifyAccountDetails");
         
-        return await httpService.SendPOSTrequest(wrappedJson);
+        Dictionary<string, string>? response = await POSTandDeserialize(wrappedJson);
+        return response;
     }
     
     // Removes empty entries from dictionary
@@ -182,11 +201,22 @@ public class AppService
 
         return dictionary;
     }
+
+    public async Task<Dictionary<string, string>?> GetUserLocation()
+    {
+        Dictionary<string, string> payload = new Dictionary<string, string>();
+        payload.Add("Email", AppContext.email);
+        
+        string wrappedJson = PackageJson(payload, "GetUserLocation");
+        
+        Dictionary<string, string>? response = await POSTandDeserialize(wrappedJson);
+        return response;
+    }
     
     // Registers handler for incoming event notifications
     // Parameters:
     // - Action<Dictionary<string, string>> handler: callback to invoke when event received
-    public void RegisterEventHandler(Action<Dictionary<string, string>> handler)
+    public void RegisterEventHandler(Action<string> handler)
     {
         eventReceivedHandler = handler;
     }
@@ -207,25 +237,6 @@ public class AppService
         packagedJson = JsonSerializer.Serialize(wrappedValues);
         
         return packagedJson;
-    }
-    
-    // Hashes password using SHA256
-    // Parameters:
-    // - string password: plaintext password
-    // Returns:
-    // string: hashed password in hexadecimal format
-    private string Hash(string password)
-    {
-        // TODO: Use salt?
-        string hashedPassword = "";
-        byte[] bytes = SHA256.HashData(Encoding.UTF8.GetBytes(password));
-        foreach (byte b in bytes)
-        {
-            hashedPassword += b.ToString("x2");
-        }
-        // TODO: Use SecureString instead of string
-
-        return hashedPassword;
     }
 }
 

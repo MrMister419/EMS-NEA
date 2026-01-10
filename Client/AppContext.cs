@@ -1,4 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.Security.Cryptography;
+using System.Text;
+using System.Text.Json;
 using System.Windows.Forms;
 
 namespace Client;
@@ -20,6 +23,41 @@ static class AppContext
         formNavigator = new FormNavigation();
         formManager = new FormManager();
         appService = new AppService();
+    }
+
+    public static Dictionary<string, string>? DeserializeToDictionary(string? json)
+    {
+        Dictionary<string, string> deserialized;
+        
+        if (string.IsNullOrWhiteSpace(json))
+        {
+            return null;
+        }
+        else
+        {
+             deserialized= JsonSerializer.Deserialize<Dictionary<string, string>>(json);
+        }
+        
+        return deserialized;
+    }
+    
+    // Hashes password using SHA256
+    // Parameters:
+    // - string password: plaintext password
+    // Returns:
+    // string: hashed password in hexadecimal format
+    public static string Hash(string password)
+    {
+        // TODO: Use salt?
+        string hashedPassword = "";
+        byte[] bytes = SHA256.HashData(Encoding.UTF8.GetBytes(password));
+        foreach (byte b in bytes)
+        {
+            hashedPassword += b.ToString("x2");
+        }
+        // TODO: Use SecureString instead of string
+
+        return hashedPassword;
     }
 }
 

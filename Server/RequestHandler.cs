@@ -46,9 +46,6 @@ public class RequestHandler
             case "Authenticate":
                 completionStatus = await Authenticate(payload);
                 break;
-            case "ToggleAlertChoice":
-                completionStatus = await ToggleAlertChoice(payload);
-                break;
             case "GetAccountDetails":
                 completionStatus = await GetAccountDetails(payload);
                 break;
@@ -57,6 +54,12 @@ public class RequestHandler
                 break;
             case "GetReceivingStatus":
                 completionStatus = await GetReceivingStatus(payload);
+                break;
+            case "ToggleAlertChoice":
+                completionStatus = await ToggleAlertChoice(payload);
+                break;
+            case "GetUserLocation":
+                completionStatus = await GetUserLocation(payload);
                 break;
             default:
                 completionStatus["outcome"] = "Unknown request type.";
@@ -157,7 +160,7 @@ public class RequestHandler
     {
         Dictionary<string, string> data = DeserializeToDictionary(alertChoiceJson);
         string email = data["Email"];
-        bool alertChoice = (data["AlertChoice"] == "true");
+        bool.TryParse(data["AlertChoice"], out bool alertChoice);
         
         await ServerContext.database.ChangeAlertChoice(alertChoice, email);
         
@@ -285,6 +288,15 @@ public class RequestHandler
         response.Add("successful", "true");
 
         return response;
+    }
+
+    private async Task<Dictionary<string, string>> GetUserLocation(string requestJson)
+    {
+        Dictionary<string, string> data = DeserializeToDictionary(requestJson);
+        string email = data["Email"];
+        
+        Dictionary<string, string> location = await ServerContext.database.GetUserLocation(email);
+        return location;
     }
 
     // Helper method to deserialize JSON string into dictionary

@@ -161,34 +161,24 @@ class Listener
     // - string eventPayloadJson: JSON string containing event data to send
     public async Task NotifyWaitingClients(List<string> targetEmails, string eventPayloadJson)
     {
-        if (targetEmails.Count == 0)
-        {
-            return;
-        }
-        
         // Check which clients are in vicinity and have placed an event request
         List<PendingRequest> toRespond = new List<PendingRequest>();
         lock (waitingClients)
         {
             List<PendingRequest> remaining = new List<PendingRequest>();
-            foreach (PendingRequest pending in waitingClients)
+            foreach (string target in targetEmails)
             {
-                bool match = false;
-                foreach (string target in targetEmails)
+                foreach (PendingRequest pending in waitingClients)
                 {
                     if (pending.Email == target)
                     {
-                        match = true;
+                        toRespond.Add(pending);
                         break;
                     }
-                }
-                if (match)
-                {
-                    toRespond.Add(pending);
-                }
-                else
-                {
-                    remaining.Add(pending);
+                    else
+                    {
+                        remaining.Add(pending);
+                    }
                 }
             }
             waitingClients.Clear();

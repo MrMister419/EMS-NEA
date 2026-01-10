@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Globalization;
+using System.IO;
 using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -18,7 +19,7 @@ public partial class MainForm : Form
     public MainForm()
     {
         receivedEvents = new List<Event>();
-        
+
         InitializeComponent();
         MainFormInitialize();
     }
@@ -28,9 +29,9 @@ public partial class MainForm : Form
         // Setup default starting UI
         feedPanel.BringToFront();
         toggleAlertsCheckbox.Checked = AppContext.isReceiving;
-        
+
         // Register long-polling handler and request event
-        AppContext.appService.RegisterEventHandler(DisplayIncomingEvent);
+        AppContext.appService.RegisterEventHandler(DisplayEventInFeed);
         if (AppContext.isReceiving)
         {
             AppContext.appService.RequestEvent();
@@ -83,7 +84,7 @@ public partial class MainForm : Form
 
         foreach (Panel panel in panels)
         {
-            if (panel.Tag?.ToString() == tag)
+            if (panel.Tag.ToString() == tag)
             {
                 panel.Visible = true;
                 panel.Enabled = true;
@@ -111,16 +112,19 @@ public partial class MainForm : Form
     }
 
     // Retrieves and displays user account details
-    private async void viewAccountButton_Click(object sender, EventArgs e)
+    private async void ViewAccountDetailsPanel(object sender, EventArgs e)
     {
         switchPanels(sender);
-        Dictionary<string, string> accountDetails = await AppContext.appService.GetAccountDetails();
-        foreach (KeyValuePair<string, string> entry in accountDetails)
-        {
-            Console.WriteLine($"{entry.Key}: {entry.Value}");
-        }
+        Dictionary<string, string>? accountDetails = await AppContext.appService.GetAccountDetails();
 
-        displayAccountDetails(accountDetails);
+        if (accountDetails == null)
+        {
+            Console.WriteLine("Failed to retrieve account details.");
+        }
+        else
+        {
+            displayAccountDetails(accountDetails);
+        }
     }
 
     // Populates account details form fields with user data
@@ -130,48 +134,34 @@ public partial class MainForm : Form
     {
         accountDetails.Add("Email", AppContext.email);
 
-        List<Panel> fieldPanels = AppContext.formNavigator.GetControlsByType<Panel>(displayDataGroupBox);
-        TextBox fieldTextBox;
+        List<TextBox> textBoxes = AppContext.formNavigator.GetControlsByType<TextBox>(displayDataGroupBox);
         string fieldTag;
-        string fieldValue;
 
-        foreach (Panel fieldPanel in fieldPanels)
+        foreach (TextBox textBox in textBoxes)
         {
-            fieldTextBox = null;
-            foreach (Control childControl in fieldPanel.Controls)
+            fieldTag = textBox.Tag.ToString();
+            if (accountDetails.TryGetValue(fieldTag, out string fieldValue))
             {
-                if (childControl is TextBox textBox)
-                {
-                    fieldTextBox = textBox;
-                }
-            }
-
-            if (fieldTextBox != null)
-            {
-                fieldTag = fieldTextBox.Tag.ToString();
-                if (accountDetails.ContainsKey(fieldTag))
-                {
-                    fieldValue = accountDetails[fieldTag];
-                    fieldTextBox.Text = fieldValue;
-                }
+                Console.Write(fieldTag);
+                textBox.Text = fieldValue;
             }
         }
     }
 
     // Switches to change account details panel
-    private void changeAccountButton_Click(object sender, EventArgs e)
+    private void accountPanelButton_Click(object sender, EventArgs e)
     {
         switchPanels(sender);
     }
 
     // Switches to change password panel
-    private void changePasswordButton_Click(object sender, EventArgs e)
+    private void ChangeToPasswordPanel(object sender, EventArgs e)
     {
         switchPanels(sender);
     }
 
     // Switches to delete account panel
-    private void deleteAccountButton_Click(object sender, EventArgs e)
+    private void DeleteAccountPanel(object sender, EventArgs e)
     {
         switchPanels(sender);
     }
@@ -181,10 +171,14 @@ public partial class MainForm : Form
     {
         Dictionary<string, string> formValues = AppContext.formNavigator.GetEnteredValues(modifyAccountPanel);
         string newEmail = formValues["NewEmail"];
-        Dictionary<string, string> outcome = await AppContext.appService.ModifyAccountDetails(formValues);
-        Console.WriteLine(outcome["outcome"]);
-        Console.WriteLine(JsonSerializer.Serialize(formValues));
-        if (outcome["successful"] == "true")
+        Dictionary<string, string>? outcome = await AppContext.appService.ModifyAccountDetails(formValues);
+
+        if (outcome == null || !outcome.ContainsKey("outcome") || !outcome.ContainsKey("successful"))
+        {
+            modifyAccountResultLabel.Text = "An error occurred. Please try again later.";
+            Console.WriteLine("Account modification failed: invalid server response.");
+        }
+        else if (outcome["successful"] == "true")
         {
             AppContext.email = newEmail;
             modifyAccountResultLabel.Text = outcome["outcome"];
@@ -239,114 +233,140 @@ public partial class MainForm : Form
     // Creates and displays event tile in feed panel when event received
     // Parameters:
     // - Dictionary<string, string> eventData: event information from server
-    private void DisplayIncomingEvent(Dictionary<string, string> eventData)
+    private void DisplayEventInFeed(string eventData)
     {
-        Event evt = JsonSerializer.Deserialize<Event>(JsonSerializer.Serialize(eventData));
+        // Create event object and add to list
+        Event evt = Event.DeserializeEvent(eventData);
         receivedEvents.Add(evt);
-        
-        eventPanel.BringToFront();
-        eventPanel.Enabled = true;
-        
-        List<Label> fieldLabels = AppContext.formNavigator.GetControlsByType<Label>(eventDetailsPanel);
-        string tag = "";
-        foreach (Label label in fieldLabels)
+
+        // Create button for event
+        Button eventButton = new Button
         {
-            tag = label.Tag.ToString();
-            label.Text = $"{tag}: {eventData[tag]}";
-        }
+            Width = feedPanel.ClientSize.Width - 25,
+            Height = 80,
+            BackColor = Color.LightGray,
+            TextAlign = ContentAlignment.MiddleLeft,
+            Padding = new Padding(10),
+            Tag = evt,
+            // TODO: Display status as well
+            Text = $"{evt.Type}"
+        };
+        eventButton.Click += EventButtonClick;
+
+        // Add button to flow layout panel and display it at the bottom of the list
+        int listIndex = receivedEvents.Count - 1;
+        flowLayoutPanel.Invoke((MethodInvoker)(() =>
+        {
+            flowLayoutPanel.Controls.Add(eventButton);
+            flowLayoutPanel.Controls.SetChildIndex(eventButton, listIndex);
+        }));
     }
 
     // Shows event details when tile clicked
-    private void EventTileClick(object sender, EventArgs e)
+    private async void EventButtonClick(object sender, EventArgs e)
     {
-        Event evt = null;
-        if (sender is Control control && control.Tag is Event data)
-        {
-            evt = data;
-        }
-        else if (sender is Control control2 && control2.Parent != null && control2.Parent.Tag is Event parentData)
-        {
-            evt = parentData;
-        }
-        if (evt == null)
-        {
-            return;
-        }
-        ShowEventDetails(evt);
+        Button button = (Button)sender;
+        Event evt = (Event)button.Tag;
+        switchPanels(sender);
+        await ShowEventDetails(evt);
     }
 
     // Displays event details panel with all event information
     // Parameters:
     // - EventData evt: event data to display
-    private void ShowEventDetails(Event evt)
+    private async Task ShowEventDetails(Event evt)
     {
-        Label typeLabel = GetLabelByTag(eventPanel, "IncidentType");
-        Label descriptionLabel = GetLabelByTag(eventPanel, "Description");
-        Label addressLabel = GetLabelByTag(eventPanel, "Address");
-        Label statusLabel = GetLabelByTag(eventPanel, "Status");
-        Label startLabel = GetLabelByTag(eventPanel, "StartTime");
-        Label resolvedLabel = GetLabelByTag(eventPanel, "ResolvedTime");
+        FillEventDetailFields(evt);
 
-        if (typeLabel != null) typeLabel.Text = evt.Type;
-        if (descriptionLabel != null) descriptionLabel.Text = evt.Description;
-        if (addressLabel != null) addressLabel.Text = evt.Address;
-        if (statusLabel != null) statusLabel.Text = evt.Status;
-        if (startLabel != null) startLabel.Text = evt.StartTimestamp;
-        if (resolvedLabel != null) resolvedLabel.Text = evt.ResolvedTimestamp;
-
-        LoadRoute(evt.LocationLatitude, evt.LocationLongitude);
-
-        eventPanel.Visible = true;
-        eventPanel.Enabled = true;
-        eventPanel.BringToFront();
+        // Get user location and display route to event location
+        Dictionary<string, string>? coordinates = await AppContext.appService.GetUserLocation();
+        if (coordinates == null)
+        {
+            Console.WriteLine("Bad response to user location request.");
+        }
+        else
+        {
+            string userLat = coordinates["Latitude"];
+            string userLong = coordinates["Longitude"];
+            string eventLat = evt.location.latitude.ToString(CultureInfo.InvariantCulture);
+            string eventLong = evt.location.longitude.ToString(CultureInfo.InvariantCulture);
+            LoadRoute(userLat, userLong, eventLat, eventLong);
+        }
     }
 
-    // Recursively finds label control by Tag property
-    // Parameters:
-    // - Control parent: parent control to search within
-    // - string tag: tag value to match
-    // Returns:
-    // Label: found label or null if not found
-    private Label GetLabelByTag(Control parent, string tag)
+    private void FillEventDetailFields(Event evt)
     {
-        foreach (Control control in parent.Controls)
+        List<Label> fieldLabels = AppContext.formNavigator.GetControlsByType<Label>(eventDetailsPanel);
+        string fieldName = "";
+        string fieldValue = "";
+
+        foreach (Label label in fieldLabels)
         {
-            if (control is Label label && label.Tag != null && label.Tag.ToString() == tag)
-            {
-                return label;
-            }
-            Label child = GetLabelByTag(control, tag);
-            if (child != null)
-            {
-                return child;
-            }
+            fieldName = label.Tag.ToString();
+            fieldValue = GetFieldValue(evt, fieldName);
+            label.Text = $"{fieldName}: {fieldValue}";
         }
-        return null;
     }
 
-    // Loads Google Maps view of event location in WebView2
-    // Parameters:
-    // - double latitude: location latitude
-    // - double longitude: location longitude
-    private async void LoadRoute(double latitude, double longitude)
+    private string GetFieldValue(Event evt, string fieldName)
     {
-        if (webView21 == null)
+        switch (fieldName)
         {
-            return;
+            case "Type": return evt.Type;
+            case "Description": return evt.Description;
+            case "Latitude":
+                {
+                    double latitude = evt.location.latitude;
+                    string latitudeString = latitude.ToString(CultureInfo.InvariantCulture);
+                    return latitudeString;
+                }
+            case "Longitude":
+                {
+                    double longitude = evt.location.longitude;
+                    string longitudeString = longitude.ToString(CultureInfo.InvariantCulture);
+                    return longitudeString;
+                }
+            case "Address": return evt.location.address;
+            case "Status": return evt.Status;
+            case "Time started": return evt.StartTimestamp;
+            case "Time resolved": return evt.ResolvedTimestamp;
+            default: return "";
         }
+    }
+
+    private async void LoadRoute(string lat1, string long1, string lat2, string long2)
+    {
         try
         {
             string apiKey = "AIzaSyBR0vC11aRcwkXbXPfGr2utiILnF9EpLRY";
-            string lat = latitude.ToString(CultureInfo.InvariantCulture);
-            string lon = longitude.ToString(CultureInfo.InvariantCulture);
-            string url = $"https://www.google.com/maps/embed/v1/directions?key={apiKey}&origin={lat},{lon}&destination={lat},{lon}&mode=walking";
-            await webView21.EnsureCoreWebView2Async();
-            webView21.Source = new Uri(url);
+            string url = $"https://www.google.com/maps/embed/v1/directions?key={apiKey}&origin={lat1},{long1}&destination={lat2},{long2}&mode=driving";
+            string html = FetchHTML(url);
+            
+            await webView.EnsureCoreWebView2Async();
+            webView.CoreWebView2.Settings.AreDefaultContextMenusEnabled = true;
+            webView.NavigateToString(html);
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex);
+            Console.WriteLine("Error displaying map embed: " + ex);
         }
+    }
+
+    private string FetchHTML(string url)
+    {
+        string html = File.ReadAllText("mapEmbed.html");
+        html = html.Replace("{url}", url);
+        return html;
+    }
+
+    private void ChangePasswordButtonClick(object sender, EventArgs e)
+    {
+
+    }
+
+    private void confirmDeleteButton_Click(object sender, EventArgs e)
+    {
+
     }
 }
 
@@ -361,6 +381,28 @@ class Event
     public string Status { get; set; }
     public string StartTimestamp { get; set; }
     public string ResolvedTimestamp { get; set; }
-    public double LocationLatitude { get; set; }
-    public double LocationLongitude { get; set; }
+    public Location location { get; set; }
+    
+    protected static JsonSerializerOptions jsonConfig = 
+        new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+
+    // Factory method to create an Event instance by deserializing JSON
+    // Parameters:
+    // - string json: JSON string containing Event data
+    // Returns:
+    // Event: deserialized Event object
+    public static Event DeserializeEvent(string json)
+    {
+        return JsonSerializer.Deserialize<Event>(json, jsonConfig);
+    }
+}
+
+/// <summary>
+/// Represents a geographic location with address and coordinates
+/// </summary>
+class Location
+{
+    public string address { get; set; }
+    public double latitude { get; set; }
+    public double longitude { get; set; }
 }
