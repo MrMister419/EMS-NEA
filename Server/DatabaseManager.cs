@@ -4,7 +4,7 @@ using System.Data.OleDb;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace EMS_NEA;
+namespace Server;
 
 /// <summary>
 /// Manages all database operations for the server
@@ -19,7 +19,7 @@ internal class DatabaseManager
             $"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=EMS_NEA_Database.accdb;Jet OLEDB:Database Password={passkey};";
         ServerContext.connection = new OleDbConnection(connectionString);
         ServerContext.connection.Open();
-        Console.WriteLine("Connected to database." + ServerContext.connection.State);
+        Console.WriteLine("Connected to database: " + ServerContext.connection.State);
     }
 
 
@@ -45,8 +45,7 @@ internal class DatabaseManager
             command.Parameters.AddWithValue("@start_time", eventToInsert.startTimestamp);
             command.Parameters.AddWithValue("@resolved_time", eventToInsert.resolvedTimestamp);
 
-            int rowsAffected = await command.ExecuteNonQueryAsync();
-            Console.WriteLine($"Inserted event into database. Rows affected: {rowsAffected}");
+            await command.ExecuteNonQueryAsync();
         }
     }
 
@@ -63,12 +62,6 @@ internal class DatabaseManager
 
         await using (OleDbCommand command = new OleDbCommand(query, ServerContext.connection))
         {
-            Console.WriteLine(userToInsert.password);
-            Console.WriteLine(userToInsert.email);
-            Console.WriteLine(userToInsert.phoneNumber);
-            Console.WriteLine(userToInsert.firstName);
-            Console.WriteLine(userToInsert.lastName);
-            
             command.Parameters.AddWithValue("@first_name", userToInsert.firstName);
             command.Parameters.AddWithValue("@last_name", userToInsert.lastName);
             command.Parameters.AddWithValue("@phone_number", userToInsert.phoneNumber);
@@ -122,7 +115,6 @@ internal class DatabaseManager
     // Task for the asyncronous operation with no return value
     public async Task ChangeAlertChoice(bool alertChoice, string email)
     {
-        Console.WriteLine("flag1");
         const string query = 
             "UPDATE [User] SET is_receiving = ?" +
             "WHERE email_address = ?";
@@ -187,7 +179,7 @@ internal class DatabaseManager
         return userDetails;
     }
     
-    // Updates user account details in database
+    // Updates user account details
     // Parameters:
     // - Dictionary<string, string> newDetails: dictionary of fields to update
     // - string oldEmail: current email address for user identification

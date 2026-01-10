@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CAD-App", "CAD-App\CAD-App.csproj", "{81EEEEB8-2C16-4FA7-963E-0FBD9CA5EA46}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DispatchSystem", "DispatchSystem\DispatchSystem.csproj", "{81EEEEB8-2C16-4FA7-963E-0FBD9CA5EA46}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server", "Server\Server.csproj", "{707E489A-8903-4527-8A59-0D28DEE94CA7}"
 EndProject

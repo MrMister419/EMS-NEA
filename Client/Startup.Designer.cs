@@ -282,7 +282,7 @@ partial class Startup
         loginSubmitButton.TabIndex = 14;
         loginSubmitButton.Text = "Log In";
         loginSubmitButton.UseVisualStyleBackColor = true;
-        loginSubmitButton.Click += loginSubmitButton_Click;
+        loginSubmitButton.Click += LoginSubmitButton_Click;
         // 
         // groupBox2
         // 
@@ -367,7 +367,6 @@ partial class Startup
         signupTabButton.Text = "Sign Up";
         signupTabButton.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
         signupTabButton.UseVisualStyleBackColor = false;
-        signupTabButton.CheckedChanged += SignupTabButtonCheckedChanged;
         signupTabButton.Click += SignupTabButtonClick;
         // 
         // loginTabButton
@@ -386,7 +385,6 @@ partial class Startup
         loginTabButton.Text = "Log In";
         loginTabButton.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
         loginTabButton.UseVisualStyleBackColor = false;
-        loginTabButton.CheckedChanged += LoginTabButtonCheckedChanged;
         loginTabButton.Click += LoginTabButtonClick;
         // 
         // panel8

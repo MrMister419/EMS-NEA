@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace EMS_NEA;
+namespace Server;
 
 /// <summary>
 /// Processes incoming client requests and coordinates responses
@@ -17,7 +17,7 @@ public class RequestHandler
     // - string receivedJson: JSON string received from client
     // Returns:
     // Task<Dictionary<string, string>> completionStatus: outcome of request processing
-    public async Task<Dictionary<string, string>> ProcessRequest(string receivedJson)
+    public async Task<string> ProcessRequest(string receivedJson)
     {
         string requestType = "";
         string payload = "";
@@ -33,6 +33,7 @@ public class RequestHandler
         // call corresponding method based on request type
         switch (requestType)
         {
+            // TODO: add completion status to all methods
             case "NewUser":
                 await CreateNewUser(payload);
                 break;
@@ -63,7 +64,10 @@ public class RequestHandler
                 break;
         }
         
-        return completionStatus;
+        string responseJson = JsonSerializer.Serialize(completionStatus);
+        if (responseJson == "{}") responseJson = "OK";
+        
+        return responseJson;
     }
 
     // Calls delegates to deserialize JSON string into User object and insert into database
@@ -73,12 +77,7 @@ public class RequestHandler
     // Task: Task for the asyncronous operation with no return value
     private async Task CreateNewUser(string userJson)
     {
-        Console.WriteLine(userJson);
         User receivedUser = User.DeserializeUser(userJson);
-        Console.WriteLine("Values:");
-        Console.WriteLine(receivedUser.email);
-        Console.WriteLine(receivedUser);
-        Console.WriteLine(receivedUser.GetType());
         await ServerContext.database.InsertUser(receivedUser);
     }
 
@@ -90,11 +89,15 @@ public class RequestHandler
     private async Task HandleNewEvent(string eventJson)
     {
         Event receivedEvent = Event.DeserializeEvent(eventJson);
-        ServerContext.database.InsertEvent(receivedEvent);
         
-        // TODO: only check users that are online
+        // Insert new Event into the database
+        // TODO: only check users that are online for efficiency
+        await ServerContext.database.InsertEvent(receivedEvent);
+        
+        // Find and notify users in vicinity to this new event
         List<string> inVicinity = await ServerContext.database.FindUsersInVicinity(receivedEvent.location);
-        ServerContext.listener.NotifyWaitingClients(inVicinity, eventJson);
+        Console.WriteLine($"Found {inVicinity.Count} users in vicinity of incident.");
+        await ServerContext.listener.NotifyWaitingClients(inVicinity, eventJson);
     }
     
     // Updates event details in database
@@ -104,7 +107,7 @@ public class RequestHandler
     // Task: Task for the asyncronous operation with no return value
     private async Task UpdateEvent(string eventUpdateJson)
     {
-        return;
+        throw new NotImplementedException();
     }
     
     // Checks login credentials against database
@@ -180,7 +183,7 @@ public class RequestHandler
 
     // Modifies user account details after authenticating
     // Parameters:
-    // - string accountDetailsJson: JSON string containing account updates and password for verification
+    // - string accountDetailsJson: JSON string containing new account details and login details
     // Returns:
     // Task<Dictionary<string, string>>: outcome and successful status
     private async Task<Dictionary<string, string>> ModifyAccountDetails(string accountDetailsJson)
@@ -194,6 +197,7 @@ public class RequestHandler
 
         if (outcome["successful"] == "true")
         {
+            // Renames NewEmail field to Email if present
             string oldEmail = accountDetails["Email"];
             if (accountDetails.ContainsKey("NewEmail"))
             {
@@ -254,6 +258,7 @@ public class RequestHandler
                     .GetProperty("value")
                     .GetInt32();
 
+            // is less than 7 minutes?
             return (seconds / 60 < 7);
         }
         catch (Exception ex)

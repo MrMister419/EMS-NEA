@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net9.0</TargetFramework>
+        <TargetFramework>net10.0</TargetFramework>
+        <RootNamespace>DispatchSystem</RootNamespace>
+        <ImplicitUsings>disable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <UserSecretsId>e29dcb7d-ce4c-4be7-b2bc-ec2019b74bd7</UserSecretsId>
+    </PropertyGroup>
+
+</Project>

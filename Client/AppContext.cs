@@ -30,7 +30,7 @@ class FormManager
 {
     // Switches between Startup and MainForm windows
     // Parameters:
-    // - Form currentForm: the form to hide and switch from
+    // Form currentForm: the form to hide and switch from
     public void SwitchForm(Form currentForm)
     {
         currentForm.Hide();
@@ -62,43 +62,28 @@ class FormNavigation
     public Dictionary<string, string> GetEnteredValues(Panel formPanel)
     {
         Dictionary<string, string> formValues = new Dictionary<string, string>();
-        List<Panel> fieldPanels = GetControlsByType<Panel>(formPanel);
+        List<TextBoxBase> textBoxes = GetControlsByType<TextBoxBase>(formPanel);
 
         string fieldName = "";
         string fieldEntry = "";
         
-        foreach (Panel panel in fieldPanels)
+        foreach (TextBoxBase textBox in textBoxes)
         {
-            fieldName = "";
-            fieldEntry = "";
-            foreach (Control childControl in panel.Controls)
+            fieldName = textBox.Tag.ToString();
+            if (fieldName == "")
             {
-                switch (childControl)
-                {
-                    case TextBox:
-                    case MaskedTextBox:
-                    {
-                        fieldName = childControl.Tag.ToString();
-                        if (fieldName == "")
-                        {
-                            continue;
-                        }
+                continue;
+            }
 
-                        fieldEntry = childControl.Text.Trim();
+            fieldEntry = textBox.Text.Trim();
 
-                        if (childControl is MaskedTextBox)
-                        {
-                            childControl.Text = "";
-                            // TODO: Use SecureString instead of string
-                        }
-
-                        break;
-                    }
-                }
-                
+            if (textBox is MaskedTextBox)
+            {
+                textBox.Text = "";
+                // TODO: Use SecureString instead of string
             }
             
-            formValues[fieldName] = fieldEntry;
+            formValues.Add(fieldName, fieldEntry);
         }
         
         return formValues;
@@ -107,7 +92,7 @@ class FormNavigation
     // Recursively finds all controls of specified type within parent control
     // Parameters:
     // - Control parentControl: parent control to search within
-    // - bool getBaseControlsOnly: if true, only returns top-level controls of type
+    // - bool getBaseControlsOnly: if true, does not check inside components of required type
     // Returns:
     // List<type>: list of controls matching the specified type
     public List<type> GetControlsByType<type>(Control parentControl, bool getBaseControlsOnly = true) where type : Control

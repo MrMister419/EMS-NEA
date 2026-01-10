@@ -13,19 +13,28 @@ namespace Client;
 /// </summary>
 public partial class MainForm : Form
 {
-    private readonly List<EventData> receivedEvents = new List<EventData>();
+    private readonly List<Event> receivedEvents;
 
     public MainForm()
     {
+        receivedEvents = new List<Event>();
+        
         InitializeComponent();
-        feedPanel.BringToFront();
-        toggleAlertsCheckbox.Checked = AppContext.isReceiving;
-        AppContext.appService.RegisterEventHandler(DisplayIncomingEvent);
+        MainFormInitialize();
     }
 
-    private void DisplayDataGroupBoxEnter(object sender, EventArgs e)
+    private void MainFormInitialize()
     {
-
+        // Setup default starting UI
+        feedPanel.BringToFront();
+        toggleAlertsCheckbox.Checked = AppContext.isReceiving;
+        
+        // Register long-polling handler and request event
+        AppContext.appService.RegisterEventHandler(DisplayIncomingEvent);
+        if (AppContext.isReceiving)
+        {
+            AppContext.appService.RequestEvent();
+        }
     }
 
     private void liveFeedButton_CheckedChanged(object sender, EventArgs e)
@@ -94,11 +103,11 @@ public partial class MainForm : Form
     }
 
     // Updates alert preference when checkbox toggled
-    private void toggleAlertsCheckbox_CheckedChanged(object sender, EventArgs e)
+    private async void toggleAlertsCheckbox_CheckedChanged(object sender, EventArgs e)
     {
         // TODO: disable for a few seconds
         bool newChoice = toggleAlertsCheckbox.Checked;
-        AppContext.appService.ToggleAlertChoice(newChoice);
+        await AppContext.appService.ToggleAlertChoice(newChoice);
     }
 
     // Retrieves and displays user account details
@@ -211,11 +220,6 @@ public partial class MainForm : Form
         switchPanels(sender);
     }
 
-    private void label30_Click(object sender, EventArgs e)
-    {
-
-    }
-
     // Loads user alert preference and requests events if enabled
     // Returns:
     // Task for the asyncronous operation with no return value
@@ -235,43 +239,32 @@ public partial class MainForm : Form
     // Creates and displays event tile in feed panel when event received
     // Parameters:
     // - Dictionary<string, string> eventData: event information from server
-    public void DisplayIncomingEvent(Dictionary<string, string> eventData)
+    private void DisplayIncomingEvent(Dictionary<string, string> eventData)
     {
-        EventData evt = MapEvent(eventData);
+        Event evt = JsonSerializer.Deserialize<Event>(JsonSerializer.Serialize(eventData));
         receivedEvents.Add(evt);
-
-        Panel tile = new Panel();
-        tile.Width = flowLayoutPanel1.ClientSize.Width - 10;
-        tile.Height = 60;
-        tile.BackColor = Color.WhiteSmoke;
-        tile.BorderStyle = BorderStyle.FixedSingle;
-        tile.Margin = new Padding(3);
-        tile.Tag = evt;
-
-        Label title = new Label();
-        title.AutoSize = false;
-        title.Dock = DockStyle.Fill;
-        title.TextAlign = ContentAlignment.MiddleLeft;
-        title.Font = new Font("Segoe UI", 12, FontStyle.Bold);
-        title.Text = evt.Type;
-        tile.Controls.Add(title);
-
-        tile.Cursor = Cursors.Hand;
-        tile.Click += EventTileClick;
-        title.Click += EventTileClick;
-
-        flowLayoutPanel1.Controls.Add(tile);
+        
+        eventPanel.BringToFront();
+        eventPanel.Enabled = true;
+        
+        List<Label> fieldLabels = AppContext.formNavigator.GetControlsByType<Label>(eventDetailsPanel);
+        string tag = "";
+        foreach (Label label in fieldLabels)
+        {
+            tag = label.Tag.ToString();
+            label.Text = $"{tag}: {eventData[tag]}";
+        }
     }
 
     // Shows event details when tile clicked
     private void EventTileClick(object sender, EventArgs e)
     {
-        EventData evt = null;
-        if (sender is Control control && control.Tag is EventData data)
+        Event evt = null;
+        if (sender is Control control && control.Tag is Event data)
         {
             evt = data;
         }
-        else if (sender is Control control2 && control2.Parent != null && control2.Parent.Tag is EventData parentData)
+        else if (sender is Control control2 && control2.Parent != null && control2.Parent.Tag is Event parentData)
         {
             evt = parentData;
         }
@@ -285,7 +278,7 @@ public partial class MainForm : Form
     // Displays event details panel with all event information
     // Parameters:
     // - EventData evt: event data to display
-    private void ShowEventDetails(EventData evt)
+    private void ShowEventDetails(Event evt)
     {
         Label typeLabel = GetLabelByTag(eventPanel, "IncidentType");
         Label descriptionLabel = GetLabelByTag(eventPanel, "Description");
@@ -331,45 +324,6 @@ public partial class MainForm : Form
         return null;
     }
 
-    // Maps dictionary event data to EventData object
-    // Parameters:
-    // - Dictionary<string, string> eventData: raw event data from server
-    // Returns:
-    // EventData: mapped event object
-    private EventData MapEvent(Dictionary<string, string> eventData)
-    {
-        EventData evt = new EventData();
-        if (eventData == null)
-        {
-            return evt;
-        }
-
-        if (eventData.TryGetValue("type", out string type)) evt.Type = type;
-        if (eventData.TryGetValue("description", out string desc)) evt.Description = desc;
-        if (eventData.TryGetValue("status", out string status)) evt.Status = status;
-        if (eventData.TryGetValue("startTimestamp", out string start)) evt.StartTimestamp = start;
-        if (eventData.TryGetValue("resolvedTimestamp", out string resolved)) evt.ResolvedTimestamp = resolved;
-        if (eventData.TryGetValue("location.address", out string address)) evt.Address = address;
-
-        double latParsed;
-        double lonParsed;
-        if (eventData.TryGetValue("location.latitude", out string latString))
-        {
-            if (double.TryParse(latString, NumberStyles.Any, CultureInfo.InvariantCulture, out latParsed))
-            {
-                evt.LocationLatitude = latParsed;
-            }
-        }
-        if (eventData.TryGetValue("location.longitude", out string lonString))
-        {
-            if (double.TryParse(lonString, NumberStyles.Any, CultureInfo.InvariantCulture, out lonParsed))
-            {
-                evt.LocationLongitude = lonParsed;
-            }
-        }
-        return evt;
-    }
-
     // Loads Google Maps view of event location in WebView2
     // Parameters:
     // - double latitude: location latitude
@@ -397,9 +351,9 @@ public partial class MainForm : Form
 }
 
 /// <summary>
-/// Represents event data
+/// Represents a single received event
 /// </summary>
-class EventData
+class Event
 {
     public string Type { get; set; }
     public string Description { get; set; }

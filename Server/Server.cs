@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace EMS_NEA;
+namespace Server;
 
 /// <summary>
 /// Responsible for initializing and managing core components of the server application.

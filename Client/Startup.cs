@@ -15,21 +15,7 @@ public partial class Startup : Form
         InitializeComponent();
     }
 
-    private void textBox4_TextChanged(object sender, System.EventArgs e)
-    {
-
-    }
-
-    private void SignupTabButtonCheckedChanged(object sender, System.EventArgs e)
-    {
-
-    }
-
-    private void LoginTabButtonCheckedChanged(object sender, System.EventArgs e)
-    {
-
-    }
-
+    // Switch to Login tab
     private void LoginTabButtonClick(object sender, System.EventArgs e)
     {
         signupPanel.Enabled = false;
@@ -38,6 +24,7 @@ public partial class Startup : Form
         loginPanel.Enabled = true;
     }
 
+    // Switch to Signup tab
     private void SignupTabButtonClick(object sender, System.EventArgs e)
     {
         loginPanel.Enabled = false;
@@ -47,15 +34,15 @@ public partial class Startup : Form
     }
     
     // Submits signup form data to server
-    private void SignupSubmitButton_Click(object sender, System.EventArgs e)
+    private async void SignupSubmitButton_Click(object sender, System.EventArgs e)
     {
         Dictionary<string, string> formValues = 
             AppContext.formNavigator.GetEnteredValues(signupPanel);
-        AppContext.appService.SignUp(formValues);
+        await AppContext.appService.SignUp(formValues);
     }
     
     // Authenticates user and switches to main form on success
-    private async void loginSubmitButton_Click(object sender, EventArgs e)
+    private async void LoginSubmitButton_Click(object sender, EventArgs e)
     {
         Dictionary<string, string> formValues = AppContext.formNavigator.GetEnteredValues(loginPanel);
         Dictionary<string, string> outcome = await AppContext.appService.Authenticate(formValues);
@@ -65,10 +52,6 @@ public partial class Startup : Form
             AppContext.email = formValues["Email"];
             await AppContext.appService.GetReceivingStatus();
             AppContext.formManager.SwitchForm(this);
-            if (AppContext.isReceiving)
-            {
-                AppContext.appService.RequestEvent();
-            }
         }
         else
         {

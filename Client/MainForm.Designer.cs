@@ -34,13 +34,24 @@
             accountBbutton = new System.Windows.Forms.RadioButton();
             informationButton = new System.Windows.Forms.RadioButton();
             mainAreaPanel = new System.Windows.Forms.Panel();
-            eventPanel = new System.Windows.Forms.Panel();
-            webView21 = new Microsoft.Web.WebView2.WinForms.WebView2();
             informationPanel = new System.Windows.Forms.Panel();
             label1 = new System.Windows.Forms.Label();
             legalPageButton = new System.Windows.Forms.Button();
             aedHelpButton = new System.Windows.Forms.Button();
             cprHelpButton = new System.Windows.Forms.Button();
+            eventPanel = new System.Windows.Forms.Panel();
+            button2 = new System.Windows.Forms.Button();
+            button1 = new System.Windows.Forms.Button();
+            eventDetailsPanel = new System.Windows.Forms.Panel();
+            label31 = new System.Windows.Forms.Label();
+            label32 = new System.Windows.Forms.Label();
+            label33 = new System.Windows.Forms.Label();
+            label34 = new System.Windows.Forms.Label();
+            label30 = new System.Windows.Forms.Label();
+            label29 = new System.Windows.Forms.Label();
+            label28 = new System.Windows.Forms.Label();
+            label27 = new System.Windows.Forms.Label();
+            webView21 = new Microsoft.Web.WebView2.WinForms.WebView2();
             modifyAccountPanel = new System.Windows.Forms.Panel();
             modifyAccountResultLabel = new System.Windows.Forms.Label();
             label12 = new System.Windows.Forms.Label();
@@ -112,22 +123,12 @@
             legalPanel = new System.Windows.Forms.Panel();
             label7 = new System.Windows.Forms.Label();
             label6 = new System.Windows.Forms.Label();
-            panel12 = new System.Windows.Forms.Panel();
-            label27 = new System.Windows.Forms.Label();
-            label28 = new System.Windows.Forms.Label();
-            label29 = new System.Windows.Forms.Label();
-            label30 = new System.Windows.Forms.Label();
-            label31 = new System.Windows.Forms.Label();
-            label32 = new System.Windows.Forms.Label();
-            label33 = new System.Windows.Forms.Label();
-            label34 = new System.Windows.Forms.Label();
-            button1 = new System.Windows.Forms.Button();
-            button2 = new System.Windows.Forms.Button();
             buttonsPanel.SuspendLayout();
             mainAreaPanel.SuspendLayout();
-            eventPanel.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)webView21).BeginInit();
             informationPanel.SuspendLayout();
+            eventPanel.SuspendLayout();
+            eventDetailsPanel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)webView21).BeginInit();
             modifyAccountPanel.SuspendLayout();
             groupBox2.SuspendLayout();
             panel1.SuspendLayout();
@@ -152,7 +153,6 @@
             cprHelpPanel.SuspendLayout();
             aedHelpPanel.SuspendLayout();
             legalPanel.SuspendLayout();
-            panel12.SuspendLayout();
             SuspendLayout();
             // 
             // buttonsPanel
@@ -243,31 +243,6 @@
             mainAreaPanel.Size = new System.Drawing.Size(588, 533);
             mainAreaPanel.TabIndex = 1;
             // 
-            // eventPanel
-            // 
-            eventPanel.Controls.Add(button2);
-            eventPanel.Controls.Add(button1);
-            eventPanel.Controls.Add(panel12);
-            eventPanel.Controls.Add(webView21);
-            eventPanel.Enabled = false;
-            eventPanel.Location = new System.Drawing.Point(0, 0);
-            eventPanel.Name = "eventPanel";
-            eventPanel.Size = new System.Drawing.Size(588, 533);
-            eventPanel.TabIndex = 6;
-            eventPanel.Tag = "information";
-            eventPanel.Visible = false;
-            // 
-            // webView21
-            // 
-            webView21.AllowExternalDrop = true;
-            webView21.CreationProperties = null;
-            webView21.DefaultBackgroundColor = System.Drawing.Color.White;
-            webView21.Location = new System.Drawing.Point(7, 3);
-            webView21.Name = "webView21";
-            webView21.Size = new System.Drawing.Size(577, 264);
-            webView21.TabIndex = 0;
-            webView21.ZoomFactor = 1D;
-            // 
             // informationPanel
             // 
             informationPanel.Controls.Add(label1);
@@ -330,6 +305,146 @@
             cprHelpButton.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             cprHelpButton.UseVisualStyleBackColor = true;
             cprHelpButton.Click += CprHelpButtonClick;
+            // 
+            // eventPanel
+            // 
+            eventPanel.Controls.Add(button2);
+            eventPanel.Controls.Add(button1);
+            eventPanel.Controls.Add(eventDetailsPanel);
+            eventPanel.Controls.Add(webView21);
+            eventPanel.Enabled = false;
+            eventPanel.Location = new System.Drawing.Point(0, 0);
+            eventPanel.Name = "eventPanel";
+            eventPanel.Size = new System.Drawing.Size(588, 533);
+            eventPanel.TabIndex = 6;
+            eventPanel.Tag = "information";
+            eventPanel.Visible = false;
+            // 
+            // button2
+            // 
+            button2.Location = new System.Drawing.Point(320, 465);
+            button2.Name = "button2";
+            button2.Size = new System.Drawing.Size(227, 53);
+            button2.TabIndex = 3;
+            button2.Tag = "ignore";
+            button2.Text = "Ignore Incident";
+            button2.UseVisualStyleBackColor = true;
+            // 
+            // button1
+            // 
+            button1.Location = new System.Drawing.Point(19, 465);
+            button1.Name = "button1";
+            button1.Size = new System.Drawing.Size(227, 53);
+            button1.TabIndex = 2;
+            button1.Tag = "respond";
+            button1.Text = "Respond to Incident";
+            button1.UseVisualStyleBackColor = true;
+            // 
+            // eventDetailsPanel
+            // 
+            eventDetailsPanel.Controls.Add(label31);
+            eventDetailsPanel.Controls.Add(label32);
+            eventDetailsPanel.Controls.Add(label33);
+            eventDetailsPanel.Controls.Add(label34);
+            eventDetailsPanel.Controls.Add(label30);
+            eventDetailsPanel.Controls.Add(label29);
+            eventDetailsPanel.Controls.Add(label28);
+            eventDetailsPanel.Controls.Add(label27);
+            eventDetailsPanel.Location = new System.Drawing.Point(8, 273);
+            eventDetailsPanel.Name = "eventDetailsPanel";
+            eventDetailsPanel.Size = new System.Drawing.Size(577, 168);
+            eventDetailsPanel.TabIndex = 1;
+            // 
+            // label31
+            // 
+            label31.AutoSize = true;
+            label31.Font = new System.Drawing.Font("Segoe UI", 11F);
+            label31.Location = new System.Drawing.Point(284, 138);
+            label31.Name = "label31";
+            label31.Size = new System.Drawing.Size(0, 25);
+            label31.TabIndex = 7;
+            label31.Tag = "endTime";
+            // 
+            // label32
+            // 
+            label32.AutoSize = true;
+            label32.Font = new System.Drawing.Font("Segoe UI", 11F);
+            label32.Location = new System.Drawing.Point(285, 99);
+            label32.Name = "label32";
+            label32.Size = new System.Drawing.Size(0, 25);
+            label32.TabIndex = 6;
+            label32.Tag = "startTime";
+            // 
+            // label33
+            // 
+            label33.AutoSize = true;
+            label33.Font = new System.Drawing.Font("Segoe UI", 11F);
+            label33.Location = new System.Drawing.Point(284, 57);
+            label33.Name = "label33";
+            label33.Size = new System.Drawing.Size(0, 25);
+            label33.TabIndex = 5;
+            label33.Tag = "longitude";
+            // 
+            // label34
+            // 
+            label34.AutoSize = true;
+            label34.Font = new System.Drawing.Font("Segoe UI", 11F);
+            label34.Location = new System.Drawing.Point(284, 17);
+            label34.Name = "label34";
+            label34.Size = new System.Drawing.Size(0, 25);
+            label34.TabIndex = 4;
+            label34.Tag = "latitude";
+            // 
+            // label30
+            // 
+            label30.AutoSize = true;
+            label30.Font = new System.Drawing.Font("Segoe UI", 11F);
+            label30.Location = new System.Drawing.Point(16, 138);
+            label30.Name = "label30";
+            label30.Size = new System.Drawing.Size(0, 25);
+            label30.TabIndex = 3;
+            label30.Tag = "status";
+            // 
+            // label29
+            // 
+            label29.AutoSize = true;
+            label29.Font = new System.Drawing.Font("Segoe UI", 11F);
+            label29.Location = new System.Drawing.Point(16, 99);
+            label29.Name = "label29";
+            label29.Size = new System.Drawing.Size(0, 25);
+            label29.TabIndex = 2;
+            label29.Tag = "address";
+            // 
+            // label28
+            // 
+            label28.AutoSize = true;
+            label28.Font = new System.Drawing.Font("Segoe UI", 11F);
+            label28.Location = new System.Drawing.Point(15, 57);
+            label28.Name = "label28";
+            label28.Size = new System.Drawing.Size(0, 25);
+            label28.TabIndex = 1;
+            label28.Tag = "description";
+            // 
+            // label27
+            // 
+            label27.AutoSize = true;
+            label27.Font = new System.Drawing.Font("Segoe UI", 11F);
+            label27.Location = new System.Drawing.Point(15, 17);
+            label27.Name = "label27";
+            label27.Size = new System.Drawing.Size(0, 25);
+            label27.TabIndex = 0;
+            label27.Tag = "type";
+            // 
+            // webView21
+            // 
+            webView21.AllowExternalDrop = true;
+            webView21.CreationProperties = null;
+            webView21.DefaultBackgroundColor = System.Drawing.Color.White;
+            webView21.Location = new System.Drawing.Point(7, 3);
+            webView21.Name = "webView21";
+            webView21.Size = new System.Drawing.Size(577, 264);
+            webView21.TabIndex = 0;
+            webView21.ZoomFactor = 1D;
             // 
             // modifyAccountPanel
             // 
@@ -618,7 +733,6 @@
             displayDataGroupBox.Size = new System.Drawing.Size(537, 154);
             displayDataGroupBox.TabIndex = 2;
             displayDataGroupBox.TabStop = false;
-            displayDataGroupBox.Enter += DisplayDataGroupBoxEnter;
             // 
             // panel6
             // 
@@ -1018,122 +1132,6 @@
             label6.TabIndex = 1;
             label6.Text = "This page will display Terms and Conditions for using the application, and other legal statements.";
             // 
-            // panel12
-            // 
-            panel12.Controls.Add(label31);
-            panel12.Controls.Add(label32);
-            panel12.Controls.Add(label33);
-            panel12.Controls.Add(label34);
-            panel12.Controls.Add(label30);
-            panel12.Controls.Add(label29);
-            panel12.Controls.Add(label28);
-            panel12.Controls.Add(label27);
-            panel12.Location = new System.Drawing.Point(8, 273);
-            panel12.Name = "panel12";
-            panel12.Size = new System.Drawing.Size(577, 168);
-            panel12.TabIndex = 1;
-            // 
-            // label27
-            // 
-            label27.AutoSize = true;
-            label27.Font = new System.Drawing.Font("Segoe UI", 11F);
-            label27.Location = new System.Drawing.Point(15, 17);
-            label27.Name = "label27";
-            label27.Size = new System.Drawing.Size(0, 25);
-            label27.TabIndex = 0;
-            label27.Tag = "type";
-            // 
-            // label28
-            // 
-            label28.AutoSize = true;
-            label28.Font = new System.Drawing.Font("Segoe UI", 11F);
-            label28.Location = new System.Drawing.Point(15, 57);
-            label28.Name = "label28";
-            label28.Size = new System.Drawing.Size(0, 25);
-            label28.TabIndex = 1;
-            label28.Tag = "description";
-            // 
-            // label29
-            // 
-            label29.AutoSize = true;
-            label29.Font = new System.Drawing.Font("Segoe UI", 11F);
-            label29.Location = new System.Drawing.Point(16, 99);
-            label29.Name = "label29";
-            label29.Size = new System.Drawing.Size(0, 25);
-            label29.TabIndex = 2;
-            label29.Tag = "address";
-            // 
-            // label30
-            // 
-            label30.AutoSize = true;
-            label30.Font = new System.Drawing.Font("Segoe UI", 11F);
-            label30.Location = new System.Drawing.Point(16, 138);
-            label30.Name = "label30";
-            label30.Size = new System.Drawing.Size(0, 25);
-            label30.TabIndex = 3;
-            label30.Tag = "status";
-            label30.Click += label30_Click;
-            // 
-            // label31
-            // 
-            label31.AutoSize = true;
-            label31.Font = new System.Drawing.Font("Segoe UI", 11F);
-            label31.Location = new System.Drawing.Point(284, 138);
-            label31.Name = "label31";
-            label31.Size = new System.Drawing.Size(0, 25);
-            label31.TabIndex = 7;
-            label31.Tag = "endTime";
-            // 
-            // label32
-            // 
-            label32.AutoSize = true;
-            label32.Font = new System.Drawing.Font("Segoe UI", 11F);
-            label32.Location = new System.Drawing.Point(285, 99);
-            label32.Name = "label32";
-            label32.Size = new System.Drawing.Size(0, 25);
-            label32.TabIndex = 6;
-            label32.Tag = "startTime";
-            // 
-            // label33
-            // 
-            label33.AutoSize = true;
-            label33.Font = new System.Drawing.Font("Segoe UI", 11F);
-            label33.Location = new System.Drawing.Point(284, 57);
-            label33.Name = "label33";
-            label33.Size = new System.Drawing.Size(0, 25);
-            label33.TabIndex = 5;
-            label33.Tag = "longitude";
-            // 
-            // label34
-            // 
-            label34.AutoSize = true;
-            label34.Font = new System.Drawing.Font("Segoe UI", 11F);
-            label34.Location = new System.Drawing.Point(284, 17);
-            label34.Name = "label34";
-            label34.Size = new System.Drawing.Size(0, 25);
-            label34.TabIndex = 4;
-            label34.Tag = "latitude";
-            // 
-            // button1
-            // 
-            button1.Location = new System.Drawing.Point(19, 465);
-            button1.Name = "button1";
-            button1.Size = new System.Drawing.Size(227, 53);
-            button1.TabIndex = 2;
-            button1.Tag = "respond";
-            button1.Text = "Respond to Incident";
-            button1.UseVisualStyleBackColor = true;
-            // 
-            // button2
-            // 
-            button2.Location = new System.Drawing.Point(320, 465);
-            button2.Name = "button2";
-            button2.Size = new System.Drawing.Size(227, 53);
-            button2.TabIndex = 3;
-            button2.Tag = "ignore";
-            button2.Text = "Ignore Incident";
-            button2.UseVisualStyleBackColor = true;
-            // 
             // MainForm
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
@@ -1145,10 +1143,12 @@
             Text = "MainForm";
             buttonsPanel.ResumeLayout(false);
             mainAreaPanel.ResumeLayout(false);
-            eventPanel.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)webView21).EndInit();
             informationPanel.ResumeLayout(false);
             informationPanel.PerformLayout();
+            eventPanel.ResumeLayout(false);
+            eventDetailsPanel.ResumeLayout(false);
+            eventDetailsPanel.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)webView21).EndInit();
             modifyAccountPanel.ResumeLayout(false);
             modifyAccountPanel.PerformLayout();
             groupBox2.ResumeLayout(false);
@@ -1194,8 +1194,6 @@
             aedHelpPanel.PerformLayout();
             legalPanel.ResumeLayout(false);
             legalPanel.PerformLayout();
-            panel12.ResumeLayout(false);
-            panel12.PerformLayout();
             ResumeLayout(false);
         }
 
@@ -1285,7 +1283,7 @@
         private System.Windows.Forms.Label modifyAccountResultLabel;
         private System.Windows.Forms.Panel eventPanel;
         private Microsoft.Web.WebView2.WinForms.WebView2 webView21;
-        private System.Windows.Forms.Panel panel12;
+        private System.Windows.Forms.Panel eventDetailsPanel;
         private System.Windows.Forms.Label label31;
         private System.Windows.Forms.Label label32;
         private System.Windows.Forms.Label label33;

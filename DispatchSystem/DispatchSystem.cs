@@ -6,7 +6,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace EMS_NEA;
+namespace DispatchSystem;
 
 /// <summary>
 /// Computer-Aided Dispatch system for sending test events to server
@@ -22,11 +22,12 @@ class DispatchSystem
 
     // Entry point for CAD application
     // Loads sample events and sends test event to server
+    // Returns: Task representing the async operation
     public static async Task Main(string[] args)
     {
         eventsList = DeserializeEvents();
-        Console.WriteLine("Waiting to send.");
-        Console.Read();
+        Console.WriteLine("Waiting to send. Press Enter to send event.");
+        Console.ReadLine();
         currentEvent = GetRandomEvent(eventsList);
         sentEvents = new List<Dictionary<string, object>>();
         Console.WriteLine(currentEvent);
@@ -47,7 +48,6 @@ class DispatchSystem
 
             List<Dictionary<string, object>>
                 events = JsonSerializer.Deserialize<List<Dictionary<string, object>>>(json);
-            Console.WriteLine(events);
 
             return events;
         }
@@ -71,7 +71,6 @@ class DispatchSystem
     private static Dictionary<string, object> GetRandomEvent(List<Dictionary<string, object>> events)
     {
         int index = Random.Next(0, events.Count - 1);
-        index = 0;
         return events[index];
     }
 
@@ -120,10 +119,5 @@ class DispatchSystem
     private static void ResolveCurrentEvent()
     {
         currentEvent["resolvedTimestamp"] = DateTime.Now.ToLongTimeString();
-    }
-
-    // Listen for client requests for events
-    private static void ListenToClient()
-    {
     }
 }

@@ -19,7 +19,4 @@ class Client
         ApplicationConfiguration.Initialize();
         Application.Run(new Startup());
     }
-    
-    
 }
-
