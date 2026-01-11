@@ -34,7 +34,16 @@
             accountBbutton = new System.Windows.Forms.RadioButton();
             informationButton = new System.Windows.Forms.RadioButton();
             mainAreaPanel = new System.Windows.Forms.Panel();
+            deleteAccountPanel = new System.Windows.Forms.Panel();
+            panel12 = new System.Windows.Forms.Panel();
+            deleteAccountOutcomeLabel = new System.Windows.Forms.Label();
+            label35 = new System.Windows.Forms.Label();
+            maskedTextBox4 = new System.Windows.Forms.MaskedTextBox();
+            label26 = new System.Windows.Forms.Label();
+            label25 = new System.Windows.Forms.Label();
+            confirmDeleteButton = new System.Windows.Forms.Button();
             changePasswordPanel = new System.Windows.Forms.Panel();
+            changePasswordOutcomeLabel = new System.Windows.Forms.Label();
             label22 = new System.Windows.Forms.Label();
             groupBox3 = new System.Windows.Forms.GroupBox();
             panel10 = new System.Windows.Forms.Panel();
@@ -44,6 +53,27 @@
             maskedTextBox2 = new System.Windows.Forms.MaskedTextBox();
             label23 = new System.Windows.Forms.Label();
             changePasswordButton = new System.Windows.Forms.Button();
+            viewAccountPanel = new System.Windows.Forms.Panel();
+            viewAccountDataStatusLabel = new System.Windows.Forms.Label();
+            label11 = new System.Windows.Forms.Label();
+            displayDataGroupBox = new System.Windows.Forms.GroupBox();
+            panel6 = new System.Windows.Forms.Panel();
+            label13 = new System.Windows.Forms.Label();
+            textBox3 = new System.Windows.Forms.TextBox();
+            panel5 = new System.Windows.Forms.Panel();
+            label14 = new System.Windows.Forms.Label();
+            textBox4 = new System.Windows.Forms.TextBox();
+            panel4 = new System.Windows.Forms.Panel();
+            label15 = new System.Windows.Forms.Label();
+            textBox2 = new System.Windows.Forms.TextBox();
+            panel3 = new System.Windows.Forms.Panel();
+            label16 = new System.Windows.Forms.Label();
+            textBox1 = new System.Windows.Forms.TextBox();
+            settingsPanel = new System.Windows.Forms.Panel();
+            changeStatusResultLabel = new System.Windows.Forms.Label();
+            signOutButton = new System.Windows.Forms.Button();
+            toggleAlertsCheckbox = new System.Windows.Forms.CheckBox();
+            label9 = new System.Windows.Forms.Label();
             eventPanel = new System.Windows.Forms.Panel();
             button2 = new System.Windows.Forms.Button();
             button1 = new System.Windows.Forms.Button();
@@ -88,32 +118,9 @@
             changeToAccountPanelButton = new System.Windows.Forms.Button();
             changeToPasswordPanelButton = new System.Windows.Forms.Button();
             deleteAccountPanelButton = new System.Windows.Forms.Button();
-            viewAccountPanel = new System.Windows.Forms.Panel();
-            label11 = new System.Windows.Forms.Label();
-            displayDataGroupBox = new System.Windows.Forms.GroupBox();
-            panel6 = new System.Windows.Forms.Panel();
-            label13 = new System.Windows.Forms.Label();
-            textBox3 = new System.Windows.Forms.TextBox();
-            panel5 = new System.Windows.Forms.Panel();
-            label14 = new System.Windows.Forms.Label();
-            textBox4 = new System.Windows.Forms.TextBox();
-            panel4 = new System.Windows.Forms.Panel();
-            label15 = new System.Windows.Forms.Label();
-            textBox2 = new System.Windows.Forms.TextBox();
-            panel3 = new System.Windows.Forms.Panel();
-            label16 = new System.Windows.Forms.Label();
-            textBox1 = new System.Windows.Forms.TextBox();
             feedPanel = new System.Windows.Forms.Panel();
             label10 = new System.Windows.Forms.Label();
             flowLayoutPanel = new System.Windows.Forms.FlowLayoutPanel();
-            settingsPanel = new System.Windows.Forms.Panel();
-            signOutButton = new System.Windows.Forms.Button();
-            toggleAlertsCheckbox = new System.Windows.Forms.CheckBox();
-            label9 = new System.Windows.Forms.Label();
-            deleteAccountPanel = new System.Windows.Forms.Panel();
-            label26 = new System.Windows.Forms.Label();
-            label25 = new System.Windows.Forms.Label();
-            confirmDeleteButton = new System.Windows.Forms.Button();
             cprHelpPanel = new System.Windows.Forms.Panel();
             label2 = new System.Windows.Forms.Label();
             label3 = new System.Windows.Forms.Label();
@@ -125,10 +132,19 @@
             label6 = new System.Windows.Forms.Label();
             buttonsPanel.SuspendLayout();
             mainAreaPanel.SuspendLayout();
+            deleteAccountPanel.SuspendLayout();
+            panel12.SuspendLayout();
             changePasswordPanel.SuspendLayout();
             groupBox3.SuspendLayout();
             panel10.SuspendLayout();
             panel11.SuspendLayout();
+            viewAccountPanel.SuspendLayout();
+            displayDataGroupBox.SuspendLayout();
+            panel6.SuspendLayout();
+            panel5.SuspendLayout();
+            panel4.SuspendLayout();
+            panel3.SuspendLayout();
+            settingsPanel.SuspendLayout();
             eventPanel.SuspendLayout();
             eventDetailsPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)webView).BeginInit();
@@ -141,15 +157,7 @@
             panel8.SuspendLayout();
             panel9.SuspendLayout();
             accountPanel.SuspendLayout();
-            viewAccountPanel.SuspendLayout();
-            displayDataGroupBox.SuspendLayout();
-            panel6.SuspendLayout();
-            panel5.SuspendLayout();
-            panel4.SuspendLayout();
-            panel3.SuspendLayout();
             feedPanel.SuspendLayout();
-            settingsPanel.SuspendLayout();
-            deleteAccountPanel.SuspendLayout();
             cprHelpPanel.SuspendLayout();
             aedHelpPanel.SuspendLayout();
             legalPanel.SuspendLayout();
@@ -226,15 +234,15 @@
             // 
             // mainAreaPanel
             // 
+            mainAreaPanel.Controls.Add(deleteAccountPanel);
+            mainAreaPanel.Controls.Add(changePasswordPanel);
+            mainAreaPanel.Controls.Add(viewAccountPanel);
+            mainAreaPanel.Controls.Add(settingsPanel);
             mainAreaPanel.Controls.Add(eventPanel);
             mainAreaPanel.Controls.Add(informationPanel);
             mainAreaPanel.Controls.Add(modifyAccountPanel);
             mainAreaPanel.Controls.Add(accountPanel);
-            mainAreaPanel.Controls.Add(viewAccountPanel);
             mainAreaPanel.Controls.Add(feedPanel);
-            mainAreaPanel.Controls.Add(settingsPanel);
-            mainAreaPanel.Controls.Add(changePasswordPanel);
-            mainAreaPanel.Controls.Add(deleteAccountPanel);
             mainAreaPanel.Controls.Add(cprHelpPanel);
             mainAreaPanel.Controls.Add(aedHelpPanel);
             mainAreaPanel.Controls.Add(legalPanel);
@@ -243,8 +251,87 @@
             mainAreaPanel.Size = new System.Drawing.Size(588, 533);
             mainAreaPanel.TabIndex = 1;
             // 
+            // deleteAccountPanel
+            // 
+            deleteAccountPanel.Controls.Add(panel12);
+            deleteAccountPanel.Controls.Add(label26);
+            deleteAccountPanel.Controls.Add(label25);
+            deleteAccountPanel.Controls.Add(confirmDeleteButton);
+            deleteAccountPanel.Location = new System.Drawing.Point(0, 0);
+            deleteAccountPanel.Name = "deleteAccountPanel";
+            deleteAccountPanel.Size = new System.Drawing.Size(588, 533);
+            deleteAccountPanel.TabIndex = 10;
+            deleteAccountPanel.Tag = "deleteAccount";
+            // 
+            // panel12
+            // 
+            panel12.Controls.Add(deleteAccountOutcomeLabel);
+            panel12.Controls.Add(label35);
+            panel12.Controls.Add(maskedTextBox4);
+            panel12.Location = new System.Drawing.Point(36, 216);
+            panel12.Name = "panel12";
+            panel12.Size = new System.Drawing.Size(490, 83);
+            panel12.TabIndex = 6;
+            // 
+            // deleteAccountOutcomeLabel
+            // 
+            deleteAccountOutcomeLabel.Font = new System.Drawing.Font("Segoe UI", 11F);
+            deleteAccountOutcomeLabel.Location = new System.Drawing.Point(248, 39);
+            deleteAccountOutcomeLabel.Name = "deleteAccountOutcomeLabel";
+            deleteAccountOutcomeLabel.Size = new System.Drawing.Size(229, 33);
+            deleteAccountOutcomeLabel.TabIndex = 7;
+            // 
+            // label35
+            // 
+            label35.AutoSize = true;
+            label35.Location = new System.Drawing.Point(22, 14);
+            label35.Name = "label35";
+            label35.Size = new System.Drawing.Size(137, 20);
+            label35.TabIndex = 6;
+            label35.Text = "Confirm Password *";
+            // 
+            // maskedTextBox4
+            // 
+            maskedTextBox4.Location = new System.Drawing.Point(19, 41);
+            maskedTextBox4.Name = "maskedTextBox4";
+            maskedTextBox4.Size = new System.Drawing.Size(208, 27);
+            maskedTextBox4.TabIndex = 5;
+            maskedTextBox4.Tag = "Password";
+            maskedTextBox4.UseSystemPasswordChar = true;
+            // 
+            // label26
+            // 
+            label26.Font = new System.Drawing.Font("Segoe UI", 13F);
+            label26.Location = new System.Drawing.Point(69, 94);
+            label26.Name = "label26";
+            label26.Size = new System.Drawing.Size(448, 97);
+            label26.TabIndex = 4;
+            label26.Text = "Warning: You will be logged out and all data associated with this account will be deleted. This action cannot be undone.";
+            // 
+            // label25
+            // 
+            label25.AutoSize = true;
+            label25.Font = new System.Drawing.Font("Segoe UI Semibold", 22.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 0);
+            label25.Location = new System.Drawing.Point(138, 3);
+            label25.Name = "label25";
+            label25.Size = new System.Drawing.Size(280, 50);
+            label25.TabIndex = 0;
+            label25.Text = "Delete Account";
+            // 
+            // confirmDeleteButton
+            // 
+            confirmDeleteButton.Font = new System.Drawing.Font("Segoe UI", 12F);
+            confirmDeleteButton.Location = new System.Drawing.Point(175, 313);
+            confirmDeleteButton.Name = "confirmDeleteButton";
+            confirmDeleteButton.Size = new System.Drawing.Size(197, 56);
+            confirmDeleteButton.TabIndex = 3;
+            confirmDeleteButton.Text = "Confirm Deletion";
+            confirmDeleteButton.UseVisualStyleBackColor = true;
+            confirmDeleteButton.Click += ConfirmDeleteButton_Click;
+            // 
             // changePasswordPanel
             // 
+            changePasswordPanel.Controls.Add(changePasswordOutcomeLabel);
             changePasswordPanel.Controls.Add(label22);
             changePasswordPanel.Controls.Add(groupBox3);
             changePasswordPanel.Controls.Add(changePasswordButton);
@@ -253,6 +340,14 @@
             changePasswordPanel.Size = new System.Drawing.Size(588, 533);
             changePasswordPanel.TabIndex = 9;
             changePasswordPanel.Tag = "changePassword";
+            // 
+            // changePasswordOutcomeLabel
+            // 
+            changePasswordOutcomeLabel.Font = new System.Drawing.Font("Segoe UI", 11F);
+            changePasswordOutcomeLabel.Location = new System.Drawing.Point(29, 209);
+            changePasswordOutcomeLabel.Name = "changePasswordOutcomeLabel";
+            changePasswordOutcomeLabel.Size = new System.Drawing.Size(469, 31);
+            changePasswordOutcomeLabel.TabIndex = 4;
             // 
             // label22
             // 
@@ -336,6 +431,206 @@
             changePasswordButton.Text = "Submit";
             changePasswordButton.UseVisualStyleBackColor = true;
             changePasswordButton.Click += ChangePasswordButtonClick;
+            // 
+            // viewAccountPanel
+            // 
+            viewAccountPanel.Controls.Add(viewAccountDataStatusLabel);
+            viewAccountPanel.Controls.Add(label11);
+            viewAccountPanel.Controls.Add(displayDataGroupBox);
+            viewAccountPanel.Location = new System.Drawing.Point(0, 0);
+            viewAccountPanel.Name = "viewAccountPanel";
+            viewAccountPanel.Size = new System.Drawing.Size(588, 533);
+            viewAccountPanel.TabIndex = 7;
+            viewAccountPanel.Tag = "viewAccount";
+            // 
+            // viewAccountDataStatusLabel
+            // 
+            viewAccountDataStatusLabel.Font = new System.Drawing.Font("Segoe UI", 11F);
+            viewAccountDataStatusLabel.Location = new System.Drawing.Point(27, 271);
+            viewAccountDataStatusLabel.Name = "viewAccountDataStatusLabel";
+            viewAccountDataStatusLabel.Size = new System.Drawing.Size(531, 52);
+            viewAccountDataStatusLabel.TabIndex = 3;
+            // 
+            // label11
+            // 
+            label11.AutoSize = true;
+            label11.Font = new System.Drawing.Font("Segoe UI Semibold", 22.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 0);
+            label11.Location = new System.Drawing.Point(164, 3);
+            label11.Name = "label11";
+            label11.Size = new System.Drawing.Size(248, 50);
+            label11.TabIndex = 0;
+            label11.Text = "Account Data";
+            // 
+            // displayDataGroupBox
+            // 
+            displayDataGroupBox.Controls.Add(panel6);
+            displayDataGroupBox.Controls.Add(panel5);
+            displayDataGroupBox.Controls.Add(panel4);
+            displayDataGroupBox.Controls.Add(panel3);
+            displayDataGroupBox.Location = new System.Drawing.Point(20, 92);
+            displayDataGroupBox.Name = "displayDataGroupBox";
+            displayDataGroupBox.Size = new System.Drawing.Size(537, 154);
+            displayDataGroupBox.TabIndex = 2;
+            displayDataGroupBox.TabStop = false;
+            // 
+            // panel6
+            // 
+            panel6.Controls.Add(label13);
+            panel6.Controls.Add(textBox3);
+            panel6.Location = new System.Drawing.Point(264, 71);
+            panel6.Name = "panel6";
+            panel6.Size = new System.Drawing.Size(263, 68);
+            panel6.TabIndex = 18;
+            // 
+            // label13
+            // 
+            label13.Location = new System.Drawing.Point(3, 8);
+            label13.Name = "label13";
+            label13.Size = new System.Drawing.Size(133, 17);
+            label13.TabIndex = 13;
+            label13.Text = "Phone Number";
+            // 
+            // textBox3
+            // 
+            textBox3.Location = new System.Drawing.Point(3, 31);
+            textBox3.Name = "textBox3";
+            textBox3.ReadOnly = true;
+            textBox3.Size = new System.Drawing.Size(228, 27);
+            textBox3.TabIndex = 12;
+            textBox3.Tag = "Phone Number";
+            // 
+            // panel5
+            // 
+            panel5.Controls.Add(label14);
+            panel5.Controls.Add(textBox4);
+            panel5.Location = new System.Drawing.Point(3, 68);
+            panel5.Name = "panel5";
+            panel5.Size = new System.Drawing.Size(255, 71);
+            panel5.TabIndex = 17;
+            // 
+            // label14
+            // 
+            label14.Location = new System.Drawing.Point(3, 11);
+            label14.Name = "label14";
+            label14.Size = new System.Drawing.Size(133, 17);
+            label14.TabIndex = 11;
+            label14.Text = "Email";
+            // 
+            // textBox4
+            // 
+            textBox4.Location = new System.Drawing.Point(3, 34);
+            textBox4.Name = "textBox4";
+            textBox4.ReadOnly = true;
+            textBox4.Size = new System.Drawing.Size(228, 27);
+            textBox4.TabIndex = 10;
+            textBox4.Tag = "Email";
+            // 
+            // panel4
+            // 
+            panel4.Controls.Add(label15);
+            panel4.Controls.Add(textBox2);
+            panel4.Location = new System.Drawing.Point(264, 23);
+            panel4.Name = "panel4";
+            panel4.Size = new System.Drawing.Size(263, 67);
+            panel4.TabIndex = 16;
+            // 
+            // label15
+            // 
+            label15.Location = new System.Drawing.Point(5, -2);
+            label15.Name = "label15";
+            label15.Size = new System.Drawing.Size(133, 17);
+            label15.TabIndex = 3;
+            label15.Text = "Last Name";
+            // 
+            // textBox2
+            // 
+            textBox2.Location = new System.Drawing.Point(5, 21);
+            textBox2.Name = "textBox2";
+            textBox2.ReadOnly = true;
+            textBox2.Size = new System.Drawing.Size(228, 27);
+            textBox2.TabIndex = 2;
+            textBox2.Tag = "Last Name";
+            // 
+            // panel3
+            // 
+            panel3.Controls.Add(label16);
+            panel3.Controls.Add(textBox1);
+            panel3.Location = new System.Drawing.Point(3, 23);
+            panel3.Name = "panel3";
+            panel3.Size = new System.Drawing.Size(255, 65);
+            panel3.TabIndex = 15;
+            // 
+            // label16
+            // 
+            label16.Location = new System.Drawing.Point(3, -2);
+            label16.Name = "label16";
+            label16.Size = new System.Drawing.Size(133, 17);
+            label16.TabIndex = 1;
+            label16.Text = "First Name";
+            // 
+            // textBox1
+            // 
+            textBox1.Location = new System.Drawing.Point(3, 21);
+            textBox1.Name = "textBox1";
+            textBox1.ReadOnly = true;
+            textBox1.Size = new System.Drawing.Size(228, 27);
+            textBox1.TabIndex = 0;
+            textBox1.Tag = "First Name";
+            // 
+            // settingsPanel
+            // 
+            settingsPanel.Controls.Add(changeStatusResultLabel);
+            settingsPanel.Controls.Add(signOutButton);
+            settingsPanel.Controls.Add(toggleAlertsCheckbox);
+            settingsPanel.Controls.Add(label9);
+            settingsPanel.Enabled = false;
+            settingsPanel.Location = new System.Drawing.Point(0, 0);
+            settingsPanel.Name = "settingsPanel";
+            settingsPanel.Size = new System.Drawing.Size(588, 533);
+            settingsPanel.TabIndex = 7;
+            settingsPanel.Tag = "settings";
+            settingsPanel.Visible = false;
+            // 
+            // changeStatusResultLabel
+            // 
+            changeStatusResultLabel.Font = new System.Drawing.Font("Segoe UI", 11F);
+            changeStatusResultLabel.Location = new System.Drawing.Point(289, 79);
+            changeStatusResultLabel.Name = "changeStatusResultLabel";
+            changeStatusResultLabel.Size = new System.Drawing.Size(268, 33);
+            changeStatusResultLabel.TabIndex = 3;
+            // 
+            // signOutButton
+            // 
+            signOutButton.Font = new System.Drawing.Font("Segoe UI", 13F);
+            signOutButton.Location = new System.Drawing.Point(20, 124);
+            signOutButton.Name = "signOutButton";
+            signOutButton.Size = new System.Drawing.Size(206, 64);
+            signOutButton.TabIndex = 2;
+            signOutButton.Text = "Sign Out";
+            signOutButton.UseVisualStyleBackColor = true;
+            signOutButton.Click += signOutButton_Click;
+            // 
+            // toggleAlertsCheckbox
+            // 
+            toggleAlertsCheckbox.AutoSize = true;
+            toggleAlertsCheckbox.Font = new System.Drawing.Font("Segoe UI", 13F);
+            toggleAlertsCheckbox.Location = new System.Drawing.Point(21, 74);
+            toggleAlertsCheckbox.Name = "toggleAlertsCheckbox";
+            toggleAlertsCheckbox.Size = new System.Drawing.Size(243, 34);
+            toggleAlertsCheckbox.TabIndex = 1;
+            toggleAlertsCheckbox.Text = "Enable Incident Alerts";
+            toggleAlertsCheckbox.UseVisualStyleBackColor = true;
+            toggleAlertsCheckbox.CheckedChanged += toggleAlertsCheckbox_CheckedChanged;
+            // 
+            // label9
+            // 
+            label9.AutoSize = true;
+            label9.Font = new System.Drawing.Font("Segoe UI Semibold", 22.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 0);
+            label9.Location = new System.Drawing.Point(214, 3);
+            label9.Name = "label9";
+            label9.Size = new System.Drawing.Size(158, 50);
+            label9.TabIndex = 0;
+            label9.Text = "Settings";
             // 
             // eventPanel
             // 
@@ -797,142 +1092,6 @@
             deleteAccountPanelButton.UseVisualStyleBackColor = true;
             deleteAccountPanelButton.Click += DeleteAccountPanel;
             // 
-            // viewAccountPanel
-            // 
-            viewAccountPanel.Controls.Add(label11);
-            viewAccountPanel.Controls.Add(displayDataGroupBox);
-            viewAccountPanel.Location = new System.Drawing.Point(0, 0);
-            viewAccountPanel.Name = "viewAccountPanel";
-            viewAccountPanel.Size = new System.Drawing.Size(588, 533);
-            viewAccountPanel.TabIndex = 7;
-            viewAccountPanel.Tag = "viewAccount";
-            // 
-            // label11
-            // 
-            label11.AutoSize = true;
-            label11.Font = new System.Drawing.Font("Segoe UI Semibold", 22.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 0);
-            label11.Location = new System.Drawing.Point(164, 3);
-            label11.Name = "label11";
-            label11.Size = new System.Drawing.Size(248, 50);
-            label11.TabIndex = 0;
-            label11.Text = "Account Data";
-            // 
-            // displayDataGroupBox
-            // 
-            displayDataGroupBox.Controls.Add(panel6);
-            displayDataGroupBox.Controls.Add(panel5);
-            displayDataGroupBox.Controls.Add(panel4);
-            displayDataGroupBox.Controls.Add(panel3);
-            displayDataGroupBox.Location = new System.Drawing.Point(20, 92);
-            displayDataGroupBox.Name = "displayDataGroupBox";
-            displayDataGroupBox.Size = new System.Drawing.Size(537, 154);
-            displayDataGroupBox.TabIndex = 2;
-            displayDataGroupBox.TabStop = false;
-            // 
-            // panel6
-            // 
-            panel6.Controls.Add(label13);
-            panel6.Controls.Add(textBox3);
-            panel6.Location = new System.Drawing.Point(264, 71);
-            panel6.Name = "panel6";
-            panel6.Size = new System.Drawing.Size(263, 68);
-            panel6.TabIndex = 18;
-            // 
-            // label13
-            // 
-            label13.Location = new System.Drawing.Point(3, 8);
-            label13.Name = "label13";
-            label13.Size = new System.Drawing.Size(133, 17);
-            label13.TabIndex = 13;
-            label13.Text = "Phone Number";
-            // 
-            // textBox3
-            // 
-            textBox3.Location = new System.Drawing.Point(3, 31);
-            textBox3.Name = "textBox3";
-            textBox3.ReadOnly = true;
-            textBox3.Size = new System.Drawing.Size(228, 27);
-            textBox3.TabIndex = 12;
-            textBox3.Tag = "Phone Number";
-            // 
-            // panel5
-            // 
-            panel5.Controls.Add(label14);
-            panel5.Controls.Add(textBox4);
-            panel5.Location = new System.Drawing.Point(3, 68);
-            panel5.Name = "panel5";
-            panel5.Size = new System.Drawing.Size(255, 71);
-            panel5.TabIndex = 17;
-            // 
-            // label14
-            // 
-            label14.Location = new System.Drawing.Point(3, 11);
-            label14.Name = "label14";
-            label14.Size = new System.Drawing.Size(133, 17);
-            label14.TabIndex = 11;
-            label14.Text = "Email";
-            // 
-            // textBox4
-            // 
-            textBox4.Location = new System.Drawing.Point(3, 34);
-            textBox4.Name = "textBox4";
-            textBox4.ReadOnly = true;
-            textBox4.Size = new System.Drawing.Size(228, 27);
-            textBox4.TabIndex = 10;
-            textBox4.Tag = "Email";
-            // 
-            // panel4
-            // 
-            panel4.Controls.Add(label15);
-            panel4.Controls.Add(textBox2);
-            panel4.Location = new System.Drawing.Point(264, 23);
-            panel4.Name = "panel4";
-            panel4.Size = new System.Drawing.Size(263, 67);
-            panel4.TabIndex = 16;
-            // 
-            // label15
-            // 
-            label15.Location = new System.Drawing.Point(5, -2);
-            label15.Name = "label15";
-            label15.Size = new System.Drawing.Size(133, 17);
-            label15.TabIndex = 3;
-            label15.Text = "Last Name";
-            // 
-            // textBox2
-            // 
-            textBox2.Location = new System.Drawing.Point(5, 21);
-            textBox2.Name = "textBox2";
-            textBox2.ReadOnly = true;
-            textBox2.Size = new System.Drawing.Size(228, 27);
-            textBox2.TabIndex = 2;
-            textBox2.Tag = "Last Name";
-            // 
-            // panel3
-            // 
-            panel3.Controls.Add(label16);
-            panel3.Controls.Add(textBox1);
-            panel3.Location = new System.Drawing.Point(3, 23);
-            panel3.Name = "panel3";
-            panel3.Size = new System.Drawing.Size(255, 65);
-            panel3.TabIndex = 15;
-            // 
-            // label16
-            // 
-            label16.Location = new System.Drawing.Point(3, -2);
-            label16.Name = "label16";
-            label16.Size = new System.Drawing.Size(133, 17);
-            label16.TabIndex = 1;
-            label16.Text = "First Name";
-            // 
-            // textBox1
-            // 
-            textBox1.Location = new System.Drawing.Point(3, 21);
-            textBox1.Name = "textBox1";
-            textBox1.ReadOnly = true;
-            textBox1.Size = new System.Drawing.Size(228, 27);
-            textBox1.TabIndex = 0;
-            textBox1.Tag = "First Name";
-            // 
             // feedPanel
             // 
             feedPanel.Controls.Add(label10);
@@ -962,93 +1121,6 @@
             flowLayoutPanel.Name = "flowLayoutPanel";
             flowLayoutPanel.Size = new System.Drawing.Size(567, 436);
             flowLayoutPanel.TabIndex = 1;
-            // 
-            // settingsPanel
-            // 
-            settingsPanel.Controls.Add(signOutButton);
-            settingsPanel.Controls.Add(toggleAlertsCheckbox);
-            settingsPanel.Controls.Add(label9);
-            settingsPanel.Enabled = false;
-            settingsPanel.Location = new System.Drawing.Point(0, 0);
-            settingsPanel.Name = "settingsPanel";
-            settingsPanel.Size = new System.Drawing.Size(588, 533);
-            settingsPanel.TabIndex = 7;
-            settingsPanel.Tag = "settings";
-            settingsPanel.Visible = false;
-            // 
-            // signOutButton
-            // 
-            signOutButton.Font = new System.Drawing.Font("Segoe UI", 13F);
-            signOutButton.Location = new System.Drawing.Point(20, 124);
-            signOutButton.Name = "signOutButton";
-            signOutButton.Size = new System.Drawing.Size(206, 64);
-            signOutButton.TabIndex = 2;
-            signOutButton.Text = "Sign Out";
-            signOutButton.UseVisualStyleBackColor = true;
-            signOutButton.Click += signOutButton_Click;
-            // 
-            // toggleAlertsCheckbox
-            // 
-            toggleAlertsCheckbox.AutoSize = true;
-            toggleAlertsCheckbox.Font = new System.Drawing.Font("Segoe UI", 13F);
-            toggleAlertsCheckbox.Location = new System.Drawing.Point(21, 74);
-            toggleAlertsCheckbox.Name = "toggleAlertsCheckbox";
-            toggleAlertsCheckbox.Size = new System.Drawing.Size(243, 34);
-            toggleAlertsCheckbox.TabIndex = 1;
-            toggleAlertsCheckbox.Text = "Enable Incident Alerts";
-            toggleAlertsCheckbox.UseVisualStyleBackColor = true;
-            toggleAlertsCheckbox.CheckedChanged += toggleAlertsCheckbox_CheckedChanged;
-            // 
-            // label9
-            // 
-            label9.AutoSize = true;
-            label9.Font = new System.Drawing.Font("Segoe UI Semibold", 22.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 0);
-            label9.Location = new System.Drawing.Point(214, 3);
-            label9.Name = "label9";
-            label9.Size = new System.Drawing.Size(158, 50);
-            label9.TabIndex = 0;
-            label9.Text = "Settings";
-            // 
-            // deleteAccountPanel
-            // 
-            deleteAccountPanel.Controls.Add(label26);
-            deleteAccountPanel.Controls.Add(label25);
-            deleteAccountPanel.Controls.Add(confirmDeleteButton);
-            deleteAccountPanel.Location = new System.Drawing.Point(0, 0);
-            deleteAccountPanel.Name = "deleteAccountPanel";
-            deleteAccountPanel.Size = new System.Drawing.Size(588, 533);
-            deleteAccountPanel.TabIndex = 10;
-            deleteAccountPanel.Tag = "deleteAccount";
-            // 
-            // label26
-            // 
-            label26.Font = new System.Drawing.Font("Segoe UI", 13F);
-            label26.Location = new System.Drawing.Point(69, 94);
-            label26.Name = "label26";
-            label26.Size = new System.Drawing.Size(448, 97);
-            label26.TabIndex = 4;
-            label26.Text = "Warning: You will be logged out and all data associated with this account will be deleted. This action cannot be undone.";
-            // 
-            // label25
-            // 
-            label25.AutoSize = true;
-            label25.Font = new System.Drawing.Font("Segoe UI Semibold", 22.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 0);
-            label25.Location = new System.Drawing.Point(138, 3);
-            label25.Name = "label25";
-            label25.Size = new System.Drawing.Size(280, 50);
-            label25.TabIndex = 0;
-            label25.Text = "Delete Account";
-            // 
-            // confirmDeleteButton
-            // 
-            confirmDeleteButton.Font = new System.Drawing.Font("Segoe UI", 12F);
-            confirmDeleteButton.Location = new System.Drawing.Point(175, 211);
-            confirmDeleteButton.Name = "confirmDeleteButton";
-            confirmDeleteButton.Size = new System.Drawing.Size(197, 56);
-            confirmDeleteButton.TabIndex = 3;
-            confirmDeleteButton.Text = "Confirm Deletion";
-            confirmDeleteButton.UseVisualStyleBackColor = true;
-            confirmDeleteButton.Click += confirmDeleteButton_Click;
             // 
             // cprHelpPanel
             // 
@@ -1148,6 +1220,10 @@
             Text = "MainForm";
             buttonsPanel.ResumeLayout(false);
             mainAreaPanel.ResumeLayout(false);
+            deleteAccountPanel.ResumeLayout(false);
+            deleteAccountPanel.PerformLayout();
+            panel12.ResumeLayout(false);
+            panel12.PerformLayout();
             changePasswordPanel.ResumeLayout(false);
             changePasswordPanel.PerformLayout();
             groupBox3.ResumeLayout(false);
@@ -1155,6 +1231,19 @@
             panel10.PerformLayout();
             panel11.ResumeLayout(false);
             panel11.PerformLayout();
+            viewAccountPanel.ResumeLayout(false);
+            viewAccountPanel.PerformLayout();
+            displayDataGroupBox.ResumeLayout(false);
+            panel6.ResumeLayout(false);
+            panel6.PerformLayout();
+            panel5.ResumeLayout(false);
+            panel5.PerformLayout();
+            panel4.ResumeLayout(false);
+            panel4.PerformLayout();
+            panel3.ResumeLayout(false);
+            panel3.PerformLayout();
+            settingsPanel.ResumeLayout(false);
+            settingsPanel.PerformLayout();
             eventPanel.ResumeLayout(false);
             eventDetailsPanel.ResumeLayout(false);
             eventDetailsPanel.PerformLayout();
@@ -1176,23 +1265,8 @@
             panel9.PerformLayout();
             accountPanel.ResumeLayout(false);
             accountPanel.PerformLayout();
-            viewAccountPanel.ResumeLayout(false);
-            viewAccountPanel.PerformLayout();
-            displayDataGroupBox.ResumeLayout(false);
-            panel6.ResumeLayout(false);
-            panel6.PerformLayout();
-            panel5.ResumeLayout(false);
-            panel5.PerformLayout();
-            panel4.ResumeLayout(false);
-            panel4.PerformLayout();
-            panel3.ResumeLayout(false);
-            panel3.PerformLayout();
             feedPanel.ResumeLayout(false);
             feedPanel.PerformLayout();
-            settingsPanel.ResumeLayout(false);
-            settingsPanel.PerformLayout();
-            deleteAccountPanel.ResumeLayout(false);
-            deleteAccountPanel.PerformLayout();
             cprHelpPanel.ResumeLayout(false);
             cprHelpPanel.PerformLayout();
             aedHelpPanel.ResumeLayout(false);
@@ -1299,5 +1373,12 @@
         private System.Windows.Forms.Label label27;
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Label changeStatusResultLabel;
+        private System.Windows.Forms.Label viewAccountDataStatusLabel;
+        private System.Windows.Forms.Label changePasswordOutcomeLabel;
+        private System.Windows.Forms.Panel panel12;
+        private System.Windows.Forms.MaskedTextBox maskedTextBox4;
+        private System.Windows.Forms.Label label35;
+        private System.Windows.Forms.Label deleteAccountOutcomeLabel;
     }
 }

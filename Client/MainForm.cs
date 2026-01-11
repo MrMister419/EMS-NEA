@@ -28,7 +28,7 @@ public partial class MainForm : Form
     {
         // Setup default starting UI
         feedPanel.BringToFront();
-        toggleAlertsCheckbox.Checked = AppContext.isReceiving;
+        ChangeCheckBoxNoTrigger();
 
         // Register long-polling handler and request event
         AppContext.appService.RegisterEventHandler(DisplayEventInFeed);
@@ -108,7 +108,23 @@ public partial class MainForm : Form
     {
         // TODO: disable for a few seconds
         bool newChoice = toggleAlertsCheckbox.Checked;
-        await AppContext.appService.ToggleAlertChoice(newChoice);
+        Dictionary<string, string>? outcome = await AppContext.appService.ToggleAlertChoice(newChoice);
+        
+        if (outcome == null || !outcome.ContainsKey("outcome") || !outcome.ContainsKey("success"))
+        {
+            changeStatusResultLabel.Text = "An error occurred. Try again later.";
+            ChangeCheckBoxNoTrigger();
+        }
+        else if (outcome["success"] == "True")
+        {
+            changeStatusResultLabel.Text = outcome["outcome"];
+            AppContext.isReceiving = newChoice;
+        }
+        else
+        {
+            changeStatusResultLabel.Text = outcome["outcome"];
+            ChangeCheckBoxNoTrigger();
+        }
     }
 
     // Retrieves and displays user account details
@@ -117,9 +133,12 @@ public partial class MainForm : Form
         switchPanels(sender);
         Dictionary<string, string>? accountDetails = await AppContext.appService.GetAccountDetails();
 
-        if (accountDetails == null)
+        if (accountDetails == null || !accountDetails.ContainsKey("outcome") || !accountDetails.ContainsKey("success"))
         {
-            Console.WriteLine("Failed to retrieve account details.");
+            viewAccountDataStatusLabel.Text = "An error occurred. Please try again later.";
+        } else if (accountDetails["success"] == "False")
+        {
+            viewAccountDataStatusLabel.Text = accountDetails["outcome"];
         }
         else
         {
@@ -144,6 +163,10 @@ public partial class MainForm : Form
             {
                 Console.Write(fieldTag);
                 textBox.Text = fieldValue;
+            }
+            else
+            {
+                textBox.Text = "Failed to retrieve field.";
             }
         }
     }
@@ -173,26 +196,59 @@ public partial class MainForm : Form
         string newEmail = formValues["NewEmail"];
         Dictionary<string, string>? outcome = await AppContext.appService.ModifyAccountDetails(formValues);
 
-        if (outcome == null || !outcome.ContainsKey("outcome") || !outcome.ContainsKey("successful"))
+        if (outcome == null || !outcome.ContainsKey("outcome") || !outcome.ContainsKey("success"))
         {
             modifyAccountResultLabel.Text = "An error occurred. Please try again later.";
             Console.WriteLine("Account modification failed: invalid server response.");
         }
-        else if (outcome["successful"] == "true")
+        else if (outcome["success"] == "True")
         {
             AppContext.email = newEmail;
             modifyAccountResultLabel.Text = outcome["outcome"];
         }
         else
         {
-            if (outcome["outcome"] == "Incorrect password.")
-            {
-                modifyAccountResultLabel.Text = outcome["outcome"];
-            }
-            else
-            {
-                modifyAccountResultLabel.Text = "An error occurred. Please try again later.";
-            }
+            modifyAccountResultLabel.Text = outcome["outcome"];
+        }
+    }
+    
+    private async void ChangePasswordButtonClick(object sender, EventArgs e)
+    {
+        Dictionary<string, string> formValues = AppContext.formNavigator.GetEnteredValues(changePasswordPanel);
+        Dictionary<string, string>? outcome = await AppContext.appService.ChangePassword(formValues);
+        
+        if (outcome == null || !outcome.ContainsKey("outcome") || !outcome.ContainsKey("success"))
+        {
+            changePasswordOutcomeLabel.Text = "An error occurred. Please try again later.";
+            Console.WriteLine("Password update failed: invalid server response.");
+        }
+        else if (outcome["success"] == "True")
+        {
+            changePasswordOutcomeLabel.Text = outcome["outcome"];
+        }
+        else
+        {
+            changePasswordOutcomeLabel.Text = outcome["outcome"];
+        }
+    }
+
+    private async void ConfirmDeleteButton_Click(object sender, EventArgs e)
+    {
+        Dictionary<string, string> formValues = AppContext.formNavigator.GetEnteredValues(deleteAccountPanel);
+        Dictionary<string, string>? outcome = await AppContext.appService.DeleteUser(formValues);
+        
+        if (outcome == null || !outcome.ContainsKey("outcome") || !outcome.ContainsKey("success"))
+        {
+            changePasswordOutcomeLabel.Text = "An error occurred. Please try again later.";
+            Console.WriteLine("Account deletion failed: invalid server response.");
+        }
+        else if (outcome["success"] == "True")
+        {
+            AppContext.formManager.SwitchForm(this);
+        }
+        else
+        {
+            changePasswordOutcomeLabel.Text = outcome["outcome"];
         }
     }
 
@@ -214,20 +270,11 @@ public partial class MainForm : Form
         switchPanels(sender);
     }
 
-    // Loads user alert preference and requests events if enabled
-    // Returns:
-    // Task for the asyncronous operation with no return value
-    private async Task LoadAlertChoice()
+    private void ChangeCheckBoxNoTrigger()
     {
-        bool isReceiving = AppContext.isReceiving;
         toggleAlertsCheckbox.CheckedChanged -= toggleAlertsCheckbox_CheckedChanged;
-        toggleAlertsCheckbox.Checked = isReceiving;
+        toggleAlertsCheckbox.Checked = AppContext.isReceiving;
         toggleAlertsCheckbox.CheckedChanged += toggleAlertsCheckbox_CheckedChanged;
-
-        if (isReceiving)
-        {
-            AppContext.appService.RequestEvent();
-        }
     }
 
     // Creates and displays event tile in feed panel when event received
@@ -358,16 +405,7 @@ public partial class MainForm : Form
         html = html.Replace("{url}", url);
         return html;
     }
-
-    private void ChangePasswordButtonClick(object sender, EventArgs e)
-    {
-
-    }
-
-    private void confirmDeleteButton_Click(object sender, EventArgs e)
-    {
-
-    }
+    
 }
 
 /// <summary>

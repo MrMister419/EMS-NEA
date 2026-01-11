@@ -102,18 +102,15 @@ class FormNavigation
         Dictionary<string, string> formValues = new Dictionary<string, string>();
         List<TextBoxBase> textBoxes = GetControlsByType<TextBoxBase>(formPanel);
 
-        string fieldName = "";
-        string fieldEntry = "";
-        
         foreach (TextBoxBase textBox in textBoxes)
         {
-            fieldName = textBox.Tag.ToString();
+            string? fieldName = textBox.Tag.ToString();
             if (fieldName == "")
             {
                 continue;
             }
 
-            fieldEntry = textBox.Text.Trim();
+            string fieldEntry = textBox.Text.Trim();
 
             if (textBox is MaskedTextBox)
             {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Net;
 using System.Text;
@@ -87,23 +88,7 @@ class Listener
         else
         {
             string responseMessage = await RequestHandler.Invoke(receivedJson);
-            HttpListenerResponse response = context.Response;
-            
-            if (responseMessage == "OK")
-            {
-                response.StatusCode = (int)HttpStatusCode.OK;
-            }
-            else
-            {
-                Console.WriteLine("Responding with: " + responseMessage);
-                response.ContentType = "application/json";
-                byte[] buffer = Encoding.UTF8.GetBytes(responseMessage);
-                response.ContentLength64 = buffer.Length;
-                
-                await response.OutputStream.WriteAsync(buffer);
-            }
-            response.Close();
-            Console.WriteLine("POST request answered.");
+            await SendResponse(context, responseMessage);
         }
     }
     
@@ -159,49 +144,82 @@ class Listener
     // Parameters:
     // - List<string> targetEmails: list of emails to notify
     // - string eventPayloadJson: JSON string containing event data to send
-    public async Task NotifyWaitingClients(List<string> targetEmails, string eventPayloadJson)
+    public async Task NotifyWaitingClients(Event evt)
     {
         // Check which clients are in vicinity and have placed an event request
-        List<PendingRequest> toRespond = new List<PendingRequest>();
+        List<string> emailsToRespond = new List<string>();
         lock (waitingClients)
         {
-            List<PendingRequest> remaining = new List<PendingRequest>();
-            foreach (string target in targetEmails)
+            foreach (PendingRequest pending in waitingClients)
             {
-                foreach (PendingRequest pending in waitingClients)
+                emailsToRespond.Add(pending.Email);
+            }
+        }
+
+        // The locations of the users with a pending event request
+        List<Dictionary<string, string>> userLocations = await ServerContext.database.GetLocationOfUsers(emailsToRespond);
+
+        // Send event notification to waiting clients in vicinity
+        PendingRequest pendingRequest = new PendingRequest();
+        string eventPayloadJson = JsonSerializer.Serialize(evt);
+        foreach (Dictionary<string, string> location in userLocations)
+        {
+            // Check if user is in vicinity of event
+            string userEmail = location["Email"];
+            string userLat = location["Latitude"];
+            string userLong = location["Longitude"];
+            string eventLat = evt.location.latitude.ToString(CultureInfo.InvariantCulture);
+            string eventLong = evt.location.longitude.ToString(CultureInfo.InvariantCulture);
+            bool isInVicinity = await ServerContext.requestHandler.CheckDistances(userLat, userLong, eventLat, eventLong);
+
+            // Answer and remove request if user is in vicinity
+            if (isInVicinity)
+            {
+                // Find the pending request for this user
+                lock (waitingClients)
                 {
-                    if (pending.Email == target)
+                    foreach (PendingRequest pending in waitingClients)
                     {
-                        toRespond.Add(pending);
-                        break;
-                    }
-                    else
-                    {
-                        remaining.Add(pending);
+                        if (pending.Email == userEmail)
+                        {
+                            pendingRequest = pending;
+                            break;
+                        }
                     }
                 }
-            }
-            waitingClients.Clear();
-            waitingClients.AddRange(remaining);
+                
+                bool sent = await SendResponse(pendingRequest.Context, eventPayloadJson);
+                
+                if (sent)
+                {
+                    lock (waitingClients)
+                    {
+                        waitingClients.Remove(pendingRequest);
+                    }
+                }
+            }        
         }
-        
-        // Send event notification to waiting clients in vicinity
-        foreach (PendingRequest pending in toRespond)
+    }
+
+    private async Task<bool> SendResponse(HttpListenerContext requestContext, string responseJson)
+    {
+        try
         {
-            try
-            {
-                HttpListenerResponse response = pending.Context.Response;
-                response.ContentType = "application/json";
-                byte[] buffer = Encoding.UTF8.GetBytes(eventPayloadJson);
-                response.ContentLength64 = buffer.Length;
-                await response.OutputStream.WriteAsync(buffer, 0, buffer.Length);
-                response.Close();
-                Console.WriteLine("Notified waiting client: " + pending.Email);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Failed to notify waiting client: {ex}");
-            }
+            HttpListenerResponse response = requestContext.Response;
+            response.ContentType = "application/json";
+            byte[] buffer = Encoding.UTF8.GetBytes(responseJson);
+            response.ContentLength64 = buffer.Length;
+            
+            await response.OutputStream.WriteAsync(buffer, 0, buffer.Length);
+            response.Close();
+            
+            Console.WriteLine("Sent response: " + responseJson);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Failed to notify waiting client: {ex}");
+            return false;
         }
     }
     

@@ -36,9 +36,25 @@ public partial class Startup : Form
     // Submits signup form data to server
     private async void SignupSubmitButton_Click(object sender, System.EventArgs e)
     {
-        Dictionary<string, string> formValues = 
-            AppContext.formNavigator.GetEnteredValues(signupPanel);
-        await AppContext.appService.SignUp(formValues);
+        Dictionary<string, string> formValues = AppContext.formNavigator.GetEnteredValues(signupPanel);
+        Dictionary<string, string>? outcome = await AppContext.appService.SignUp(formValues);
+        
+        // Check response is valid
+        if (outcome == null || !outcome.ContainsKey("outcome") || !outcome.ContainsKey("success"))
+        {
+            Console.WriteLine("Signup failed: invalid server response.");
+            signupMessageLabel.Text = "Error signing up. Please try again later.";
+        }
+        // Signup successful
+        else if (outcome["success"] == "True")
+        {
+            signupMessageLabel.Text = outcome["outcome"];
+        }
+        // Signup failed
+        else
+        {
+            signupMessageLabel.Text = outcome["outcome"];
+        }
     }
     
     // Authenticates user and switches to main form on success
@@ -48,15 +64,14 @@ public partial class Startup : Form
         Dictionary<string, string>? outcome = await AppContext.appService.Authenticate(formValues);
 
         // Check response is valid
-        if (outcome == null || !outcome.ContainsKey("outcome") || !outcome.ContainsKey("successful"))
+        if (outcome == null || !outcome.ContainsKey("outcome") || !outcome.ContainsKey("success"))
         {
             Console.WriteLine("Login failed: invalid server response.");
+            loginMessageLabel.Text = "Error logging in. Please try again later.";
         }
         // Login successful
-        else if (outcome["successful"] == "true")
+        else if (outcome["success"] == "True")
         {
-            Console.WriteLine("Login success.");
-            
             AppContext.email = formValues["Email"];
             await AppContext.appService.GetReceivingStatus();
             AppContext.formManager.SwitchForm(this);
@@ -64,7 +79,6 @@ public partial class Startup : Form
         // Login failed
         else
         {
-            Console.WriteLine("Login failed: invalid logins.");
             loginMessageLabel.Text = outcome["outcome"];
         }
     }

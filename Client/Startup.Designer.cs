@@ -33,6 +33,7 @@ partial class Startup
     {
         label1 = new System.Windows.Forms.Label();
         groupBox1 = new System.Windows.Forms.GroupBox();
+        signupMessageLabel = new System.Windows.Forms.Label();
         panel7 = new System.Windows.Forms.Panel();
         maskedTextBox1 = new System.Windows.Forms.MaskedTextBox();
         label6 = new System.Windows.Forms.Label();
@@ -90,6 +91,7 @@ partial class Startup
         // 
         // groupBox1
         // 
+        groupBox1.Controls.Add(signupMessageLabel);
         groupBox1.Controls.Add(panel7);
         groupBox1.Controls.Add(panel6);
         groupBox1.Controls.Add(panel5);
@@ -100,6 +102,14 @@ partial class Startup
         groupBox1.Size = new System.Drawing.Size(545, 207);
         groupBox1.TabIndex = 1;
         groupBox1.TabStop = false;
+        // 
+        // signupMessageLabel
+        // 
+        signupMessageLabel.Font = new System.Drawing.Font("Segoe UI", 10F);
+        signupMessageLabel.Location = new System.Drawing.Point(269, 153);
+        signupMessageLabel.Name = "signupMessageLabel";
+        signupMessageLabel.Size = new System.Drawing.Size(259, 40);
+        signupMessageLabel.TabIndex = 20;
         // 
         // panel7
         // 
@@ -468,4 +478,5 @@ partial class Startup
     private System.Windows.Forms.Label loginMessageLabel;
     private System.Windows.Forms.MaskedTextBox maskedTextBox2;
     private System.Windows.Forms.Panel panel8;
+    private System.Windows.Forms.Label signupMessageLabel;
 }

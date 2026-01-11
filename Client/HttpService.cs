@@ -16,7 +16,7 @@ class HttpService
     
     public HttpService()
     {
-        HttpClient.Timeout = TimeSpan.FromSeconds(60);
+        HttpClient.Timeout = TimeSpan.FromSeconds(180);
     }
     
     public async Task<string?> SendPOSTrequest(string json)

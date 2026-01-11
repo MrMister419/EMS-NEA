@@ -20,8 +20,7 @@ internal class DatabaseManager
         string passkey = System.Environment.GetEnvironmentVariable("DBPasskey");
         connectionString = $"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=EMS_NEA_Database.accdb;Jet OLEDB:Database Password={passkey};";
     }
-
-
+    
     // Inserts new event into database
     // Parameters:
     // - Event eventToInsert: Event object containing incident details
@@ -37,21 +36,24 @@ internal class DatabaseManager
         try
         {
             await using (OleDbConnection connection = new OleDbConnection(connectionString))
-            await using (OleDbCommand command = new OleDbCommand(query, connection))
             {
-                command.Parameters.AddWithValue("@incident_type", eventToInsert.type);
-                command.Parameters.AddWithValue("@description", eventToInsert.description);
-                command.Parameters.AddWithValue("@address", eventToInsert.location.address);
-                command.Parameters.AddWithValue("@latitude", eventToInsert.location.latitude);
-                command.Parameters.AddWithValue("@longitude", eventToInsert.location.longitude);
-                command.Parameters.AddWithValue("@status", eventToInsert.status);
-                command.Parameters.AddWithValue("@start_time", eventToInsert.startTimestamp);
-                command.Parameters.AddWithValue("@resolved_time", eventToInsert.resolvedTimestamp);
+                await connection.OpenAsync();
+                await using (OleDbCommand command = new OleDbCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@incident_type", eventToInsert.type);
+                    command.Parameters.AddWithValue("@description", eventToInsert.description);
+                    command.Parameters.AddWithValue("@address", eventToInsert.location.address);
+                    command.Parameters.AddWithValue("@latitude", eventToInsert.location.latitude);
+                    command.Parameters.AddWithValue("@longitude", eventToInsert.location.longitude);
+                    command.Parameters.AddWithValue("@status", eventToInsert.status);
+                    command.Parameters.AddWithValue("@start_time", eventToInsert.startTimestamp);
+                    command.Parameters.AddWithValue("@resolved_time", eventToInsert.resolvedTimestamp);
 
-                await command.ExecuteNonQueryAsync();
+                    await command.ExecuteNonQueryAsync();
+                }
             }
 
-            outcome = FormulateOutcome(true, "Event inserted successfully.");
+            outcome = FormulateOutcome(true, "Event received successfully.");
         }
         catch (Exception e)
         {
@@ -77,21 +79,25 @@ internal class DatabaseManager
         try
         {
             await using (OleDbConnection connection = new OleDbConnection(connectionString))
-            await using (OleDbCommand command = new OleDbCommand(query, connection))
             {
-                command.Parameters.AddWithValue("@first_name", userToInsert.firstName);
-                command.Parameters.AddWithValue("@last_name", userToInsert.lastName);
-                command.Parameters.AddWithValue("@phone_number", userToInsert.phoneNumber);
-                command.Parameters.AddWithValue("@email_address", userToInsert.email);
-                command.Parameters.AddWithValue("@password_hash", userToInsert.password);
-                command.Parameters.AddWithValue("@latitude", 0);
-                command.Parameters.AddWithValue("@longitude", 0);
-                command.Parameters.AddWithValue("@is_receiving", false);
-            
-                await command.ExecuteNonQueryAsync();
-                Console.WriteLine("Inserted user into database.");
+                await connection.OpenAsync();
+                await using (OleDbCommand command = new OleDbCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@first_name", userToInsert.firstName);
+                    command.Parameters.AddWithValue("@last_name", userToInsert.lastName);
+                    command.Parameters.AddWithValue("@phone_number", userToInsert.phoneNumber);
+                    command.Parameters.AddWithValue("@email_address", userToInsert.email);
+                    command.Parameters.AddWithValue("@password_hash", userToInsert.password);
+                    command.Parameters.AddWithValue("@latitude", 0);
+                    command.Parameters.AddWithValue("@longitude", 0);
+                    command.Parameters.AddWithValue("@is_receiving", false);
+
+                    await command.ExecuteNonQueryAsync();
+                    Console.WriteLine("Inserted user into database.");
+                }
+
+                outcome = FormulateOutcome(true, "User added successfully.");
             }
-            outcome = FormulateOutcome(true, "User added successfully.");
         }
         catch (Exception e)
         {
@@ -117,26 +123,29 @@ internal class DatabaseManager
         try
         {
             await using (OleDbConnection connection = new OleDbConnection(connectionString))
-            await using (OleDbCommand command = new OleDbCommand(query, connection))
             {
-                command.Parameters.AddWithValue("@email_address", email);
+                await connection.OpenAsync();
+                await using (OleDbCommand command = new OleDbCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@email_address", email);
 
-                // Returns null if email is not found
-                string? retrievedHash = (string?) await command.ExecuteScalarAsync();
+                    // Returns null if email is not found
+                    string? retrievedHash = (string?)await command.ExecuteScalarAsync();
 
-                if (retrievedHash == null)
-                {
-                    outcome = FormulateOutcome(false, "User not found.");
-                } else if (retrievedHash != passwordHash)
-                {
-                    outcome = FormulateOutcome(false, "Incorrect password.");
-                }
-                else
-                {
-                    outcome = FormulateOutcome(true, "Correct logins.");
+                    if (retrievedHash == null)
+                    {
+                        outcome = FormulateOutcome(false, "User not found.");
+                    }
+                    else if (retrievedHash != passwordHash)
+                    {
+                        outcome = FormulateOutcome(false, "Incorrect password.");
+                    }
+                    else
+                    {
+                        outcome = FormulateOutcome(true, "Correct logins.");
+                    }
                 }
             }
-
         }
         catch (Exception e)
         {
@@ -162,13 +171,17 @@ internal class DatabaseManager
         try
         {
             await using (OleDbConnection connection = new OleDbConnection(connectionString))
-            await using (OleDbCommand command = new OleDbCommand(query, connection))
             {
-                command.Parameters.AddWithValue("@is_receiving", alertChoice);
-                command.Parameters.AddWithValue("@email_address", email);
-                await command.ExecuteNonQueryAsync();
-            }
-            outcome = FormulateOutcome(true, "Alert preference updated successfully.");
+                await connection.OpenAsync();
+                await using (OleDbCommand command = new OleDbCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@is_receiving", alertChoice);
+                    command.Parameters.AddWithValue("@email_address", email);
+                    await command.ExecuteNonQueryAsync();
+                }
+
+                outcome = FormulateOutcome(true, "Alert preference updated successfully.");
+            }        
         }
         catch (Exception e)
         {
@@ -192,23 +205,27 @@ internal class DatabaseManager
         
         try
         {
-            bool? result;
             await using (OleDbConnection connection = new OleDbConnection(connectionString))
-            await using (OleDbCommand command = new OleDbCommand(query, connection))
             {
-                command.Parameters.AddWithValue("@email_address", email);
-                result = (bool?) await command.ExecuteScalarAsync();
-            }
-            
-            if (result != null)
-            {
-                receivingStatus.Add("isReceiving", result.Value.ToString());
-                outcome = FormulateOutcome(true, "Status retrieved.", receivingStatus);
-            }
-            else
-            {
-                outcome = FormulateOutcome(false, "Email not found.");
-            }
+                await connection.OpenAsync();
+                bool? result;
+                
+                await using (OleDbCommand command = new OleDbCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@email_address", email);
+                    result = (bool?)await command.ExecuteScalarAsync();
+                }
+
+                if (result != null)
+                {
+                    receivingStatus.Add("isReceiving", result.Value.ToString());
+                    outcome = FormulateOutcome(true, "Status retrieved.", receivingStatus);
+                }
+                else
+                {
+                    outcome = FormulateOutcome(false, "Email not found.");
+                }
+            }        
         }
         catch (Exception e)
         {
@@ -234,25 +251,28 @@ internal class DatabaseManager
         try
         {
             await using (OleDbConnection connection = new OleDbConnection(connectionString))
-            await using (OleDbCommand command = new OleDbCommand(query, connection))
             {
-                command.Parameters.AddWithValue("@email_address", email);
-                await using (OleDbDataReader reader = (OleDbDataReader)await command.ExecuteReaderAsync())
+                await connection.OpenAsync();
+                await using (OleDbCommand command = new OleDbCommand(query, connection))
                 {
-                    if (await reader.ReadAsync())
+                    command.Parameters.AddWithValue("@email_address", email);
+                    await using (OleDbDataReader reader = (OleDbDataReader)await command.ExecuteReaderAsync())
                     {
-                        userDetails.Add("First Name", reader.GetString(0));
-                        userDetails.Add("Last Name", reader.GetString(1));
-                        userDetails.Add("Phone Number", reader.GetString(2));
-                        
-                        outcome = FormulateOutcome(true, "User details retrieved.", userDetails);
-                    }
-                    else
-                    {
-                        outcome = FormulateOutcome(false, "Email not found.");
+                        if (await reader.ReadAsync())
+                        {
+                            userDetails.Add("First Name", reader.GetString(0));
+                            userDetails.Add("Last Name", reader.GetString(1));
+                            userDetails.Add("Phone Number", reader.GetString(2));
+
+                            outcome = FormulateOutcome(true, "User details retrieved.", userDetails);
+                        }
+                        else
+                        {
+                            outcome = FormulateOutcome(false, "Email not found.");
+                        }
                     }
                 }
-            }
+            }        
         }
         catch (Exception e)
         {
@@ -272,7 +292,6 @@ internal class DatabaseManager
     public async Task<Dictionary<string, string>> UpdateUserDetails(Dictionary<string, string> newDetails, string oldEmail)
     {
         Dictionary<string, string> outcome;
-        string query;
         StringBuilder queryBuilder = new StringBuilder("UPDATE [User] SET ");
 
         foreach (string field in newDetails.Keys)
@@ -283,22 +302,27 @@ internal class DatabaseManager
         queryBuilder.Remove(queryBuilder.Length - 2, 2);
         
         queryBuilder.Append(" WHERE email_address = ?");
-        query = queryBuilder.ToString();
+        string query = queryBuilder.ToString();
 
         try
         {
             await using (OleDbConnection connection = new OleDbConnection(connectionString))
-            await using (OleDbCommand command = new OleDbCommand(query, connection))
             {
-                foreach (string fieldValue in newDetails.Values)
+                await connection.OpenAsync();
+                await using (OleDbCommand command = new OleDbCommand(query, connection))
                 {
-                    command.Parameters.AddWithValue("", fieldValue);
+                    foreach (string fieldValue in newDetails.Values)
+                    {
+                        command.Parameters.AddWithValue("", fieldValue);
+                    }
+
+                    command.Parameters.AddWithValue("", oldEmail);
+
+                    await command.ExecuteNonQueryAsync();
                 }
-                command.Parameters.AddWithValue("", oldEmail);
-            
-                await command.ExecuteNonQueryAsync();
-            }
-            outcome = FormulateOutcome(true, "Details updated successfully.");
+
+                outcome = FormulateOutcome(true, "Details updated successfully.");
+            }        
         }
         catch (Exception e)
         {
@@ -309,29 +333,55 @@ internal class DatabaseManager
         return outcome;
     }
 
-    // Finds all users in vicinity of incident location
-    // Currently returns first user for testing purposes
-    // Parameters:
-    // - Location locationDetails: incident location coordinates
-    // Returns:
-    // Task<List<string>>: list of user emails in vicinity
-    public async Task<List<string>> FindUsersInVicinity(Location locationDetails)
+    public async Task<List<Dictionary<string, string>>> GetLocationOfUsers(List<string> emails)
     {
-        // TODO: optimise
-        const string query = "SELECT email_address FROM [User]";
-        List<string> emailsInRange = new List<string>();
-
-        await using (OleDbConnection connection = new OleDbConnection(connectionString))
-        await using (OleDbCommand command = new OleDbCommand(query, connection))
-        await using (OleDbDataReader reader = (OleDbDataReader)await command.ExecuteReaderAsync())
+        // Check if list is empty
+        List<Dictionary<string, string>> locations = new List<Dictionary<string, string>>();
+        if (emails.Count == 0)
         {
-            if (await reader.ReadAsync())
-            {
-                string email = reader.GetString(0);
-                emailsInRange.Add(email);
-            }
+            return locations;
         }
-        return emailsInRange;
+        
+        // Create query string
+        string placeholders = "";
+        for (int i=0; i<emails.Count; i++)
+        {
+            placeholders += "?, ";
+        }
+        placeholders = placeholders.Remove(placeholders.Length - 2, 2);
+        
+        string query = $"SELECT email_address, latitude, longitude FROM [User]" +
+                       $"WHERE email_address IN ({placeholders})";
+        
+        await using (OleDbConnection connection = new OleDbConnection(connectionString))
+        {
+            await connection.OpenAsync();
+            await using (OleDbCommand command = new OleDbCommand(query, connection))
+            {
+                foreach (string email in emails)
+                {
+                    command.Parameters.AddWithValue("@email_address", email);
+                }
+                
+                await using (OleDbDataReader reader = (OleDbDataReader)await command.ExecuteReaderAsync())
+                {
+                    while (await reader.ReadAsync())
+                    {
+                        string email = reader.GetString(0);
+                        string latitude = reader.GetDouble(1).ToString(CultureInfo.InvariantCulture);
+                        string longitude = reader.GetDouble(2).ToString(CultureInfo.InvariantCulture);
+                        
+                        Dictionary<string, string> emailLocation = new Dictionary<string, string>();
+                        emailLocation.Add("Email", email);
+                        emailLocation.Add("Latitude", latitude);
+                        emailLocation.Add("Longitude", longitude);
+                        locations.Add(emailLocation);
+                    }
+                }
+            }
+        }        
+        
+        return locations;
     }
 
     public async Task<Dictionary<string, string>> GetUserLocation(string email)
@@ -343,25 +393,28 @@ internal class DatabaseManager
         try
         {
             await using (OleDbConnection connection = new OleDbConnection(connectionString))
-            await using (OleDbCommand command = new OleDbCommand(query, connection))
             {
-                command.Parameters.AddWithValue("@email_address", email);
-                await using (OleDbDataReader reader = (OleDbDataReader)await command.ExecuteReaderAsync())
+                await connection.OpenAsync();
+                await using (OleDbCommand command = new OleDbCommand(query, connection))
                 {
-                    if (await reader.ReadAsync())
+                    command.Parameters.AddWithValue("@email_address", email);
+                    await using (OleDbDataReader reader = (OleDbDataReader)await command.ExecuteReaderAsync())
                     {
-                        string latitude = reader.GetDouble(0).ToString(CultureInfo.InvariantCulture);
-                        string longitude = reader.GetDouble(1).ToString(CultureInfo.InvariantCulture);
-                        location.Add("Latitude", latitude);
-                        location.Add("Longitude", longitude);
-                        outcome = FormulateOutcome(true, "Location retrieved.", location);
-                    }
-                    else
-                    {
-                        outcome = FormulateOutcome(false, "Email not found.");
+                        if (await reader.ReadAsync())
+                        {
+                            string latitude = reader.GetDouble(0).ToString(CultureInfo.InvariantCulture);
+                            string longitude = reader.GetDouble(1).ToString(CultureInfo.InvariantCulture);
+                            location.Add("Latitude", latitude);
+                            location.Add("Longitude", longitude);
+                            outcome = FormulateOutcome(true, "Location retrieved.", location);
+                        }
+                        else
+                        {
+                            outcome = FormulateOutcome(false, "Email not found.");
+                        }
                     }
                 }
-            }
+            }        
         }
         catch (Exception e)
         {
@@ -372,11 +425,67 @@ internal class DatabaseManager
         return outcome;
     }
 
+    public async Task<Dictionary<string, string>> UpdatePassword(string email, string newPasswordHash)
+    {
+        Dictionary<string, string> outcome;
+        const string query = "UPDATE [User] SET password_hash = ? WHERE email_address = ?";
+        
+        try
+        {
+            await using (OleDbConnection connection = new OleDbConnection(connectionString))
+            {
+                await connection.OpenAsync();
+                await using (OleDbCommand command = new OleDbCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@password_hash", newPasswordHash);
+                    command.Parameters.AddWithValue("@email_address", email);
+                    await command.ExecuteNonQueryAsync();
+                }
+            }
+            outcome = FormulateOutcome(true, "Password updated.");
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("Error updating password: " + e);
+            outcome = FormulateOutcome(false, "Error updating password.");
+        }
+        
+        return outcome;
+    }
+
+    public async Task<Dictionary<string, string>> DeleteUser(string email)
+    {
+        const string query = "DELETE FROM [User] WHERE email_address = ?";
+        Dictionary<string, string> outcome;
+        
+        try
+        {
+            await using (OleDbConnection connection = new OleDbConnection(connectionString))
+            {
+                await connection.OpenAsync();
+                await using (OleDbCommand command = new OleDbCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@email_address", email);
+                    await command.ExecuteNonQueryAsync();
+                }
+
+                outcome = FormulateOutcome(true, "User account deleted.");
+            }        
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("Error deleting user account: " + e);
+            outcome = FormulateOutcome(false, "Error deleting account.");
+        }
+        
+        return outcome;
+    }
+
     private Dictionary<string, string> FormulateOutcome(bool success, string outcomeMessage, Dictionary<string, string>? data = null)
     {
         Dictionary<string, string> outcome = new Dictionary<string, string>();
-        outcome.Add("Success", success.ToString());
-        outcome.Add("Outcome", outcomeMessage);
+        outcome.Add("success", success.ToString());
+        outcome.Add("outcome", outcomeMessage);
 
         if (data != null)
         {

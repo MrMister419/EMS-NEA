@@ -9,7 +9,7 @@ namespace Server;
 /// </summary>
 static class ServerContext
 {
-    private static RequestHandler requestHandler;
+    public static RequestHandler requestHandler;
     public static DatabaseManager database;
     public static HttpClient httpClient;
     public static Listener listener;

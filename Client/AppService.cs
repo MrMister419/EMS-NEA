@@ -33,12 +33,12 @@ public class AppService
     // Sends user signup request to server
     // Parameters:
     // - Dictionary<string, string> formValues: user registration data
-    public async Task SignUp(Dictionary<string, string> formValues)
+    public async Task<Dictionary<string, string>?> SignUp(Dictionary<string, string> formValues)
     {
         formValues["Password"] = AppContext.Hash(formValues["Password"]);
         string wrappedJson = PackageJson(formValues, "NewUser");
         
-        await httpService.SendPOSTrequest(wrappedJson);
+        return await POSTandDeserialize(wrappedJson);
     }
 
     // Authenticates user credentials with server
@@ -125,7 +125,7 @@ public class AppService
     // Updates user alert preference on server
     // Parameters:
     // - bool newChoice: new alert receiving preference
-    public async Task ToggleAlertChoice(bool newChoice)
+    public async Task<Dictionary<string, string>?> ToggleAlertChoice(bool newChoice)
     {
         // Create POST request string
         Dictionary<string, string> payload = new Dictionary<string, string>();
@@ -135,12 +135,7 @@ public class AppService
         
         string wrappedJson = PackageJson(payload, "ToggleAlertChoice");
         
-        await httpService.SendPOSTrequest(wrappedJson);
-        AppContext.isReceiving = newChoice;
-        if (newChoice)
-        {
-            RequestEvent();
-        }
+        return await POSTandDeserialize(wrappedJson);
     }
 
     // Retrieves user account details from server
@@ -202,6 +197,33 @@ public class AppService
         return dictionary;
     }
 
+    public async Task<Dictionary<string, string>?> ChangePassword(Dictionary<string, string> formValues)
+    {
+        formValues = RemoveNullEntries(formValues);
+
+        string oldPasswordHash = AppContext.Hash(formValues["OldPassword"]);
+        string newPasswordHash = AppContext.Hash(formValues["NewPassword"]);
+        formValues["OldPassword"] = oldPasswordHash;
+        formValues["NewPassword"] = newPasswordHash;
+        formValues.Add("Email", AppContext.email);
+        
+        string wrappedJson = PackageJson(formValues, "ChangePassword");
+        
+        return await POSTandDeserialize(wrappedJson);
+    }
+
+    public async Task<Dictionary<string, string>?> DeleteUser(Dictionary<string, string> formValues)
+    {
+        string passwordHash = AppContext.Hash(formValues["Password"]);
+        formValues["Password"] = passwordHash;
+        formValues.Add("Email", AppContext.email);
+        
+        string wrappedJson = PackageJson(formValues, "DeleteUser");
+        
+        return await POSTandDeserialize(wrappedJson);
+    }
+
+
     public async Task<Dictionary<string, string>?> GetUserLocation()
     {
         Dictionary<string, string> payload = new Dictionary<string, string>();
@@ -229,12 +251,11 @@ public class AppService
     // string: packaged JSON string
     private string PackageJson(Dictionary<string, string> payload, string type)
     {
-        string packagedJson;
         Dictionary<string, object> wrappedValues = new Dictionary<string, object>();
 
         wrappedValues.Add("type", type);
         wrappedValues.Add("payload", payload);
-        packagedJson = JsonSerializer.Serialize(wrappedValues);
+        string packagedJson = JsonSerializer.Serialize(wrappedValues);
         
         return packagedJson;
     }

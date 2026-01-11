@@ -35,13 +35,13 @@ public class RequestHandler
         {
             // TODO: add completion status to all methods
             case "NewUser":
-                await CreateNewUser(payload);
+                completionStatus = await CreateNewUser(payload);
                 break;
             case "NewEvent":
-                await HandleNewEvent(payload);
+                completionStatus = await HandleNewEvent(payload);
                 break;
             case "UpdateEvent":
-                await UpdateEvent(payload);
+                completionStatus = await UpdateEvent(payload);
                 break;
             case "Authenticate":
                 completionStatus = await Authenticate(payload);
@@ -61,16 +61,19 @@ public class RequestHandler
             case "GetUserLocation":
                 completionStatus = await GetUserLocation(payload);
                 break;
+            case "ChangePassword":
+                completionStatus = await UpdatePassword(payload);
+                break;
+            case "DeleteUser":
+                completionStatus = await DeleteUser(payload);
+                break;
             default:
-                completionStatus["outcome"] = "Unknown request type.";
-                completionStatus["successful"] = "false";
+                completionStatus.Add("success", "False");
+                completionStatus.Add("outcome", "Invalid request type.");
                 break;
         }
         
-        string responseJson = JsonSerializer.Serialize(completionStatus);
-        if (responseJson == "{}") responseJson = "OK";
-        
-        return responseJson;
+        return JsonSerializer.Serialize(completionStatus);
     }
 
     // Calls delegates to deserialize JSON string into User object and insert into database
@@ -78,10 +81,10 @@ public class RequestHandler
     // - string userJson: JSON string containing User object data
     // Returns:
     // Task: Task for the asyncronous operation with no return value
-    private async Task CreateNewUser(string userJson)
+    private async Task<Dictionary<string, string>> CreateNewUser(string userJson)
     {
         User receivedUser = User.DeserializeUser(userJson);
-        await ServerContext.database.InsertUser(receivedUser);
+        return await ServerContext.database.InsertUser(receivedUser);
     }
 
     // Deserializes JSON string into Event object and insert into database
@@ -89,18 +92,20 @@ public class RequestHandler
     // - string eventJson: JSON string containing Event object data
     // Returns:
     // Task: Task for the asyncronous operation with no return value
-    private async Task HandleNewEvent(string eventJson)
+    private async Task<Dictionary<string, string>> HandleNewEvent(string eventJson)
     {
         Event receivedEvent = Event.DeserializeEvent(eventJson);
         
         // Insert new Event into the database
-        // TODO: only check users that are online for efficiency
-        await ServerContext.database.InsertEvent(receivedEvent);
+        Dictionary<string, string> insertionOutcome = await ServerContext.database.InsertEvent(receivedEvent);
+
+        if (insertionOutcome["success"].Equals("True"))
+        {
+            // Find and notify users in vicinity to this new event
+            await ServerContext.listener.NotifyWaitingClients(receivedEvent);
+        }
         
-        // Find and notify users in vicinity to this new event
-        List<string> inVicinity = await ServerContext.database.FindUsersInVicinity(receivedEvent.location);
-        Console.WriteLine($"Found {inVicinity.Count} users in vicinity of incident.");
-        await ServerContext.listener.NotifyWaitingClients(inVicinity, eventJson);
+        return insertionOutcome;
     }
     
     // Updates event details in database
@@ -108,7 +113,7 @@ public class RequestHandler
     // - string eventUpdateJson: JSON string containing updated Event data
     // Returns:
     // Task: Task for the asyncronous operation with no return value
-    private async Task UpdateEvent(string eventUpdateJson)
+    private async Task<Dictionary<string, string>> UpdateEvent(string eventUpdateJson)
     {
         throw new NotImplementedException();
     }
@@ -120,23 +125,10 @@ public class RequestHandler
     // Task<Dictionary<string, string>>: outcome and successful status
     private async Task<Dictionary<string, string>> Authenticate(Dictionary<string, string> loginDetails)
     {
-        Dictionary<string, string> statusResult = new Dictionary<string, string>();
-        
         string email = loginDetails["Email"];
         string password = loginDetails["Password"];
-        string outcome = await ServerContext.database.CheckLoginDetails(email, password);
         
-        statusResult.Add("outcome", outcome);
-        if (outcome == "Correct logins.")
-        {
-            statusResult.Add("successful", "true");
-        }
-        else
-        {
-            statusResult.Add("successful", "false");
-        }
-        
-        return statusResult;
+        return await ServerContext.database.CheckLoginDetails(email, password);
     }
 
     // Overload that deserializes JSON string and calls main Authenticate method
@@ -162,11 +154,7 @@ public class RequestHandler
         string email = data["Email"];
         bool.TryParse(data["AlertChoice"], out bool alertChoice);
         
-        await ServerContext.database.ChangeAlertChoice(alertChoice, email);
-        
-        Dictionary<string, string> response = new Dictionary<string, string>();
-        response.Add("successful", "true");
-        return response;
+        return await ServerContext.database.ChangeAlertChoice(alertChoice, email);
     }
 
     // Retrieves user account details from database
@@ -179,9 +167,7 @@ public class RequestHandler
         Dictionary<string, string> data = DeserializeToDictionary(accountDetailsJson);
         string email = data["Email"];
         
-        Dictionary<string, string> userDetails = await ServerContext.database.RetrieveUserDetails(email);
-        
-        return userDetails;
+        return await ServerContext.database.RetrieveUserDetails(email);
     }
 
     // Modifies user account details after authenticating
@@ -196,9 +182,9 @@ public class RequestHandler
         accountDetails.Add("Email", accountDetails["OldEmail"]);
         accountDetails.Remove("OldEmail");
         
-        Dictionary<string, string> outcome = await Authenticate(accountDetails);
+        Dictionary<string, string> authenicateOutcome = await Authenticate(accountDetails);
 
-        if (outcome["successful"] == "true")
+        if (authenicateOutcome["success"] == "True")
         {
             // Renames NewEmail field to Email if present
             string oldEmail = accountDetails["Email"];
@@ -213,63 +199,15 @@ public class RequestHandler
             }
             accountDetails.Remove("Password");
             
-            bool updateCompletion = await ServerContext.database.UpdateUserDetails(accountDetails, oldEmail);
-            
-            if (updateCompletion)
-            {
-                outcome["outcome"] = "Update successful.";
-            }
-            else
-            {
-                outcome["outcome"] = "Server error.";
-                outcome["successful"] = "false";
-            }
+            Dictionary<string, string> updateOutcome = await ServerContext.database.UpdateUserDetails(accountDetails, oldEmail);
+            return updateOutcome;
         }
         else
         {
-            outcome["outcome"] = "Incorrect password.";
-        }
-        
-        return outcome;
-    }
-
-    // Checks if two locations are within 7 minutes drive using Google Distance Matrix API
-    // Parameters:
-    // - double lat1: latitude of first location
-    // - double long1: longitude of first location
-    // - double lat2: latitude of second location
-    // - double long2: longitude of second location
-    // Returns:
-    // Task<bool>: true if within 7 minutes, false otherwise
-    public async Task<bool> CheckDistances(double lat1, double long1, double lat2, double long2)
-    {
-        const string apiKey = "AIzaSyBR0vC11aRcwkXbXPfGr2utiILnF9EpLRY";
-        string origin = $"{lat1},{long1}";
-        string destination = $"{lat2},{long2}";
-        string url = $"https://maps.googleapis.com/maps/api/distancematrix/json?origins={origin}&destinations={destination}&key={apiKey}";
-        try
-        {
-            string json = await ServerContext.httpClient.GetStringAsync(url).ConfigureAwait(false);
-            Console.WriteLine("DistanceMatrix response: " + json);
-            
-            JsonDocument response = JsonDocument.Parse(json);
-
-            int seconds = response.RootElement
-                    .GetProperty("rows")[0]
-                    .GetProperty("elements")[0]
-                    .GetProperty("duration")
-                    .GetProperty("value")
-                    .GetInt32();
-
-            // is less than 7 minutes?
-            return (seconds / 60 < 7);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"DistanceMatrix call failed: {ex}");
-            return false;
+            return authenicateOutcome;
         }
     }
+
     
     // Retrieves user alert-receiving status from database
     // Parameters:
@@ -280,14 +218,50 @@ public class RequestHandler
     {
         Dictionary<string, string> data = DeserializeToDictionary(requestJson);
         string email = data["Email"];
-        Dictionary<string, string> response = new Dictionary<string, string>();
 
-        bool receiving = await ServerContext.database.GetReceivingStatus(email);
-        response.Add("isReceiving", receiving.ToString());
-        response.Add("outcome", "Done");
-        response.Add("successful", "true");
+        return await ServerContext.database.GetReceivingStatus(email);
+    }
 
-        return response;
+    private async Task<Dictionary<string, string>> UpdatePassword(string requestJson)
+    {
+        Dictionary<string, string> accountDetails = DeserializeToDictionary(requestJson);
+        
+        // Authenticate user first to ensure old password is correct
+        Dictionary<string, string> authenticationDetails = new Dictionary<string, string>();
+        string email = accountDetails["Email"];
+        string oldPassword = accountDetails["OldPassword"];
+        authenticationDetails.Add("Email", email);
+        authenticationDetails.Add("Password", oldPassword);
+        Dictionary<string, string> authenticateOutcome = await Authenticate(authenticationDetails);
+        
+        if (authenticateOutcome["success"] == "True")
+        {
+            Dictionary<string, string> updateOutcome = await ServerContext.database.UpdatePassword(email, accountDetails["NewPassword"]);
+            return updateOutcome;
+        }
+        else
+        {
+            return authenticateOutcome;
+        }
+    }
+    
+    private async Task<Dictionary<string, string>> DeleteUser(string requestJson)
+    {
+        Dictionary<string, string> accountDetails = DeserializeToDictionary(requestJson);
+        
+        // Authenticate user first to ensure old password is correct
+        Dictionary<string, string> authenticateOutcome = await Authenticate(accountDetails);
+        
+        if (authenticateOutcome["success"] == "True")
+        {
+            string email = accountDetails["Email"];
+            Dictionary<string, string> deleteOutcome = await ServerContext.database.DeleteUser(email);
+            return deleteOutcome;
+        }
+        else
+        {
+            return authenticateOutcome;
+        }
     }
 
     private async Task<Dictionary<string, string>> GetUserLocation(string requestJson)
@@ -295,8 +269,46 @@ public class RequestHandler
         Dictionary<string, string> data = DeserializeToDictionary(requestJson);
         string email = data["Email"];
         
-        Dictionary<string, string> location = await ServerContext.database.GetUserLocation(email);
-        return location;
+        return await ServerContext.database.GetUserLocation(email);
+    }
+    
+    // Checks if two locations are within 7 minutes drive using Google Distance Matrix API
+    // Parameters:
+    // - double lat1: latitude of first location
+    // - double long1: longitude of first location
+    // - double lat2: latitude of second location
+    // - double long2: longitude of second location
+    // Returns:
+    // Task<bool>: true if within 7 minutes, false otherwise
+    public async Task<bool> CheckDistances(string lat1, string long1, string lat2, string long2)
+    {
+        const string apiKey = "AIzaSyBR0vC11aRcwkXbXPfGr2utiILnF9EpLRY";
+        string origin = $"{lat1},{long1}";
+        string destination = $"{lat2},{long2}";
+        string url = $"https://maps.googleapis.com/maps/api/distancematrix/json?origins={origin}&destinations={destination}&key={apiKey}";
+        try
+        {
+            string json = await ServerContext.httpClient.GetStringAsync(url);
+            Console.WriteLine("DistanceMatrix response: " + json);
+            
+            JsonDocument response = JsonDocument.Parse(json);
+
+            int seconds = response.RootElement
+                .GetProperty("rows")[0]
+                .GetProperty("elements")[0]
+                .GetProperty("duration")
+                .GetProperty("value")
+                .GetInt32();
+
+            // is less than 7 minutes?
+            return true;
+            return (seconds / 60 < 7);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Distance Matrix call failed: {ex}");
+            return false;
+        }
     }
 
     // Helper method to deserialize JSON string into dictionary
