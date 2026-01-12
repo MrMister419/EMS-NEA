@@ -16,7 +16,7 @@ public class RequestHandler
     // Parameters:
     // - string receivedJson: JSON string received from client
     // Returns:
-    // Task<Dictionary<string, string>> completionStatus: outcome of request processing
+    // Task<string>: outcome of request processing in JSON format
     public async Task<string> ProcessRequest(string receivedJson)
     {
         string requestType = "";
@@ -76,22 +76,22 @@ public class RequestHandler
         return JsonSerializer.Serialize(completionStatus);
     }
 
-    // Calls delegates to deserialize JSON string into User object and insert into database
+    // Deserializes JSON string into User object and inserts into database
     // Parameters:
     // - string userJson: JSON string containing User object data
     // Returns:
-    // Task: Task for the asyncronous operation with no return value
+    // Task<Dictionary<string, string>>: creation outcome
     private async Task<Dictionary<string, string>> CreateNewUser(string userJson)
     {
         User receivedUser = User.DeserializeUser(userJson);
         return await ServerContext.database.InsertUser(receivedUser);
     }
 
-    // Deserializes JSON string into Event object and insert into database
+    // Deserializes JSON string into Event object and inserts into database
     // Parameters:
     // - string eventJson: JSON string containing Event object data
     // Returns:
-    // Task: Task for the asyncronous operation with no return value
+    // Task<Dictionary<string, string>>: insertion outcome
     private async Task<Dictionary<string, string>> HandleNewEvent(string eventJson)
     {
         Event receivedEvent = Event.DeserializeEvent(eventJson);
@@ -112,7 +112,7 @@ public class RequestHandler
     // Parameters:
     // - string eventUpdateJson: JSON string containing updated Event data
     // Returns:
-    // Task: Task for the asyncronous operation with no return value
+    // Task<Dictionary<string, string>>: update outcome
     private async Task<Dictionary<string, string>> UpdateEvent(string eventUpdateJson)
     {
         throw new NotImplementedException();
@@ -207,7 +207,6 @@ public class RequestHandler
             return authenicateOutcome;
         }
     }
-
     
     // Retrieves user alert-receiving status from database
     // Parameters:
@@ -222,6 +221,11 @@ public class RequestHandler
         return await ServerContext.database.GetReceivingStatus(email);
     }
 
+    // Authenticates user and updates password in database
+    // Parameters:
+    // - string requestJson: JSON string containing Email, OldPassword, and NewPassword
+    // Returns:
+    // Task<Dictionary<string, string>>: outcome and successful status
     private async Task<Dictionary<string, string>> UpdatePassword(string requestJson)
     {
         Dictionary<string, string> accountDetails = DeserializeToDictionary(requestJson);
@@ -245,6 +249,11 @@ public class RequestHandler
         }
     }
     
+    // Authenticates user and deletes account from database
+    // Parameters:
+    // - string requestJson: JSON string containing Email and Password
+    // Returns:
+    // Task<Dictionary<string, string>>: outcome and successful status
     private async Task<Dictionary<string, string>> DeleteUser(string requestJson)
     {
         Dictionary<string, string> accountDetails = DeserializeToDictionary(requestJson);
@@ -264,6 +273,11 @@ public class RequestHandler
         }
     }
 
+    // Retrieves user geographic coordinates from database
+    // Parameters:
+    // - string requestJson: JSON string containing Email
+    // Returns:
+    // Task<Dictionary<string, string>>: user coordinates with outcome and success status
     private async Task<Dictionary<string, string>> GetUserLocation(string requestJson)
     {
         Dictionary<string, string> data = DeserializeToDictionary(requestJson);
@@ -274,13 +288,13 @@ public class RequestHandler
     
     // Checks if two locations are within 7 minutes drive using Google Distance Matrix API
     // Parameters:
-    // - double lat1: latitude of first location
-    // - double long1: longitude of first location
-    // - double lat2: latitude of second location
-    // - double long2: longitude of second location
+    // - string lat1: latitude of first location
+    // - string long1: longitude of first location
+    // - string lat2: latitude of second location
+    // - string long2: longitude of second location
     // Returns:
     // Task<bool>: true if within 7 minutes, false otherwise
-    public async Task<bool> CheckDistances(string lat1, string long1, string lat2, string long2)
+    public async Task<bool> CheckDistance(string lat1, string long1, string lat2, string long2)
     {
         const string apiKey = "AIzaSyBR0vC11aRcwkXbXPfGr2utiILnF9EpLRY";
         string origin = $"{lat1},{long1}";

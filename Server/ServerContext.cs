@@ -1,5 +1,4 @@
-﻿using System.Data.OleDb;
-using System.Net.Http;
+﻿using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace Server;
@@ -16,7 +15,7 @@ static class ServerContext
 
     // Initializes all server components and starts listening for requests
     // Returns:
-    // Task for the asyncronous operation with no return value
+    // Task: asyncronous operation with no return value
     public static async Task InitializeServer()
     {
         requestHandler = new RequestHandler();

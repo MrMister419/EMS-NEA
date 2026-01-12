@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
-using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Client;
@@ -14,11 +12,17 @@ class HttpService
 {
     private readonly HttpClient HttpClient = new HttpClient();
     
+    // Initializes HTTP client with timeout settings
     public HttpService()
     {
         HttpClient.Timeout = TimeSpan.FromSeconds(180);
     }
     
+    // Sends HTTP POST request with JSON payload to server
+    // Parameters:
+    // - string json: JSON data to send
+    // Returns:
+    // Task<string?>: response JSON or null if error
     public async Task<string?> SendPOSTrequest(string json)
     {
         Console.WriteLine("\nSending POST request: " + json);

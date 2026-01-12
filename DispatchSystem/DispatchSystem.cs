@@ -25,15 +25,18 @@ class DispatchSystem
     // Returns: Task representing the async operation
     public static async Task Main(string[] args)
     {
-        eventsList = DeserializeEvents();
-        Console.WriteLine("Waiting to send. Press Enter to send event.");
-        Console.ReadLine();
-        currentEvent = GetRandomEvent(eventsList);
-        sentEvents = new List<Dictionary<string, object>>();
-        Console.WriteLine(currentEvent);
-        StartCurrentEvent();
+        while (true)
+        {
+            eventsList = DeserializeEvents();
+            currentEvent = GetRandomEvent(eventsList);
+            sentEvents = new List<Dictionary<string, object>>();
 
-        await SendCurrentEvent();
+            Console.WriteLine("Waiting to send. Press Enter to send event.");
+            Console.ReadLine();
+
+            StartCurrentEvent();
+            await SendCurrentEvent();
+        }    
     }
 
     // Loads sample events from JSON file
@@ -74,7 +77,7 @@ class DispatchSystem
         return events[index];
     }
 
-    // Initializes event with starting fields
+    // Initializes event with starting fields and timestamp
     private static void StartCurrentEvent()
     {
         currentEvent["eventID"] = sentEvents.Count;

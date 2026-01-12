@@ -240,7 +240,7 @@ internal class DatabaseManager
     // Parameters:
     // - string email: user email address
     // Returns:
-    // Task<Dictionary<string, string>>: user details dictionary
+    // Task<Dictionary<string, string>>: user details outcome
     public async Task<Dictionary<string, string>> RetrieveUserDetails(string email)
     {
         const string query = 
@@ -268,7 +268,7 @@ internal class DatabaseManager
                         }
                         else
                         {
-                            outcome = FormulateOutcome(false, "Email not found.");
+                            outcome = FormulateOutcome(false, "User not found.");
                         }
                     }
                 }
@@ -283,12 +283,12 @@ internal class DatabaseManager
         return outcome;
     }
     
-    // Updates user account details
+    // Updates user account details in database
     // Parameters:
     // - Dictionary<string, string> newDetails: dictionary of fields to update
     // - string oldEmail: current email address for user identification
     // Returns:
-    // Task<bool>: true if update successful
+    // Task<Dictionary<string, string>>: update outcome
     public async Task<Dictionary<string, string>> UpdateUserDetails(Dictionary<string, string> newDetails, string oldEmail)
     {
         Dictionary<string, string> outcome;
@@ -333,6 +333,11 @@ internal class DatabaseManager
         return outcome;
     }
 
+    // Retrieves geographic locations for multiple users
+    // Parameters:
+    // - List<string> emails: list of user email addresses
+    // Returns:
+    // Task<List<Dictionary<string, string>>>: list of dictionaries containing user location data
     public async Task<List<Dictionary<string, string>>> GetLocationOfUsers(List<string> emails)
     {
         // Check if list is empty
@@ -384,6 +389,11 @@ internal class DatabaseManager
         return locations;
     }
 
+    // Retrieves geographic location for a single user
+    // Parameters:
+    // - string email: user email address
+    // Returns:
+    // Task<Dictionary<string, string>>: outcome containing user location data
     public async Task<Dictionary<string, string>> GetUserLocation(string email)
     {
         const string query = "SELECT latitude, longitude FROM [User] WHERE email_address = ?";
@@ -410,7 +420,7 @@ internal class DatabaseManager
                         }
                         else
                         {
-                            outcome = FormulateOutcome(false, "Email not found.");
+                            outcome = FormulateOutcome(false, "User not found.");
                         }
                     }
                 }
@@ -425,6 +435,12 @@ internal class DatabaseManager
         return outcome;
     }
 
+    // Updates user password in database
+    // Parameters:
+    // - string email: user email address
+    // - string newPasswordHash: hashed new password
+    // Returns:
+    // Task<Dictionary<string, string>>: update outcome
     public async Task<Dictionary<string, string>> UpdatePassword(string email, string newPasswordHash)
     {
         Dictionary<string, string> outcome;
@@ -453,6 +469,11 @@ internal class DatabaseManager
         return outcome;
     }
 
+    // Deletes user account from database
+    // Parameters:
+    // - string email: user email address
+    // Returns:
+    // Task<Dictionary<string, string>>: deletion outcome
     public async Task<Dictionary<string, string>> DeleteUser(string email)
     {
         const string query = "DELETE FROM [User] WHERE email_address = ?";
@@ -481,6 +502,13 @@ internal class DatabaseManager
         return outcome;
     }
 
+    // Creates standardized response dictionary with success status and outcome message
+    // Parameters:
+    // - bool success: whether operation succeeded
+    // - string outcomeMessage: outcome message
+    // - Dictionary<string, string>? data: optional additional data to include
+    // Returns:
+    // Dictionary<string, string>: formatted outcome response
     private Dictionary<string, string> FormulateOutcome(bool success, string outcomeMessage, Dictionary<string, string>? data = null)
     {
         Dictionary<string, string> outcome = new Dictionary<string, string>();

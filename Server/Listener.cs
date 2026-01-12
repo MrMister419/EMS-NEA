@@ -37,6 +37,11 @@ class Listener
         }
     }
 
+    // Wrapper for request processing to handle exceptions
+    // Parameters:
+    // - HttpListenerContext context: HTTP context for the request
+    // Returns:
+    // Task for the asyncronous operation with no return value
     private async Task ProcessRequestAsyncWrapper(HttpListenerContext context)
     {
         try
@@ -49,6 +54,11 @@ class Listener
         }
     }
 
+    // Extracts and parses incoming request data before routing
+    // Parameters:
+    // - HttpListenerContext context: HTTP context for the request
+    // Returns:
+    // Task for the asyncronous operation with no return value
     private async Task ProcessRequest(HttpListenerContext context)
     {
         // Extract the request
@@ -92,6 +102,10 @@ class Listener
         }
     }
     
+    // Stores request in waiting list for long-polling notification
+    // Parameters:
+    // - HttpListenerContext context: HTTP context for the request
+    // - string payload: JSON payload containing user identity
     private void LongPollRequest(HttpListenerContext context, string payload)
     {
         string? email = ExtractEmail(payload);
@@ -142,8 +156,9 @@ class Listener
     
     // Asyncronously notifies waiting clients in vicinity of incident
     // Parameters:
-    // - List<string> targetEmails: list of emails to notify
-    // - string eventPayloadJson: JSON string containing event data to send
+    // - Event evt: incident data to send
+    // Returns:
+    // Task for the asyncronous operation with no return value
     public async Task NotifyWaitingClients(Event evt)
     {
         // Check which clients are in vicinity and have placed an event request
@@ -170,7 +185,7 @@ class Listener
             string userLong = location["Longitude"];
             string eventLat = evt.location.latitude.ToString(CultureInfo.InvariantCulture);
             string eventLong = evt.location.longitude.ToString(CultureInfo.InvariantCulture);
-            bool isInVicinity = await ServerContext.requestHandler.CheckDistances(userLat, userLong, eventLat, eventLong);
+            bool isInVicinity = await ServerContext.requestHandler.CheckDistance(userLat, userLong, eventLat, eventLong);
 
             // Answer and remove request if user is in vicinity
             if (isInVicinity)
@@ -201,6 +216,12 @@ class Listener
         }
     }
 
+    // Sends HTTP response with JSON payload
+    // Parameters:
+    // - HttpListenerContext requestContext: HTTP context to send response to
+    // - string responseJson: JSON data to send
+    // Returns:
+    // Task<bool>: true if response sent successfully
     private async Task<bool> SendResponse(HttpListenerContext requestContext, string responseJson)
     {
         try

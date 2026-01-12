@@ -10,13 +10,14 @@ namespace Client;
 public partial class Startup : Form
 {
     
+    // Initializes Startup form
     public Startup()
     {
         InitializeComponent();
     }
 
-    // Switch to Login tab
-    private void LoginTabButtonClick(object sender, System.EventArgs e)
+    // Switches UI to login panel
+    private void LoginTabButtonClick(object sender, EventArgs e)
     {
         signupPanel.Enabled = false;
         signupPanel.Visible = false;
@@ -24,8 +25,8 @@ public partial class Startup : Form
         loginPanel.Enabled = true;
     }
 
-    // Switch to Signup tab
-    private void SignupTabButtonClick(object sender, System.EventArgs e)
+    // Switches UI to signup panel
+    private void SignupTabButtonClick(object sender, EventArgs e)
     {
         loginPanel.Enabled = false;
         loginPanel.Visible = false;
@@ -34,7 +35,7 @@ public partial class Startup : Form
     }
     
     // Submits signup form data to server
-    private async void SignupSubmitButton_Click(object sender, System.EventArgs e)
+    private async void SignupSubmitButton_Click(object sender, EventArgs e)
     {
         Dictionary<string, string> formValues = AppContext.formNavigator.GetEnteredValues(signupPanel);
         Dictionary<string, string>? outcome = await AppContext.appService.SignUp(formValues);

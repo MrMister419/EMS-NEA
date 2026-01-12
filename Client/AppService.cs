@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Security.Cryptography;
-using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 
@@ -17,11 +15,17 @@ public class AppService
     private static HttpService httpService;
     private Action<string> eventReceivedHandler;
 
+    // Initializes AppService and its dependencies
     public AppService()
     {
         httpService = new HttpService();
     }
     
+    // Sends POST request and deserializes JSON response to dictionary
+    // Parameters:
+    // - string wrappedJson: packaged request JSON to send
+    // Returns:
+    // Task<Dictionary<string, string>?>: deserialized response dictionary or null
     private async Task<Dictionary<string, string>?> POSTandDeserialize(string wrappedJson)
     {
         string? responseString = await httpService.SendPOSTrequest(wrappedJson);
@@ -30,9 +34,28 @@ public class AppService
         return response;
     }
     
+    // Wraps payload in JSON envelope with request type
+    // Parameters:
+    // - Dictionary<string, string> payload: data to send
+    // - string type: request type identifier
+    // Returns:
+    // string: packaged JSON string
+    private string PackageJson(Dictionary<string, string> payload, string type)
+    {
+        Dictionary<string, object> wrappedValues = new Dictionary<string, object>();
+
+        wrappedValues.Add("type", type);
+        wrappedValues.Add("payload", payload);
+        string packagedJson = JsonSerializer.Serialize(wrappedValues);
+        
+        return packagedJson;
+    }
+    
     // Sends user signup request to server
     // Parameters:
     // - Dictionary<string, string> formValues: user registration data
+    // Returns:
+    // Task<Dictionary<string, string>?>: signup result from server
     public async Task<Dictionary<string, string>?> SignUp(Dictionary<string, string> formValues)
     {
         formValues["Password"] = AppContext.Hash(formValues["Password"]);
@@ -45,19 +68,18 @@ public class AppService
     // Parameters:
     // - Dictionary<string, string> formValues: email and password
     // Returns:
-    // Task<Dictionary<string, string>>: authentication result with outcome and success status
+    // Task<Dictionary<string, string>?>: authentication result from server
     public async Task<Dictionary<string, string>?> Authenticate(Dictionary<string, string> formValues)
     {
         formValues["Password"] = AppContext.Hash(formValues["Password"]);
         string wrappedJson = PackageJson(formValues, "Authenticate");
         
-        Dictionary<string, string>? response = await POSTandDeserialize(wrappedJson);
-        return response;
+        return await POSTandDeserialize(wrappedJson);
     }
     
     // Retrieves user alert-receiving preference from server
     // Returns:
-    // Task for the asyncronous operation with no return value
+    // Task: asyncronous operation with no return value
     public async Task GetReceivingStatus()
     {
         // Creates POST request string
@@ -85,6 +107,11 @@ public class AppService
         Console.WriteLine("\nPlaced event request.");
     }
 
+    // Wrapper for event listening to handle exceptions
+    // Parameters:
+    // - string wrappedJson: packaged request JSON
+    // Returns:
+    // Task: asyncronous operation with no return value
     private async Task ListenForEventAsyncWrapper(string wrappedJson)
     {
         try
@@ -101,7 +128,7 @@ public class AppService
     // Parameters:
     // - string wrappedJson: packaged request JSON
     // Returns:
-    // Task for the asyncronous operation with no return value
+    // Task: asyncronous operation with no return value
     private async Task ListenForEvent(string wrappedJson)
     {
         // Waits here until long-poll is answered
@@ -125,6 +152,8 @@ public class AppService
     // Updates user alert preference on server
     // Parameters:
     // - bool newChoice: new alert receiving preference
+    // Returns:
+    // Task<Dictionary<string, string>?>: toggle outcome
     public async Task<Dictionary<string, string>?> ToggleAlertChoice(bool newChoice)
     {
         // Create POST request string
@@ -168,8 +197,7 @@ public class AppService
         
         string wrappedJson = PackageJson(formValues, "ModifyAccountDetails");
         
-        Dictionary<string, string>? response = await POSTandDeserialize(wrappedJson);
-        return response;
+        return await POSTandDeserialize(wrappedJson);
     }
     
     // Removes empty entries from dictionary
@@ -197,6 +225,11 @@ public class AppService
         return dictionary;
     }
 
+    // Sends password change request to server
+    // Parameters:
+    // - Dictionary<string, string> formValues: old and new password details
+    // Returns:
+    // Task<Dictionary<string, string>?>: change password result from server
     public async Task<Dictionary<string, string>?> ChangePassword(Dictionary<string, string> formValues)
     {
         formValues = RemoveNullEntries(formValues);
@@ -212,6 +245,11 @@ public class AppService
         return await POSTandDeserialize(wrappedJson);
     }
 
+    // Sends account deletion request to server
+    // Parameters:
+    // - Dictionary<string, string> formValues: user password for verification
+    // Returns:
+    // Task<Dictionary<string, string>?>: deletion result from server
     public async Task<Dictionary<string, string>?> DeleteUser(Dictionary<string, string> formValues)
     {
         string passwordHash = AppContext.Hash(formValues["Password"]);
@@ -224,6 +262,9 @@ public class AppService
     }
 
 
+    // Retrieves user geographic coordinates from server
+    // Returns:
+    // Task<Dictionary<string, string>?>: latitude and longitude with outcome and success status
     public async Task<Dictionary<string, string>?> GetUserLocation()
     {
         Dictionary<string, string> payload = new Dictionary<string, string>();
@@ -237,28 +278,12 @@ public class AppService
     
     // Registers handler for incoming event notifications
     // Parameters:
-    // - Action<Dictionary<string, string>> handler: callback to invoke when event received
+    // - Action<string> handler: callback to invoke when event received
     public void RegisterEventHandler(Action<string> handler)
     {
         eventReceivedHandler = handler;
     }
-
-    // Wraps payload in JSON envelope with request type
-    // Parameters:
-    // - Dictionary<string, string> payload: data to send
-    // - string type: request type identifier
-    // Returns:
-    // string: packaged JSON string
-    private string PackageJson(Dictionary<string, string> payload, string type)
-    {
-        Dictionary<string, object> wrappedValues = new Dictionary<string, object>();
-
-        wrappedValues.Add("type", type);
-        wrappedValues.Add("payload", payload);
-        string packagedJson = JsonSerializer.Serialize(wrappedValues);
-        
-        return packagedJson;
-    }
+    
 }
 
 // class User

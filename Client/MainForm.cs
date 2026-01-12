@@ -16,6 +16,7 @@ public partial class MainForm : Form
 {
     private readonly List<Event> receivedEvents;
 
+    // Initializes MainForm and sets up default UI
     public MainForm()
     {
         receivedEvents = new List<Event>();
@@ -24,6 +25,7 @@ public partial class MainForm : Form
         MainFormInitialize();
     }
 
+    // Initializes starting main form UI and event handling
     private void MainFormInitialize()
     {
         // Setup default starting UI
@@ -38,27 +40,69 @@ public partial class MainForm : Form
         }
     }
 
+    // Switches main panel to live feed when selected
     private void liveFeedButton_CheckedChanged(object sender, EventArgs e)
     {
         switchPanels(sender);
     }
 
+    // Switches main panel to settings when selected
     private void settingsButton_CheckedChanged(object sender, EventArgs e)
     {
         switchPanels(sender);
     }
 
+    // Switches main panel to account when selected
     private void accountBbutton_CheckedChanged(object sender, EventArgs e)
     {
         switchPanels(sender);
     }
 
+    // Switches main panel to information when selected
     private void informationButton_CheckedChanged(object sender, EventArgs e)
+    {
+        switchPanels(sender);
+    }
+    
+    // Switches to change account details panel
+    private void accountPanelButton_Click(object sender, EventArgs e)
+    {
+        switchPanels(sender);
+    }
+
+    // Switches to change password panel
+    private void ChangeToPasswordPanel(object sender, EventArgs e)
+    {
+        switchPanels(sender);
+    }
+
+    // Switches to delete account panel
+    private void DeleteAccountPanel(object sender, EventArgs e)
+    {
+        switchPanels(sender);
+    }
+    
+    // Switches to CPR help information panel
+    private void CprHelpButtonClick(object sender, EventArgs e)
+    {
+        switchPanels(sender);
+    }
+
+    // Switches to AED help information panel
+    private void AedHelpButtonClick(object sender, EventArgs e)
+    {
+        switchPanels(sender);
+    }
+
+    // Switches to legal information panel
+    private void LegalPageButtonClick(object sender, EventArgs e)
     {
         switchPanels(sender);
     }
 
     // Routes main panel switching based on button type
+    // Parameters:
+    // - object buttonObject: the button or radio button that was clicked
     private void switchPanels(object buttonObject)
     {
         if (buttonObject is RadioButton radioButton)
@@ -75,6 +119,8 @@ public partial class MainForm : Form
     }
 
     // Switches to panel matching button's tag
+    // Parameters:
+    // - ButtonBase button: the button whose tag matches the target panel
     private void switchPanelFrom(ButtonBase button)
     {
         string tag = button.Tag.ToString();
@@ -106,7 +152,6 @@ public partial class MainForm : Form
     // Updates alert preference when checkbox toggled
     private async void toggleAlertsCheckbox_CheckedChanged(object sender, EventArgs e)
     {
-        // TODO: disable for a few seconds
         bool newChoice = toggleAlertsCheckbox.Checked;
         Dictionary<string, string>? outcome = await AppContext.appService.ToggleAlertChoice(newChoice);
         
@@ -125,6 +170,11 @@ public partial class MainForm : Form
             changeStatusResultLabel.Text = outcome["outcome"];
             ChangeCheckBoxNoTrigger();
         }
+        
+        // Disable checkbox for a few seconds to prevent double-clicks / spamming
+        toggleAlertsCheckbox.Enabled = false;
+        await Task.Delay(2000);
+        toggleAlertsCheckbox.Enabled = true;
     }
 
     // Retrieves and displays user account details
@@ -151,7 +201,10 @@ public partial class MainForm : Form
     // - Dictionary<string, string> accountDetails: user account information
     private void displayAccountDetails(Dictionary<string, string> accountDetails)
     {
-        accountDetails.Add("Email", AppContext.email);
+        if (!accountDetails.ContainsKey("Email"))
+        {
+            accountDetails.Add("Email", AppContext.email);
+        }
 
         List<TextBox> textBoxes = AppContext.formNavigator.GetControlsByType<TextBox>(displayDataGroupBox);
         string fieldTag;
@@ -169,24 +222,6 @@ public partial class MainForm : Form
                 textBox.Text = "Failed to retrieve field.";
             }
         }
-    }
-
-    // Switches to change account details panel
-    private void accountPanelButton_Click(object sender, EventArgs e)
-    {
-        switchPanels(sender);
-    }
-
-    // Switches to change password panel
-    private void ChangeToPasswordPanel(object sender, EventArgs e)
-    {
-        switchPanels(sender);
-    }
-
-    // Switches to delete account panel
-    private void DeleteAccountPanel(object sender, EventArgs e)
-    {
-        switchPanels(sender);
     }
 
     // Submits modified account details to server
@@ -211,7 +246,8 @@ public partial class MainForm : Form
             modifyAccountResultLabel.Text = outcome["outcome"];
         }
     }
-    
+
+    // Submits password change request to server
     private async void ChangePasswordButtonClick(object sender, EventArgs e)
     {
         Dictionary<string, string> formValues = AppContext.formNavigator.GetEnteredValues(changePasswordPanel);
@@ -232,6 +268,7 @@ public partial class MainForm : Form
         }
     }
 
+    // Submits account deletion request to server
     private async void ConfirmDeleteButton_Click(object sender, EventArgs e)
     {
         Dictionary<string, string> formValues = AppContext.formNavigator.GetEnteredValues(deleteAccountPanel);
@@ -251,35 +288,10 @@ public partial class MainForm : Form
             changePasswordOutcomeLabel.Text = outcome["outcome"];
         }
     }
-
-    // Switches to CPR help information panel
-    private void CprHelpButtonClick(object sender, EventArgs e)
-    {
-        switchPanels(sender);
-    }
-
-    // Switches to AED help information panel
-    private void AedHelpButtonClick(object sender, EventArgs e)
-    {
-        switchPanels(sender);
-    }
-
-    // Switches to legal information panel
-    private void LegalPageButtonClick(object sender, EventArgs e)
-    {
-        switchPanels(sender);
-    }
-
-    private void ChangeCheckBoxNoTrigger()
-    {
-        toggleAlertsCheckbox.CheckedChanged -= toggleAlertsCheckbox_CheckedChanged;
-        toggleAlertsCheckbox.Checked = AppContext.isReceiving;
-        toggleAlertsCheckbox.CheckedChanged += toggleAlertsCheckbox_CheckedChanged;
-    }
-
+    
     // Creates and displays event tile in feed panel when event received
     // Parameters:
-    // - Dictionary<string, string> eventData: event information from server
+    // - string eventData: event information from server in JSON format
     private void DisplayEventInFeed(string eventData)
     {
         // Create event object and add to list
@@ -308,7 +320,7 @@ public partial class MainForm : Form
             flowLayoutPanel.Controls.SetChildIndex(eventButton, listIndex);
         }));
     }
-
+    
     // Shows event details when tile clicked
     private async void EventButtonClick(object sender, EventArgs e)
     {
@@ -320,7 +332,9 @@ public partial class MainForm : Form
 
     // Displays event details panel with all event information
     // Parameters:
-    // - EventData evt: event data to display
+    // - Event evt: event data to display
+    // Returns:
+    // Task: asyncronous operation with no return value
     private async Task ShowEventDetails(Event evt)
     {
         FillEventDetailFields(evt);
@@ -341,6 +355,9 @@ public partial class MainForm : Form
         }
     }
 
+    // Populates event details panel fields with event data
+    // Parameters:
+    // - Event evt: event data to extract field values from
     private void FillEventDetailFields(Event evt)
     {
         List<Label> fieldLabels = AppContext.formNavigator.GetControlsByType<Label>(eventDetailsPanel);
@@ -355,6 +372,12 @@ public partial class MainForm : Form
         }
     }
 
+    // Retrieves specific field value from event object
+    // Parameters:
+    // - Event evt: event data to extract value from
+    // - string fieldName: name of the field to retrieve
+    // Returns:
+    // string: field value or empty string if not found
     private string GetFieldValue(Event evt, string fieldName)
     {
         switch (fieldName)
@@ -381,6 +404,12 @@ public partial class MainForm : Form
         }
     }
 
+    // Displays route on map using Google Maps embed
+    // Parameters:
+    // - string lat1: origin latitude
+    // - string long1: origin longitude
+    // - string lat2: destination latitude
+    // - string long2: destination longitude
     private async void LoadRoute(string lat1, string long1, string lat2, string long2)
     {
         try
@@ -399,11 +428,24 @@ public partial class MainForm : Form
         }
     }
 
+    // Loads HTML template and inserts map URL
+    // Parameters:
+    // - string url: Google Maps embed URL
+    // Returns:
+    // string: HTML with URL inserted
     private string FetchHTML(string url)
     {
         string html = File.ReadAllText("mapEmbed.html");
         html = html.Replace("{url}", url);
         return html;
+    }
+    
+    // Updates alert choice checkbox without triggering event handler
+    private void ChangeCheckBoxNoTrigger()
+    {
+        toggleAlertsCheckbox.CheckedChanged -= toggleAlertsCheckbox_CheckedChanged;
+        toggleAlertsCheckbox.Checked = AppContext.isReceiving;
+        toggleAlertsCheckbox.CheckedChanged += toggleAlertsCheckbox_CheckedChanged;
     }
     
 }

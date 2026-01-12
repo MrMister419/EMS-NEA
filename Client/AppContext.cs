@@ -25,6 +25,11 @@ static class AppContext
         appService = new AppService();
     }
 
+    // Deserializes JSON string to dictionary
+    // Parameters:
+    // - string? json: JSON string to deserialize
+    // Returns:
+    // Dictionary<string, string>?: deserialized dictionary or null if input was invalid
     public static Dictionary<string, string>? DeserializeToDictionary(string? json)
     {
         Dictionary<string, string> deserialized;
@@ -68,7 +73,7 @@ class FormManager
 {
     // Switches between Startup and MainForm windows
     // Parameters:
-    // Form currentForm: the form to hide and switch from
+    // - Form currentForm: the form to hide and switch from
     public void SwitchForm(Form currentForm)
     {
         currentForm.Hide();
@@ -139,7 +144,6 @@ class FormNavigation
             List<type> subControls = GetControlsByType<type>(control, getBaseControlsOnly);
             if (control is type)
             {
-                
                 if (subControls.Count > 0 && !getBaseControlsOnly)
                 {
                     controls.AddRange(subControls);
